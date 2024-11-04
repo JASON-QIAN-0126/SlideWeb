@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate,useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Register({ onRegister, isAuthenticated }) {
   const [email, setEmail] = useState('');
@@ -7,23 +8,35 @@ function Register({ onRegister, isAuthenticated }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError('Password does not match!');
       return;
     }
-    if (email && name && password) {
-      onRegister();
-    } else {
-      setError('Please fill in all required text');
+    try {
+      const response = await axios.post('http://localhost:5005/admin/auth/register', {
+        email,
+        password,
+        name,
+      });
+      const token = response.data.token;
+      onRegister(token);
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Failed to register');
+      }
     }
   };
+
 
   return (
     <div>
@@ -60,6 +73,7 @@ function Register({ onRegister, isAuthenticated }) {
         /><br/>
         <button type="submit">Register</button>
       </form>
+      <button onClick={() => navigate('/')}>Back</button>
     </div>
   );
 }

@@ -1,21 +1,32 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Login({ onLogin, isAuthenticated }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email === 'user@example.com' && password === 'password') {
-      onLogin();
-    } else {
-      setError('Uncorrect email or password');
+    try {
+      const response = await axios.post('http://localhost:5005/admin/auth/login', {
+        email,
+        password,
+      });
+      const token = response.data.token;
+      onLogin(token);
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Failed to login');
+      }
     }
   };
 
@@ -38,8 +49,9 @@ function Login({ onLogin, isAuthenticated }) {
           onChange={(e) => setPassword(e.target.value)}
           required
         /><br/>
-        <button type="submit">Submit</button>
+        <button type="submit">Submit</button>  {/* form:onSubmit and type:submit make "enter" work */}
       </form>
+      <button onClick={() => navigate('/')}>Back</button>
     </div>
   );
 }
