@@ -5,6 +5,7 @@ import Login from './myjs/login';
 import Register from './myjs/register';
 import Dashboard from './myjs/dashboard';
 import axios from 'axios';
+import Presentation from './myjs/presentation';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -54,7 +55,17 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            token ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/" replace />
+            token ? <Dashboard onLogout={handleLogout} token={token} /> : <Navigate to="/" replace />
+          }
+        />
+        <Route
+          path="/presentation/:id"
+          element={
+            token ? (
+              <Presentation token={token} />
+            ) : (
+              <Navigate to="/" replace />
+            )
           }
         />
       </Routes>
