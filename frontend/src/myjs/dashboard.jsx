@@ -14,7 +14,9 @@ function Dashboard({ onLogout, token }) {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {
-        setPresentations(response.data.presentations || []);
+        const store = response.data.store || {};
+        const presentationsArray = Object.values(store);
+        setPresentations(presentationsArray);
       })
       .catch((err) => {
         console.error('Failed to fetch presentations', err);
@@ -30,23 +32,32 @@ function Dashboard({ onLogout, token }) {
     setShowModal(true);
   };
 
+
   const handleSavePresentation = () => {
     const newPresentation = {
-      id: Date.now(), // 简单的唯一ID
+      id: Date.now(),
       name: newPresentationName,
-      slides: [{ id: 1, content: '' }], // 默认包含一个空白幻灯片
+      slides: [{ id: 1, content: '' }],
     };
 
-    // 更新后端存储
-    axios.put('http://localhost:5005/store', {
-      presentations: [...presentations, newPresentation],
-    }, {
+    axios.get('http://localhost:5005/store', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
+      .then((response) => {
+        const store = response.data.store || {};
+        store[newPresentation.id] = newPresentation;
+
+        return axios.put('http://localhost:5005/store', {
+          store: store,
+        }, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+      })
       .then(() => {
         setPresentations([...presentations, newPresentation]);
         setShowModal(false);
         setNewPresentationName('');
+        console.log('Presentation saved successfully in global store');
       })
       .catch((err) => {
         console.error('Failed to save presentation', err);
@@ -63,8 +74,18 @@ function Dashboard({ onLogout, token }) {
       <button onClick={handleLogout}>Log out</button>
       <button onClick={handleCreatePresentation}>New Presentation</button>
 
+
       {showModal && (
-        <div className="modal">
+        <div className="modal" style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: '#fff',
+          padding: '20px',
+          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+          zIndex: 1000,
+        }}>
           <h3>Create New Presentation</h3>
           <input
             type="text"
@@ -85,7 +106,7 @@ function Dashboard({ onLogout, token }) {
             onClick={() => handlePresentationClick(presentation.id)}
             style={{
               width: '200px',
-              height: '100px', // 2:1 ratio
+              height: '100px',
               border: '1px solid #ccc',
               margin: '10px',
               cursor: 'pointer',
@@ -100,9 +121,7 @@ function Dashboard({ onLogout, token }) {
                 height: '70%',
                 backgroundColor: '#eee',
               }}
-            >
-              {/* 如果有缩略图，显示缩略图 */}
-            </div>
+            />
             <h3 style={{ margin: '5px 0' }}>{presentation.name}</h3>
             {presentation.description && <p>{presentation.description}</p>}
             <p>Slides: {presentation.slides.length}</p>
