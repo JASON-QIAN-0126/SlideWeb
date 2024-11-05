@@ -29,28 +29,41 @@ function Presentation({ token }) {
       });
   }, [id, token]);
 
-  const updateStore = (updatedPresentation) => {
-    axios.get('http://localhost:5005/store', {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
-      .then((response) => {
-        const store = response.data.store || {};
-        store[updatedPresentation.id] = updatedPresentation;
-
-        return axios.put('http://localhost:5005/store', {
-          store: store,
-        }, {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-      })
-      .then(() => {
-        setPresentation(updatedPresentation);
-      })
-      .catch((err) => {
-        console.error('Failed to update store', err);
+  const updateStore = async (updatedPresentation) => {
+    try {
+      const response = await axios.get('http://localhost:5005/store', {
+        headers: { 'Authorization': `Bearer ${token}` },
       });
+      const store = response.data.store || {};
+      store[updatedPresentation.id] = updatedPresentation;
+  
+      await axios.put('http://localhost:5005/store', {
+        store: store,
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      setPresentation(updatedPresentation);
+      return updatedPresentation;
+    } catch (err) {
+      console.error('Failed to update store', err);
+    }
   };
-    // add
+
+  const handleAddSlide = async () => {
+    const newSlide = {
+      id: Date.now(),
+      content: '',
+    };
+    const updatedPresentation = {
+      ...presentation,
+      slides: [...presentation.slides, newSlide],
+    };
+    const newPresentation = await updateStore(updatedPresentation);
+    if (newPresentation) {
+      setCurrentSlideIndex(newPresentation.slides.length - 1);
+    }
+  };
+
   const handleDeleteSlide = () => {
     if (presentation.slides.length === 1) {
       alert('Cannot delete the only slide. Consider deleting the presentation.');
@@ -78,7 +91,30 @@ function Presentation({ token }) {
     }
   };
 
-  // delete
+    const handleDeletePresentation = () => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this presentation?');
+        if (confirmDelete) {
+        axios.get('http://localhost:5005/store', {
+            headers: { 'Authorization': `Bearer ${token}` },
+        })
+            .then((response) => {
+            const store = response.data.store || {};
+            delete store[presentation.id];
+
+            return axios.put('http://localhost:5005/store', {
+                store: store,
+            }, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            })
+            .then(() => {
+            navigate('/dashboard');
+            })
+            .catch((err) => {
+            console.error('Failed to delete presentation', err);
+            });
+        }
+    };
 
   const handleUpdateTitle = () => {
     const updatedPresentation = {
