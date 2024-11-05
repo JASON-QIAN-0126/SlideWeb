@@ -23,17 +23,17 @@ function Dashboard({ onLogout, token }) {
       });
   }, [token]);
 
-  const handleLogout = () => {
+  function handleLogout() {
     onLogout();
     navigate('/');
   };
 
-  const handleCreatePresentation = () => {
+  function handleCreatePresentation() {
     setShowModal(true);
   };
 
 
-  const handleSavePresentation = () => {
+  function handleSavePresentation() {
     const newPresentation = {
       id: Date.now(),
       name: newPresentationName,
@@ -64,7 +64,7 @@ function Dashboard({ onLogout, token }) {
       });
   };
 
-  const handlePresentationClick = (id) => {
+  function handlePresentationClick(id) {
     navigate(`/presentation/${id}`);
   };
 

@@ -14,7 +14,7 @@ function Register({ onRegister, isAuthenticated }) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('Password does not match!');

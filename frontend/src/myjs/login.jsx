@@ -12,7 +12,7 @@ function Login({ onLogin, isAuthenticated }) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5005/admin/auth/login', {
@@ -28,8 +28,8 @@ function Login({ onLogin, isAuthenticated }) {
         setError('Failed to login');
       }
     }
-  };
-
+  }
+  
   return (
     <div>
       <h2>Log in</h2>
