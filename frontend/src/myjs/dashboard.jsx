@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import SlideThumbnail from './SlideThumbnail';
 
 function Dashboard({ onLogout, token }) {
   const [presentations, setPresentations] = useState([]);
@@ -106,30 +107,70 @@ function Dashboard({ onLogout, token }) {
             className="presentation-card"
             onClick={() => handlePresentationClick(presentation.id)}
             style={{
-              width: '200px',
-              height: '100px',
+              width: '360px',
+              height: '180px',
               border: '1px solid #ccc',
-              margin: '10px',
+              margin: '20px',
               cursor: 'pointer',
-              display: 'inline-block',
+              display: 'inline-flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
               position: 'relative',
+              alignItems: 'center',
+              padding: '10px',
             }}
           >
-            <div className="thumbnail" style={{ width: '100%', height: '70%', backgroundColor: '#eee' }}>
-              {presentation.thumbnailSlideIndex !== undefined ? (
-                <img
-                  src={presentation.slides[presentation.thumbnailSlideIndex].content}
-                  alt={`Thumbnail for ${presentation.name}`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <div style={{ backgroundColor: '#ccc', width: '100%', height: '100%' }}>No Thumbnail</div>
+          <div
+            className="thumbnail"
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+            >
+              {/* 渲染缩略图幻灯片 */}
+              {presentation.slides && presentation.slides.length > 0 && (
+                <div
+                  style={{
+                    transform: 'scale(1)',
+                    transformOrigin: 'center center',
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <SlideThumbnail slide={presentation.slides[presentation.thumbnailSlideIndex || 0]} />
+                </div>
+              )}
+            </div>
+            <div
+              style={{
+                alignSelf: 'flex-start',
+                color: '#000',
+              }}
+            >
+              <h3 style={{ margin: '5px 0', fontSize: '1em', fontWeight: 'bold' }}>{presentation.name}</h3>
+              {presentation.description && (
+                <p style={{ margin: '5px 0 0 0', fontSize: '0.85em' }}>{presentation.description}</p>
               )}
             </div>
 
-            <h3 style={{ margin: '5px 0' }}>{presentation.name}</h3>
-            {presentation.description && <p>{presentation.description}</p>}
-            <p>Slides: {presentation.slides.length}</p>
+            <div
+              style={{
+                alignSelf: 'flex-end',
+                fontSize: '0.85em',
+                color: '#666',
+              }}
+            >
+              <p style={{ margin: '0' }}>Slides: {presentation.slides.length}</p>
+            </div>
           </div>
         ))}
       </div>

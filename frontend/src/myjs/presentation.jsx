@@ -6,6 +6,7 @@ import TextElement from './textelement';
 import ImageElement from './imageelement';
 import VideoElement from './videoelement';
 import CodeElement from './codeelement';
+import SlideThumbnail from './SlideThumbnail';
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -413,21 +414,32 @@ function Presentation({ token }) {
         
         <button onClick={() => setShowThumbnailModal(true)}>Update Thumbnail</button>
         {showThumbnailModal && (
-            <div className="modal" style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              backgroundColor: '#fff',
-              padding: '20px',
-              boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-              zIndex: 1000,
+          <div className="modal" style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: '#fff',
+            padding: '20px',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+            zIndex: 1000,
           }}>
             <h3>Select Thumbnail Slide</h3>
             {presentation.slides.map((slide, index) => (
-              <div key={slide.id} onClick={() => { handleUpdateThumbnail(index); setShowThumbnailModal(false); }}>
+              <div
+                key={slide.id}
+                onClick={() => { handleUpdateThumbnail(index); setShowThumbnailModal(false); }}
+                style={{
+                  cursor: 'pointer',
+                  marginBottom: '20px',
+                  border: '1px solid #ccc',
+                  padding: '10px',
+                }}
+              >
                 <p>Slide {index + 1}</p>
-                {/* 可以在这里显示幻灯片的缩略内容 */}
+                <SlideThumbnail slide={slide} />
               </div>
             ))}
             <button onClick={() => setShowThumbnailModal(false)}>Cancel</button>
