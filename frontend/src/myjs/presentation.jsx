@@ -612,6 +612,22 @@ function Presentation({ token }) {
                 />
               </label>
               <label>
+                Font Family:
+                <select
+                  value={elementProperties.fontFamily || 'Arial'}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      fontFamily: e.target.value,
+                    })
+                  }
+                >
+                  <option value="Arial">Arial</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Courier New">Courier New</option>
+                </select>
+              </label>
+              <label>
                 Color (HEX):
                 <input
                   type="text"

@@ -66,6 +66,7 @@ function SlideThumbnail({ slide }) {
                       fontSize: `${element.properties.fontSize}em`,
                       color: element.properties.color,
                       whiteSpace: 'pre-wrap',
+                      fontFamily: element.properties.fontFamily,
                     }}
                   >
                     {element.properties.text}
