@@ -4,8 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid'; // for id
 import TextElement from './textelement';
 import ImageElement from './imageelement';
-// import VideoElement from './videoelement';
-// import CodeElement from './codeelement';
+import VideoElement from './videoelement';
+import CodeElement from './codeelement';
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -308,30 +308,20 @@ function Presentation({ token }) {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  const CodeBlock = ({ code, language, fontSize }) => {
-    const codeRef = useRef(null);
-
-    useEffect(() => {
-      if (codeRef.current) {
-        hljs.highlightBlock(codeRef.current);
-      }
-    }, [code]);
-
-    return (
-      <pre
-        style={{
-          fontSize: `${fontSize}em`,
-          fontFamily: 'monospace',
-          whiteSpace: 'pre-wrap',
-        }}
-      >
-        <code ref={codeRef} className={language}>
-          {code}
-        </code>
-      </pre>
-    );
+  const handleImageFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setElementProperties({
+          ...elementProperties,
+          src: reader.result, // base64 string
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   };
-  
+
   return (
     <div>
         <h2>
@@ -554,6 +544,14 @@ function Presentation({ token }) {
                       src: e.target.value,
                     })
                   }
+                />
+              </label>
+              <label>
+                OR Upload Image:
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageFileChange}
                 />
               </label>
               <label>
