@@ -137,7 +137,7 @@ function Dashboard({ onLogout, token }) {
                 <SlideThumbnail 
                   slide={{ 
                     ...presentation.slides[presentation.thumbnailSlideIndex || 0], 
-                    background: presentation.slides[presentation.thumbnailSlideIndex || 0].background || presentation.defaultBackground || {} 
+                    background: presentation.slides[presentation.thumbnailSlideIndex || 0]?.background || presentation.defaultBackground || {} 
                   }} 
                 />
               ) : (

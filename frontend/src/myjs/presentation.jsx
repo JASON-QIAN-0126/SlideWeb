@@ -8,6 +8,8 @@ import VideoElement from './videoelement';
 import CodeElement from './codeelement';
 import SlideThumbnail from './SlideThumbnail';
 import BackgroundPicker from './background';
+import ConfirmModal from './confirmmodal';
+import NotificationModal from './notificationmodal';
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -20,6 +22,10 @@ function Presentation({ token }) {
   const [thumbnailSlideIndex, setThumbnailSlideIndex] = useState(0);
   const [showThumbnailModal, setShowThumbnailModal] = useState(false);
   
+  // query modal
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isNotificationOpen, setNotificationOpen] = useState(false);
+
   // add 'text', 'image', 'video', 'code'
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -115,7 +121,7 @@ function Presentation({ token }) {
 
   const handleDeleteSlide = () => {
     if (presentation.slides.length === 1) {
-      alert('Cannot delete the only slide. Consider deleting the presentation.');
+      setNotificationOpen(true); // 显示通知模态框
       return;
     }
     const updatedSlides = presentation.slides.filter(
@@ -147,28 +153,38 @@ function Presentation({ token }) {
   };
 
   const handleDeletePresentation = () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this presentation?');
-    if (confirmDelete) {
-      axios.get('http://localhost:5005/store', {
-        headers: { 'Authorization': `Bearer ${token}` },
-      })
-        .then((response) => {
-          const store = response.data.store || {};
-          delete store[presentation.id];
+    setIsConfirmModalOpen(true); // 打开确认模态框
+  };
 
-          return axios.put('http://localhost:5005/store', {
-            store: store,
-          }, {
-            headers: { 'Authorization': `Bearer ${token}` },
-          });
-        })
-        .then(() => {
-          navigate('/dashboard');
-        })
-        .catch((err) => {
-          console.error('Failed to delete presentation', err);
+  // 确认删除后的逻辑
+  const handleConfirmDelete = () => {
+    setIsConfirmModalOpen(false); // 关闭确认模态框
+
+    // 执行删除操作
+    axios.get('http://localhost:5005/store', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then((response) => {
+        const store = response.data.store || {};
+        delete store[presentation.id];
+
+        return axios.put('http://localhost:5005/store', {
+          store: store,
+        }, {
+          headers: { 'Authorization': `Bearer ${token}` },
         });
-    }
+      })
+      .then(() => {
+        navigate('/dashboard');
+      })
+      .catch((err) => {
+        console.error('Failed to delete presentation', err);
+      });
+  };
+
+  // 取消删除操作
+  const handleCancelDelete = () => {
+    setIsConfirmModalOpen(false); // 关闭确认模态框
   };
 
   const handleUpdateTitle = () => {
@@ -417,6 +433,14 @@ function Presentation({ token }) {
       </h2>
       <button onClick={() => navigate('/dashboard')}>Back</button>
       <button onClick={handleDeletePresentation}>Delete Presentation</button>
+      {isConfirmModalOpen && (
+        <ConfirmModal
+          title="Delete Confirmation"
+          message="Are you sure you want to delete this presentation?"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
 
       {showTitleModal && (
         <div className="modal" style={{
@@ -510,7 +534,7 @@ function Presentation({ token }) {
         show={showBackgroundModal}
         onClose={() => {
           setShowBackgroundModal(false);
-          setIsDefaultBackground(false); // 重置默认背景选择
+          setIsDefaultBackground(false);
         }}
         onApply={handleSetBackground}
         currentBackground={currentSlide.background || {}}
@@ -560,6 +584,12 @@ function Presentation({ token }) {
       <div>
         <button onClick={handleAddSlide}>Add Slide</button>
         <button onClick={handleDeleteSlide}>Delete Slide</button>
+        {isNotificationOpen && (
+          <NotificationModal
+            message="Cannot delete the only slide. Consider deleting the presentation."
+            onClose={() => setNotificationOpen(false)}
+          />
+        )}
       </div>
 
       <div>
