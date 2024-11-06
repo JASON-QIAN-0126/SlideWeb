@@ -1,77 +1,75 @@
-import React from 'react';
-
 function SlideThumbnail({ slide }) {
-    if (!slide || !slide.elements) {
-        return (
-            <div
-            style={{
-                width: '200px',
-                height: '150px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#f0f0f0',
-                color: '#999',
-                fontSize: '0.9em',
-            }}
-            >
-            No Content
-            </div>
-        );
-        }
-    
-    const renderBackground = () => {
-      if (!slide.background) {
-          return null;
-      }
+  if (!slide || !slide.elements) {
+    return (
+      <div
+        style={{
+          width: '200px',
+          height: '150px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f0f0f0',
+          color: '#999',
+          fontSize: '0.9em',
+        }}
+      >
+        No Content
+      </div>
+    );
+  }
 
-      const { type, value } = slide.background;
+  const renderBackground = () => {
+    if (!slide.background) {
+      return null;
+    }
 
-      switch(type) {
-          case 'color':
-              return (
-                  <div
-                      style={{
-                          backgroundColor: value,
-                          width: '100%',
-                          height: '100%',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                      }}
-                  ></div>
-              );
-          case 'gradient':
-              return (
-                  <div
-                      style={{
-                          backgroundImage: value,
-                          width: '100%',
-                          height: '100%',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                      }}
-                  ></div>
-              );
-          case 'image':
-              return (
-                  <div
-                      style={{
-                          backgroundImage: `url(${value})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          width: '100%',
-                          height: '100%',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                      }}
-                  ></div>
-              );
-          default:
-              return null;
-      }
+    const { type, value } = slide.background;
+
+    switch (type) {
+    case 'color':
+      return (
+        <div
+          style={{
+            backgroundColor: value,
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+          }}
+        ></div>
+      );
+    case 'gradient':
+      return (
+        <div
+          style={{
+            backgroundImage: value,
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+          }}
+        ></div>
+      );
+    case 'image':
+      return (
+        <div
+          style={{
+            backgroundImage: `url(${value})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+          }}
+        ></div>
+      );
+    default:
+      return null;
+    }
   };
 
   return (
