@@ -445,6 +445,8 @@ function Presentation({ token }) {
             <button onClick={() => setShowThumbnailModal(false)}>Cancel</button>
           </div>
         )}
+
+        <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
     <div
         className="slide-container"
         style={{

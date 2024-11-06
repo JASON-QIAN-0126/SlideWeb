@@ -135,19 +135,7 @@ function Dashboard({ onLogout, token }) {
             >
               {/* 渲染缩略图幻灯片 */}
               {presentation.slides && presentation.slides.length > 0 && (
-                <div
-                  style={{
-                    transform: 'scale(1)',
-                    transformOrigin: 'center center',
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <SlideThumbnail slide={presentation.slides[presentation.thumbnailSlideIndex || 0]} />
-                </div>
+                <SlideThumbnail slide={presentation.slides[presentation.thumbnailSlideIndex || 0]} />
               )}
             </div>
             <div
