@@ -218,7 +218,39 @@ function Presentation({ token }) {
     setShowModal(true);
   };
 
-  // update element
+  const handleUpdateElement = () => {
+    let updatedProperties = { ...elementProperties };
+    if (modalType === 'video') {
+      const videoId = parseYouTubeId(elementProperties.videoUrl);
+      if (videoId) {
+        updatedProperties.videoId = videoId;
+      } else {
+        alert('Invalid YouTube URL');
+        return;
+      }
+    }
+    const updatedPresentation = { ...presentation };
+    const elements = currentSlide.elements.map((el) => {
+      if (el.id === editingElementId) {
+        return {
+          ...el,
+          size: {
+            width: parseFloat(elementProperties.size?.width) || 0,
+            height: parseFloat(elementProperties.size?.height) || 0,
+          },
+          position: {
+            x: parseFloat(elementProperties.position?.x) || 0,
+            y: parseFloat(elementProperties.position?.y) || 0,
+          },
+          properties: updatedProperties,
+        };
+      }
+      return el;
+    });
+    updatedPresentation.slides[currentSlideIndex].elements = elements;
+    updateStore(updatedPresentation);
+    setShowModal(false);
+  };
 
   const renderElements = () => {
     const elements = currentSlide.elements || [];
@@ -301,7 +333,7 @@ function Presentation({ token }) {
         </div>
         )}
 
-<div
+    <div
         className="slide-container"
         style={{
           position: 'relative',
@@ -339,7 +371,151 @@ function Presentation({ token }) {
         </button>
       </div>
 
-      
+      <div>
+        <button onClick={handleAddSlide}>Add Slide</button>
+        <button onClick={handleDeleteSlide}>Delete Slide</button>
+      </div>
+
+      <div>
+        <button onClick={() => handleAddElement('text')}>Add Text</button>
+        <button onClick={() => handleAddElement('image')}>Add Image</button>
+        <button onClick={() => handleAddElement('video')}>Add Video</button>
+        <button onClick={() => handleAddElement('code')}>Add Code</button>
+      </div>
+
+      {showModal && (
+        <div
+          className="modal"
+          style={{
+            position: 'fixed',
+            top: '10%',
+            left: '50%',
+            transform: 'translate(-50%, 0)',
+            backgroundColor: '#fff',
+            padding: '20px',
+            maxHeight: '80%',
+            overflowY: 'auto',
+            boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+            zIndex: 1000,
+          }}
+        >
+          <h3>{editingElementId ? 'Edit Element' : 'Add Element'}</h3>
+          <label>
+            Width (%):
+            <input
+              type="number"
+              value={elementProperties.size?.width || ''}
+              onChange={(e) =>
+                setElementProperties({
+                  ...elementProperties,
+                  size: {
+                    ...elementProperties.size,
+                    width: e.target.value,
+                  },
+                })
+              }
+            />
+          </label>
+          <label>
+            Height (%):
+            <input
+              type="number"
+              value={elementProperties.size?.height || ''}
+              onChange={(e) =>
+                setElementProperties({
+                  ...elementProperties,
+                  size: {
+                    ...elementProperties.size,
+                    height: e.target.value,
+                  },
+                })
+              }
+            />
+          </label>
+          {editingElementId && (
+            <>
+              <label>
+                X Position (%):
+                <input
+                  type="number"
+                  value={elementProperties.position?.x || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      position: {
+                        ...elementProperties.position,
+                        x: e.target.value,
+                      },
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Y Position (%):
+                <input
+                  type="number"
+                  value={elementProperties.position?.y || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      position: {
+                        ...elementProperties.position,
+                        y: e.target.value,
+                      },
+                    })
+                  }
+                />
+              </label>
+            </>
+          )}
+          {modalType === 'text' && (
+            <>
+              <label>
+                Text:
+                <textarea
+                  value={elementProperties.text || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      text: e.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Font Size (em):
+                <input
+                  type="number"
+                  value={elementProperties.fontSize || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      fontSize: e.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Color (HEX):
+                <input
+                  type="text"
+                  value={elementProperties.color || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      color: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            </>
+          )}
+          <button onClick={editingElementId ? handleUpdateElement : handleSaveElement}>
+            {editingElementId ? 'Update' : 'Add'}
+          </button>
+          <button onClick={() => setShowModal(false)}>Cancel</button>
+        </div>
+      )}
     </div>
   );
 }
