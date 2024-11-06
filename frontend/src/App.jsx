@@ -6,6 +6,7 @@ import Register from './myjs/register';
 import Dashboard from './myjs/dashboard';
 import axios from 'axios';
 import Presentation from './myjs/presentation';
+import Preview from './myjs/preview';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -67,6 +68,14 @@ function App() {
               <Navigate to="/" replace />
             )
           }
+        />
+        <Route 
+          path="/presentation/:id/:slideIndex?" 
+          element={<Presentation token={token} />} 
+        />
+        <Route
+          path="/preview/:id/:slideIndex?"
+          element={<Preview token={token} />}
         />
       </Routes>
     </Router>

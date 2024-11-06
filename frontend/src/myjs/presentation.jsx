@@ -125,13 +125,17 @@ function Presentation({ token }) {
 
   const handleNextSlide = () => {
     if (currentSlideIndex < presentation.slides.length - 1) {
-      setCurrentSlideIndex(currentSlideIndex + 1);
+      const newIndex = currentSlideIndex + 1;
+      setCurrentSlideIndex(newIndex);
+      navigate(`/presentation/${id}/${newIndex}`);
     }
   };
-
+  
   const handlePrevSlide = () => {
     if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(currentSlideIndex - 1);
+      const newIndex = currentSlideIndex - 1;
+      setCurrentSlideIndex(newIndex);
+      navigate(`/presentation/${id}/${newIndex}`);
     }
   };
 
