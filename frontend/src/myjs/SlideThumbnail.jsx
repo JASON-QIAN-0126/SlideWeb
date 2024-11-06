@@ -1,6 +1,25 @@
 import React from 'react';
 
 function SlideThumbnail({ slide }) {
+    if (!slide || !slide.elements) {
+        return (
+            <div
+            style={{
+                width: '200px',
+                height: '150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f0f0f0',
+                color: '#999',
+                fontSize: '0.9em',
+            }}
+            >
+            No Content
+            </div>
+        );
+        }
+
   return (
     <div
       style={{
