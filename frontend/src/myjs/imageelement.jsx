@@ -1,6 +1,4 @@
-import React from 'react';
-
-function ImageElement({ element, onEdit }) {
+function ImageElement({ element}) {
   return (
     <img
       src={element.properties.src}

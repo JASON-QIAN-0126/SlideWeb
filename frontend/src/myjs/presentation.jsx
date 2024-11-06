@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid'; // for id
@@ -147,28 +147,28 @@ function Presentation({ token }) {
   };
 
   const handleDeletePresentation = () => {
-      const confirmDelete = window.confirm('Are you sure you want to delete this presentation?');
-      if (confirmDelete) {
+    const confirmDelete = window.confirm('Are you sure you want to delete this presentation?');
+    if (confirmDelete) {
       axios.get('http://localhost:5005/store', {
-          headers: { 'Authorization': `Bearer ${token}` },
+        headers: { 'Authorization': `Bearer ${token}` },
       })
-          .then((response) => {
+        .then((response) => {
           const store = response.data.store || {};
           delete store[presentation.id];
 
           return axios.put('http://localhost:5005/store', {
-              store: store,
+            store: store,
           }, {
-              headers: { 'Authorization': `Bearer ${token}` },
+            headers: { 'Authorization': `Bearer ${token}` },
           });
-          })
-          .then(() => {
+        })
+        .then(() => {
           navigate('/dashboard');
-          })
-          .catch((err) => {
+        })
+        .catch((err) => {
           console.error('Failed to delete presentation', err);
-          });
-      }
+        });
+    }
   };
 
   const handleUpdateTitle = () => {
@@ -315,20 +315,20 @@ function Presentation({ token }) {
   
         let content = null;
         switch (element.type) {
-          case 'text':
-            content = <TextElement element={element} onEdit={handleEditElement} />;
-            break;
-          case 'image':
-            content = <ImageElement element={element} onEdit={handleEditElement} />;
-            break;
-          case 'video':
-            content = <VideoElement element={element} onEdit={handleEditElement} />;
-            break;
-          case 'code':
-            content = <CodeElement element={element} onEdit={handleEditElement} />;
-            break;
-          default:
-            break;
+        case 'text':
+          content = <TextElement element={element} onEdit={handleEditElement} />;
+          break;
+        case 'image':
+          content = <ImageElement element={element} onEdit={handleEditElement} />;
+          break;
+        case 'video':
+          content = <VideoElement element={element} onEdit={handleEditElement} />;
+          break;
+        case 'code':
+          content = <CodeElement element={element} onEdit={handleEditElement} />;
+          break;
+        default:
+          break;
         }
   
         return (
@@ -411,114 +411,114 @@ function Presentation({ token }) {
 
   return (
     <div>
-        <h2>
+      <h2>
         {presentation.name}
         <button onClick={() => setShowTitleModal(true)}>Edit Title</button>
-        </h2>
-        <button onClick={() => navigate('/dashboard')}>Back</button>
-        <button onClick={handleDeletePresentation}>Delete Presentation</button>
+      </h2>
+      <button onClick={() => navigate('/dashboard')}>Back</button>
+      <button onClick={handleDeletePresentation}>Delete Presentation</button>
 
-        {showTitleModal && (
+      {showTitleModal && (
         <div className="modal" style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: '#fff',
-            padding: '20px',
-            boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-            zIndex: 1000,
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: '#fff',
+          padding: '20px',
+          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+          zIndex: 1000,
         }}>
-            <h3>Edit Title</h3>
-            <input
+          <h3>Edit Title</h3>
+          <input
             type="text"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             placeholder="New Title"
-            />
-            <button onClick={handleUpdateTitle}>Update</button>
-            <button onClick={() => setShowTitleModal(false)}>Cancel</button>
+          />
+          <button onClick={handleUpdateTitle}>Update</button>
+          <button onClick={() => setShowTitleModal(false)}>Cancel</button>
         </div>
-        )}
+      )}
 
-        <button onClick={() => setShowDescriptionModal(true)}>Edit Description</button>
-        {showDescriptionModal && (
-            <div className="modal" style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                backgroundColor: '#fff',
-                padding: '20px',
-                boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-                zIndex: 1000,
-            }}>
-            <h3>Edit Description</h3>
-            <textarea
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-              placeholder="New Description"
-            />
-            <button onClick={handleUpdateDescription}>Update</button>
-            <button onClick={() => setShowDescriptionModal(false)}>Cancel</button>
-          </div>
-        )}
+      <button onClick={() => setShowDescriptionModal(true)}>Edit Description</button>
+      {showDescriptionModal && (
+        <div className="modal" style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: '#fff',
+          padding: '20px',
+          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+          zIndex: 1000,
+        }}>
+          <h3>Edit Description</h3>
+          <textarea
+            value={newDescription}
+            onChange={(e) => setNewDescription(e.target.value)}
+            placeholder="New Description"
+          />
+          <button onClick={handleUpdateDescription}>Update</button>
+          <button onClick={() => setShowDescriptionModal(false)}>Cancel</button>
+        </div>
+      )}
         
-        <button onClick={() => setShowThumbnailModal(true)}>Update Thumbnail</button>
-        {showThumbnailModal && (
-          <div className="modal" style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: '#fff',
-            padding: '20px',
-            maxHeight: '80vh',
-            overflowY: 'auto',
-            boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-            zIndex: 1000,
-          }}>
-            <h3>Select Thumbnail Slide</h3>
-            {presentation.slides.map((slide, index) => (
-              <div
-                key={slide.id}
-                onClick={() => { handleUpdateThumbnail(index); setShowThumbnailModal(false); }}
-                style={{
-                  cursor: 'pointer',
-                  marginBottom: '20px',
-                  border: '1px solid #ccc',
-                  padding: '10px',
-                }}
-              >
-                <p>Slide {index + 1}</p>
-                <SlideThumbnail 
-                  slide={{ 
-                    ...slide, 
-                    background: slide.background || presentation.defaultBackground || {} 
-                  }} 
-                />
-              </div>
-            ))}
-            <button onClick={() => setShowThumbnailModal(false)}>Cancel</button>
-          </div>
-        )}
+      <button onClick={() => setShowThumbnailModal(true)}>Update Thumbnail</button>
+      {showThumbnailModal && (
+        <div className="modal" style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: '#fff',
+          padding: '20px',
+          maxHeight: '80vh',
+          overflowY: 'auto',
+          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+          zIndex: 1000,
+        }}>
+          <h3>Select Thumbnail Slide</h3>
+          {presentation.slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              onClick={() => { handleUpdateThumbnail(index); setShowThumbnailModal(false); }}
+              style={{
+                cursor: 'pointer',
+                marginBottom: '20px',
+                border: '1px solid #ccc',
+                padding: '10px',
+              }}
+            >
+              <p>Slide {index + 1}</p>
+              <SlideThumbnail 
+                slide={{ 
+                  ...slide, 
+                  background: slide.background || presentation.defaultBackground || {} 
+                }} 
+              />
+            </div>
+          ))}
+          <button onClick={() => setShowThumbnailModal(false)}>Cancel</button>
+        </div>
+      )}
 
-        <button onClick={() => setShowBackgroundModal(true)}>Change Background</button>
-        <BackgroundPicker
-          show={showBackgroundModal}
-          onClose={() => {
-            setShowBackgroundModal(false);
-            setIsDefaultBackground(false); // 重置默认背景选择
-          }}
-          onApply={handleSetBackground}
-          currentBackground={currentSlide.background || {}}
-          isDefault={isDefaultBackground}
-          setIsDefault={setIsDefaultBackground}
-        />
+      <button onClick={() => setShowBackgroundModal(true)}>Change Background</button>
+      <BackgroundPicker
+        show={showBackgroundModal}
+        onClose={() => {
+          setShowBackgroundModal(false);
+          setIsDefaultBackground(false); // 重置默认背景选择
+        }}
+        onApply={handleSetBackground}
+        currentBackground={currentSlide.background || {}}
+        isDefault={isDefaultBackground}
+        setIsDefault={setIsDefaultBackground}
+      />
 
-        <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
+      <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
         
-    <div
+      <div
         className="slide-container"
         style={slideStyle}
       >
