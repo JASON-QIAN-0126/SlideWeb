@@ -626,23 +626,6 @@ function Presentation({ token }) {
                   }
                 />
               </label>
-              <label>
-                Language:
-                <select
-                  value={elementProperties.language || ''}
-                  onChange={(e) =>
-                    setElementProperties({
-                      ...elementProperties,
-                      language: e.target.value,
-                    })
-                  }
-                >
-                  <option value="">Select Language</option>
-                  <option value="javascript">JavaScript</option>
-                  <option value="python">Python</option>
-                  <option value="c">C</option>
-                </select>
-              </label>
             </>
           )}
           <button onClick={editingElementId ? handleUpdateElement : handleSaveElement}>
