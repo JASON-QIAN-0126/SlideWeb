@@ -3,9 +3,9 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid'; // for id
 import TextElement from './textelement';
-// import ImageElement from 'imageelement';
-// import VideoElement from 'videoelement';
-// import CodeElement from 'codeelement';
+import ImageElement from './imageelement';
+// import VideoElement from './videoelement';
+// import CodeElement from './codeelement';
 
 function Presentation({ token }) {
   const { id } = useParams();
