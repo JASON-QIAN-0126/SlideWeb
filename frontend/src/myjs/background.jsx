@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // Function to extract HEX colors from a gradient string
 const extractColors = (gradientValue) => {

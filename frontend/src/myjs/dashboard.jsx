@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import SlideThumbnail from './SlideThumbnail';
@@ -119,18 +119,18 @@ function Dashboard({ onLogout, token }) {
               padding: '10px',
             }}
           >
-          <div
-            className="thumbnail"
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              overflow: 'hidden',
-              position: 'relative',
-            }}
+            <div
+              className="thumbnail"
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                overflow: 'hidden',
+                position: 'relative',
+              }}
             >
               {/* 渲染缩略图幻灯片 */}
               {presentation.slides && presentation.slides.length > 0 ? (

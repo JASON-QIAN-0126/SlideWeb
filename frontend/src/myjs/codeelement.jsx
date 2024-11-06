@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import hljs from 'highlight.js/lib/core';
 
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -98,7 +98,7 @@ const StyledPre = styled.pre`
   border-radius: 4px;
 `;
 
-function CodeElement({ element, onEdit }) {
+function CodeElement({ element}) {
   const codeRef = useRef(null);
 
   useEffect(() => {

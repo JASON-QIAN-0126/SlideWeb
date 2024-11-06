@@ -111,53 +111,53 @@ function SlideThumbnail({ slide }) {
             };
             let content = null;
             switch (element.type) {
-              case 'text':
-                content = (
-                  <div
-                    style={{
-                      fontSize: `${element.properties.fontSize}em`,
-                      color: element.properties.color,
-                      whiteSpace: 'pre-wrap',
-                      fontFamily: element.properties.fontFamily,
-                    }}
-                  >
-                    {element.properties.text}
-                  </div>
-                );
-                break;
-              case 'image':
-                content = (
-                  <img
-                    src={element.properties.src}
-                    alt={element.properties.alt}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                );
-                break;
-              case 'video':
-                content = (
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${element.properties.videoId}`}
-                  ></iframe>
-                );
-                break;
-              case 'code':
-                content = (
-                  <pre
-                    style={{
-                      fontSize: `${element.properties.fontSize}em`,
-                      fontFamily: 'monospace',
-                      whiteSpace: 'pre-wrap',
-                    }}
-                  >
-                    {element.properties.code}
-                  </pre>
-                );
-                break;
-              default:
-                break;
+            case 'text':
+              content = (
+                <div
+                  style={{
+                    fontSize: `${element.properties.fontSize}em`,
+                    color: element.properties.color,
+                    whiteSpace: 'pre-wrap',
+                    fontFamily: element.properties.fontFamily,
+                  }}
+                >
+                  {element.properties.text}
+                </div>
+              );
+              break;
+            case 'image':
+              content = (
+                <img
+                  src={element.properties.src}
+                  alt={element.properties.alt}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              );
+              break;
+            case 'video':
+              content = (
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${element.properties.videoId}`}
+                ></iframe>
+              );
+              break;
+            case 'code':
+              content = (
+                <pre
+                  style={{
+                    fontSize: `${element.properties.fontSize}em`,
+                    fontFamily: 'monospace',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {element.properties.code}
+                </pre>
+              );
+              break;
+            default:
+              break;
             }
             return (
               <div key={element.id} style={style}>
