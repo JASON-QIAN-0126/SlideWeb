@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import TextElement from './textelement';
 import ImageElement from './imageelement';
 import VideoElement from './videoelement';
@@ -10,6 +11,7 @@ function Preview({ token }) {
   const { id, slideIndex } = useParams();
   const [presentation, setPresentation] = useState(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(parseInt(slideIndex) || 0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('http://localhost:5005/store', {
@@ -33,7 +35,7 @@ function Preview({ token }) {
     if (currentSlideIndex < presentation.slides.length - 1) {
       const newIndex = currentSlideIndex + 1;
       setCurrentSlideIndex(newIndex);
-      window.history.replaceState(null, '', `/preview/${id}/${newIndex}`);
+      navigate(`/preview/${id}/${newIndex}`, { replace: true });
     }
   };
 
@@ -41,7 +43,7 @@ function Preview({ token }) {
     if (currentSlideIndex > 0) {
       const newIndex = currentSlideIndex - 1;
       setCurrentSlideIndex(newIndex);
-      window.history.replaceState(null, '', `/preview/${id}/${newIndex}`);
+      navigate(`/preview/${id}/${newIndex}`, { replace: true });
     }
   };
 
