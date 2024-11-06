@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid'; // for id
+import TextElement from './textelement';
+// import ImageElement from 'imageelement';
+// import VideoElement from 'videoelement';
+// import CodeElement from 'codeelement';
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -8,6 +13,10 @@ function Presentation({ token }) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showTitleModal, setShowTitleModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState(''); // 'text', 'image', 'video', 'code'
+  const [elementProperties, setElementProperties] = useState({});
+  const [editingElementId, setEditingElementId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,7 +60,7 @@ function Presentation({ token }) {
   const handleAddSlide = async () => {
     const newSlide = {
       id: Date.now(),
-      content: '',
+      elements: [],
     };
     const updatedPresentation = {
       ...presentation,
@@ -68,7 +77,9 @@ function Presentation({ token }) {
       alert('Cannot delete the only slide. Consider deleting the presentation.');
       return;
     }
-    const updatedSlides = presentation.slides.filter((_, index) => index !== currentSlideIndex);
+    const updatedSlides = presentation.slides.filter(
+      (_, index) => index !== currentSlideIndex
+    );
     const updatedPresentation = {
       ...presentation,
       slides: updatedSlides,
@@ -146,6 +157,118 @@ function Presentation({ token }) {
 
   const currentSlide = presentation.slides[currentSlideIndex];
 
+  if (!currentSlide) {
+    return <div>Loading slide...</div>;
+  }
+
+  const handleAddElement = (type) => {
+    setModalType(type);
+    setElementProperties({});
+    setEditingElementId(null);
+    setShowModal(true);
+  };
+
+  const handleSaveElement = () => {
+    let updatedProperties = { ...elementProperties };
+    if (modalType === 'video') {
+      const videoId = parseYouTubeId(elementProperties.videoUrl);
+      if (videoId) {
+        updatedProperties.videoId = videoId;
+      } else {
+        alert('Invalid YouTube URL');
+        return;
+      }
+    }
+    const newElement = {
+      id: uuidv4(),
+      type: modalType,
+      position: { x: 0, y: 0 },
+      size: {
+        width: parseFloat(elementProperties.size?.width) || 0,
+        height: parseFloat(elementProperties.size?.height) || 0,
+      },
+      properties: updatedProperties,
+      layer: Date.now(),
+    };
+    const updatedPresentation = { ...presentation };
+    updatedPresentation.slides[currentSlideIndex].elements = [
+      ...(currentSlide.elements || []),
+      newElement,
+    ];
+    updateStore(updatedPresentation);
+    setShowModal(false);
+  };
+
+  const handleDeleteElement = (elementId) => {
+    const updatedPresentation = { ...presentation };
+    updatedPresentation.slides[currentSlideIndex].elements = currentSlide.elements.filter(
+      (el) => el.id !== elementId
+    );
+    updateStore(updatedPresentation);
+  };
+
+  const handleEditElement = (element) => {
+    setModalType(element.type);
+    setElementProperties({
+      ...element.properties,
+      size: element.size,
+      position: element.position,
+    });
+    setEditingElementId(element.id);
+    setShowModal(true);
+  };
+
+  // update element
+
+  const renderElements = () => {
+    const elements = currentSlide.elements || [];
+    return elements
+      .sort((a, b) => a.layer - b.layer)
+      .map((element) => {
+        const style = {
+          position: 'absolute',
+          top: `${element.position.y}%`,
+          left: `${element.position.x}%`,
+          width: `${element.size.width}%`,
+          height: `${element.size.height}%`,
+          border: '1px solid grey',
+          overflow: 'hidden',
+          cursor: 'pointer',
+        };
+  
+        let content = null;
+        switch (element.type) {
+          case 'text':
+            content = <TextElement element={element} onEdit={handleEditElement} />;
+            break;
+          case 'image':
+            content = <ImageElement element={element} onEdit={handleEditElement} />;
+            break;
+          case 'video':
+            content = <VideoElement element={element} onEdit={handleEditElement} />;
+            break;
+          case 'code':
+            content = <CodeElement element={element} onEdit={handleEditElement} />;
+            break;
+          default:
+            break;
+        }
+  
+        return (
+          <div
+            key={element.id}
+            style={style}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              handleDeleteElement(element.id);
+            }}
+          >
+            {content}
+          </div>
+        );
+      });
+  };
+
   return (
     <div>
         <h2>
@@ -154,7 +277,6 @@ function Presentation({ token }) {
         </h2>
         <button onClick={() => navigate('/dashboard')}>Back</button>
         <button onClick={handleDeletePresentation}>Delete Presentation</button>
-
 
         {showTitleModal && (
         <div className="modal" style={{
@@ -179,10 +301,16 @@ function Presentation({ token }) {
         </div>
         )}
 
-      <div className="slide-container" style={{ position: 'relative', width: '600px', height: '400px', border: '1px solid #000' }}>
-        <div className="slide-content">
-          <p>{currentSlide.content}</p>
-        </div>
+<div
+        className="slide-container"
+        style={{
+          position: 'relative',
+          width: '600px',
+          height: '400px',
+          border: '1px solid #000',
+        }}
+      >
+        {renderElements()}
         <div
           style={{
             position: 'absolute',
@@ -195,16 +323,23 @@ function Presentation({ token }) {
         >
           {currentSlideIndex + 1}
         </div>
-        <button onClick={handlePrevSlide} disabled={currentSlideIndex === 0} style={{ position: 'absolute', top: '50%', left: '0' }}>
+        <button
+          onClick={handlePrevSlide}
+          disabled={currentSlideIndex === 0}
+          style={{ position: 'absolute', top: '50%', left: '0' }}
+        >
           &lt;
         </button>
-        <button onClick={handleNextSlide} disabled={currentSlideIndex === presentation.slides.length - 1} style={{ position: 'absolute', top: '50%', right: '0' }}>
+        <button
+          onClick={handleNextSlide}
+          disabled={currentSlideIndex === presentation.slides.length - 1}
+          style={{ position: 'absolute', top: '50%', right: '0' }}
+        >
           &gt;
         </button>
       </div>
 
-      <button onClick={handleAddSlide}>Add Slide</button>
-      <button onClick={handleDeleteSlide}>Delete Slide</button>
+      
     </div>
   );
 }
