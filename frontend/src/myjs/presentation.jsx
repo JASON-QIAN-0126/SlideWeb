@@ -15,7 +15,9 @@ function Presentation({ token }) {
   const [newTitle, setNewTitle] = useState('');
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [newDescription, setNewDescription] = useState('');
-
+  const [thumbnailSlideIndex, setThumbnailSlideIndex] = useState(0);
+  const [showThumbnailModal, setShowThumbnailModal] = useState(false);
+  
   // add 'text', 'image', 'video', 'code'
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -40,6 +42,23 @@ function Presentation({ token }) {
         console.error('Failed to fetch presentation', err);
       });
   }, [id, token]);
+
+  useEffect(() => {
+    if (presentation && presentation.thumbnailSlideIndex !== undefined) {
+      setThumbnailSlideIndex(presentation.thumbnailSlideIndex);
+    } else {
+      setThumbnailSlideIndex(0);
+    }
+  }, [presentation]);
+
+  const handleUpdateThumbnail = (index) => {
+    const updatedPresentation = {
+      ...presentation,
+      thumbnailSlideIndex: index,
+    };
+    updateStore(updatedPresentation);
+    setThumbnailSlideIndex(index);
+  };
 
   const updateStore = async (updatedPresentation) => {
     try {
@@ -304,6 +323,7 @@ function Presentation({ token }) {
           <div
             key={element.id}
             style={style}
+            onDoubleClick={() => handleEditElement(element)}
             onContextMenu={(e) => {
               e.preventDefault();
               handleDeleteElement(element.id);
@@ -391,6 +411,28 @@ function Presentation({ token }) {
           </div>
         )}
         
+        <button onClick={() => setShowThumbnailModal(true)}>Update Thumbnail</button>
+        {showThumbnailModal && (
+            <div className="modal" style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: '#fff',
+              padding: '20px',
+              boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+              zIndex: 1000,
+          }}>
+            <h3>Select Thumbnail Slide</h3>
+            {presentation.slides.map((slide, index) => (
+              <div key={slide.id} onClick={() => { handleUpdateThumbnail(index); setShowThumbnailModal(false); }}>
+                <p>Slide {index + 1}</p>
+                {/* 可以在这里显示幻灯片的缩略内容 */}
+              </div>
+            ))}
+            <button onClick={() => setShowThumbnailModal(false)}>Cancel</button>
+          </div>
+        )}
     <div
         className="slide-container"
         style={{

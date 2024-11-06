@@ -108,7 +108,7 @@ function CodeElement({ element, onEdit }) {
   }, [element.properties.code]);
 
   return (
-    <HighlightStyles onDoubleClick={() => onEdit(element)}>
+    <HighlightStyles>
       <StyledPre fontSize={element.properties.fontSize || 1}>
         <code ref={codeRef}>{element.properties.code}</code>
       </StyledPre>

@@ -6,9 +6,7 @@ function Dashboard({ onLogout, token }) {
   const [presentations, setPresentations] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newPresentationName, setNewPresentationName] = useState('');
-  // const thumbnailIndex = presentation.thumbnailSlideIndex || 0;
   const navigate = useNavigate();
-
 
   useEffect(() => {
     axios.get('http://localhost:5005/store', {
@@ -38,7 +36,9 @@ function Dashboard({ onLogout, token }) {
     const newPresentation = {
       id: Date.now(),
       name: newPresentationName,
-      slides: [{ id: 1, content: '' }],
+      description: '',
+      thumbnailSlideIndex: 0,
+      slides: [{ id: Date.now(), elements: [] }],
     };
 
     axios.get('http://localhost:5005/store', {
@@ -115,14 +115,18 @@ function Dashboard({ onLogout, token }) {
               position: 'relative',
             }}
           >
-            <div
-              className="thumbnail"
-              style={{
-                width: '100%',
-                height: '70%',
-                backgroundColor: '#eee',
-              }}
-            />
+            <div className="thumbnail" style={{ width: '100%', height: '70%', backgroundColor: '#eee' }}>
+              {presentation.thumbnailSlideIndex !== undefined ? (
+                <img
+                  src={presentation.slides[presentation.thumbnailSlideIndex].content}
+                  alt={`Thumbnail for ${presentation.name}`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div style={{ backgroundColor: '#ccc', width: '100%', height: '100%' }}>No Thumbnail</div>
+              )}
+            </div>
+
             <h3 style={{ margin: '5px 0' }}>{presentation.name}</h3>
             {presentation.description && <p>{presentation.description}</p>}
             <p>Slides: {presentation.slides.length}</p>

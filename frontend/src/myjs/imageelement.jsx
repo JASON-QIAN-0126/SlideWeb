@@ -6,7 +6,6 @@ function ImageElement({ element, onEdit }) {
       src={element.properties.src}
       alt={element.properties.alt}
       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-      onDoubleClick={() => onEdit(element)}
     />
   );
 }

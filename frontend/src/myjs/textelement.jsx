@@ -8,7 +8,7 @@ function TextElement({ element, onEdit }) {
   };
 
   return (
-    <div style={style} onDoubleClick={() => onEdit(element)}>
+    <div style={style}>
       {element.properties.text}
     </div>
   );

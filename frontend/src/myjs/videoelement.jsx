@@ -10,7 +10,6 @@ function VideoElement({ element, onEdit }) {
       }`}
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowFullScreen
-      onDoubleClick={() => onEdit(element)}
     ></iframe>
   );
 }
