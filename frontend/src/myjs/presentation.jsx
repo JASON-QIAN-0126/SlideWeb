@@ -301,6 +301,37 @@ function Presentation({ token }) {
       });
   };
 
+  const parseYouTubeId = (url) => {
+    const regExp =
+      /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const CodeBlock = ({ code, language, fontSize }) => {
+    const codeRef = useRef(null);
+
+    useEffect(() => {
+      if (codeRef.current) {
+        hljs.highlightBlock(codeRef.current);
+      }
+    }, [code]);
+
+    return (
+      <pre
+        style={{
+          fontSize: `${fontSize}em`,
+          fontFamily: 'monospace',
+          whiteSpace: 'pre-wrap',
+        }}
+      >
+        <code ref={codeRef} className={language}>
+          {code}
+        </code>
+      </pre>
+    );
+  };
+  
   return (
     <div>
         <h2>
@@ -507,6 +538,112 @@ function Presentation({ token }) {
                     })
                   }
                 />
+              </label>
+            </>
+          )}
+          {modalType === 'image' && (
+            <>
+              <label>
+                Image URL:
+                <input
+                  type="text"
+                  value={elementProperties.src || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      src: e.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Alt Text:
+                <input
+                  type="text"
+                  value={elementProperties.alt || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      alt: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            </>
+          )}
+          {modalType === 'video' && (
+            <>
+              <label>
+                YouTube Video URL:
+                <input
+                  type="text"
+                  value={elementProperties.videoUrl || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      videoUrl: e.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Auto Play:
+                <input
+                  type="checkbox"
+                  checked={elementProperties.autoplay || false}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      autoplay: e.target.checked,
+                    })
+                  }
+                />
+              </label>
+            </>
+          )}
+          {modalType === 'code' && (
+            <>
+              <label>
+                Code:
+                <textarea
+                  value={elementProperties.code || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      code: e.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Font Size (em):
+                <input
+                  type="number"
+                  value={elementProperties.fontSize || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      fontSize: e.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Language:
+                <select
+                  value={elementProperties.language || ''}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      language: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">Select Language</option>
+                  <option value="javascript">JavaScript</option>
+                  <option value="python">Python</option>
+                  <option value="c">C</option>
+                </select>
               </label>
             </>
           )}
