@@ -7,6 +7,7 @@ import ImageElement from './imageelement';
 import VideoElement from './videoelement';
 import CodeElement from './codeelement';
 import SlideThumbnail from './SlideThumbnail';
+import BackgroundPicker from './background';
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -26,6 +27,10 @@ function Presentation({ token }) {
   const [editingElementId, setEditingElementId] = useState(null);
   const navigate = useNavigate();
 
+  // background
+  const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+  const [isDefaultBackground, setIsDefaultBackground] = useState(false);
+
   useEffect(() => {
     axios.get('http://localhost:5005/store', {
       headers: { 'Authorization': `Bearer ${token}` },
@@ -44,6 +49,7 @@ function Presentation({ token }) {
       });
   }, [id, token]);
 
+  // Thumbnail
   useEffect(() => {
     if (presentation && presentation.thumbnailSlideIndex !== undefined) {
       setThumbnailSlideIndex(presentation.thumbnailSlideIndex);
@@ -91,6 +97,7 @@ function Presentation({ token }) {
     setNewDescription('');
   };
 
+  // add and delete slide
   const handleAddSlide = async () => {
     const newSlide = {
       id: Date.now(),
@@ -139,30 +146,30 @@ function Presentation({ token }) {
     }
   };
 
-    const handleDeletePresentation = () => {
-        const confirmDelete = window.confirm('Are you sure you want to delete this presentation?');
-        if (confirmDelete) {
-        axios.get('http://localhost:5005/store', {
-            headers: { 'Authorization': `Bearer ${token}` },
-        })
-            .then((response) => {
-            const store = response.data.store || {};
-            delete store[presentation.id];
+  const handleDeletePresentation = () => {
+      const confirmDelete = window.confirm('Are you sure you want to delete this presentation?');
+      if (confirmDelete) {
+      axios.get('http://localhost:5005/store', {
+          headers: { 'Authorization': `Bearer ${token}` },
+      })
+          .then((response) => {
+          const store = response.data.store || {};
+          delete store[presentation.id];
 
-            return axios.put('http://localhost:5005/store', {
-                store: store,
-            }, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            })
-            .then(() => {
-            navigate('/dashboard');
-            })
-            .catch((err) => {
-            console.error('Failed to delete presentation', err);
-            });
-        }
-    };
+          return axios.put('http://localhost:5005/store', {
+              store: store,
+          }, {
+              headers: { 'Authorization': `Bearer ${token}` },
+          });
+          })
+          .then(() => {
+          navigate('/dashboard');
+          })
+          .catch((err) => {
+          console.error('Failed to delete presentation', err);
+          });
+      }
+  };
 
   const handleUpdateTitle = () => {
     const updatedPresentation = {
@@ -361,6 +368,47 @@ function Presentation({ token }) {
     }
   };
 
+  // background
+  const slideBackground = currentSlide.background || presentation.defaultBackground || {};
+
+  const slideStyle = {
+    position: 'relative',
+    width: '600px',
+    height: '400px',
+    border: '1px solid #000',
+    backgroundColor: '#fff', // 默认背景色
+  };
+
+  if (slideBackground.type === 'color') {
+    slideStyle.backgroundColor = slideBackground.value;
+  } else if (slideBackground.type === 'gradient') {
+    slideStyle.backgroundImage = slideBackground.value;
+  } else if (slideBackground.type === 'image') {
+    slideStyle.backgroundImage = `url(${slideBackground.value})`;
+    slideStyle.backgroundSize = 'cover';
+  }
+
+  const handleSetBackground = (background) => {
+    let updatedPresentation = { ...presentation };
+  
+    if (isDefaultBackground) {
+      updatedPresentation.defaultBackground = background;
+    } else {
+      updatedPresentation.slides = presentation.slides.map((slide, index) => {
+        if (index === currentSlideIndex) {
+          return {
+            ...slide,
+            background: background,
+          };
+        }
+        return slide;
+      });
+    }
+  
+    updateStore(updatedPresentation);
+    setIsDefaultBackground(false);
+  };
+
   return (
     <div>
         <h2>
@@ -443,22 +491,36 @@ function Presentation({ token }) {
                 }}
               >
                 <p>Slide {index + 1}</p>
-                <SlideThumbnail slide={slide} />
+                <SlideThumbnail 
+                  slide={{ 
+                    ...slide, 
+                    background: slide.background || presentation.defaultBackground || {} 
+                  }} 
+                />
               </div>
             ))}
             <button onClick={() => setShowThumbnailModal(false)}>Cancel</button>
           </div>
         )}
 
+        <button onClick={() => setShowBackgroundModal(true)}>Change Background</button>
+        <BackgroundPicker
+          show={showBackgroundModal}
+          onClose={() => {
+            setShowBackgroundModal(false);
+            setIsDefaultBackground(false); // 重置默认背景选择
+          }}
+          onApply={handleSetBackground}
+          currentBackground={currentSlide.background || {}}
+          isDefault={isDefaultBackground}
+          setIsDefault={setIsDefaultBackground}
+        />
+
         <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
+        
     <div
         className="slide-container"
-        style={{
-          position: 'relative',
-          width: '600px',
-          height: '400px',
-          border: '1px solid #000',
-        }}
+        style={slideStyle}
       >
         {renderElements()}
         <div

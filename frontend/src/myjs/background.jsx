@@ -101,6 +101,25 @@ function BackgroundPicker({
         </select>
       </label>
 
+      {backgroundType === 'color' && (
+        <label>
+          Color (HEX):
+          <input
+            type="color"
+            value={colorValue}
+            onChange={(e) => setColorValue(e.target.value)}
+            style={{ marginLeft: '10px' }}
+          />
+          <input
+            type="text"
+            value={colorValue}
+            onChange={(e) => setColorValue(e.target.value)}
+            placeholder="#ffffff"
+            style={{ marginLeft: '10px', width: '100px' }}
+          />
+        </label>
+      )}
+
       {backgroundType === 'gradient' && (
         <>
           <label>
@@ -166,6 +185,30 @@ function BackgroundPicker({
             ))}
             <button onClick={addColor}>Add Color</button>
           </div>
+        </>
+      )}
+
+      {backgroundType === 'image' && (
+        <>
+          <label>
+            Image URL:
+            <input
+              type="text"
+              value={imageURL}
+              onChange={(e) => setImageURL(e.target.value)}
+              placeholder="https://example.com/image.jpg"
+              style={{ marginLeft: '10px', width: '100%' }}
+            />
+          </label>
+          <label>
+            OR Upload Image:
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageFileChange}
+              style={{ marginLeft: '10px' }}
+            />
+          </label>
         </>
       )}
 

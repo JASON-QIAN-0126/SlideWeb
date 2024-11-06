@@ -76,7 +76,6 @@ function Dashboard({ onLogout, token }) {
       <button onClick={handleLogout}>Log out</button>
       <button onClick={handleCreatePresentation}>New Presentation</button>
 
-
       {showModal && (
         <div className="modal" style={{
           position: 'fixed',
@@ -134,8 +133,15 @@ function Dashboard({ onLogout, token }) {
             }}
             >
               {/* 渲染缩略图幻灯片 */}
-              {presentation.slides && presentation.slides.length > 0 && (
-                <SlideThumbnail slide={presentation.slides[presentation.thumbnailSlideIndex || 0]} />
+              {presentation.slides && presentation.slides.length > 0 ? (
+                <SlideThumbnail 
+                  slide={{ 
+                    ...presentation.slides[presentation.thumbnailSlideIndex || 0], 
+                    background: presentation.slides[presentation.thumbnailSlideIndex || 0].background || presentation.defaultBackground || {} 
+                  }} 
+                />
+              ) : (
+                <SlideThumbnail />
               )}
             </div>
             <div

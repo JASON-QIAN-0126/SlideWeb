@@ -19,6 +19,60 @@ function SlideThumbnail({ slide }) {
             </div>
         );
         }
+    
+    const renderBackground = () => {
+      if (!slide.background) {
+          return null;
+      }
+
+      const { type, value } = slide.background;
+
+      switch(type) {
+          case 'color':
+              return (
+                  <div
+                      style={{
+                          backgroundColor: value,
+                          width: '100%',
+                          height: '100%',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                      }}
+                  ></div>
+              );
+          case 'gradient':
+              return (
+                  <div
+                      style={{
+                          backgroundImage: value,
+                          width: '100%',
+                          height: '100%',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                      }}
+                  ></div>
+              );
+          case 'image':
+              return (
+                  <div
+                      style={{
+                          backgroundImage: `url(${value})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          width: '100%',
+                          height: '100%',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                      }}
+                  ></div>
+              );
+          default:
+              return null;
+      }
+  };
 
   return (
     <div
@@ -30,6 +84,7 @@ function SlideThumbnail({ slide }) {
         backgroundColor: '#fff',
       }}
     >
+      {renderBackground()}
       <div
         style={{
           transform: 'scale(0.4)',
@@ -45,7 +100,6 @@ function SlideThumbnail({ slide }) {
             position: 'relative',
             width: '600px',
             height: '400px',
-            backgroundColor: '#fff',
           }}
         >
           {slide.elements.map((element) => {
@@ -88,7 +142,6 @@ function SlideThumbnail({ slide }) {
                     width="100%"
                     height="100%"
                     src={`https://www.youtube.com/embed/${element.properties.videoId}`}
-                    frameBorder="0"
                   ></iframe>
                 );
                 break;
