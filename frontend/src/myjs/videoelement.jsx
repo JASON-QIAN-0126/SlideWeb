@@ -1,6 +1,4 @@
-import React from 'react';
-
-function VideoElement({ element, onEdit }) {
+function VideoElement({ element }) {
   return (
     <iframe
       width="100%"

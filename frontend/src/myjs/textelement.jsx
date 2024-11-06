@@ -1,4 +1,4 @@
-function TextElement({ element, onEdit }) {
+function TextElement({ element}) {
   const style = {
     fontSize: `${element.properties.fontSize}em`,
     color: element.properties.color,

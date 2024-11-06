@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import TextElement from './textelement';
@@ -27,7 +27,7 @@ function Preview({ token }) {
       .catch((err) => {
         console.error('Failed to fetch presentation', err);
       });
-    }, [id, token]);
+  }, [id, token]);
 
   const handleNextSlide = () => {
     if (currentSlideIndex < presentation.slides.length - 1) {
@@ -82,20 +82,20 @@ function Preview({ token }) {
 
         let content = null;
         switch (element.type) {
-          case 'text':
-            content = <TextElement element={element} />;
-            break;
-          case 'image':
-            content = <ImageElement element={element} />;
-            break;
-          case 'video':
-            content = <VideoElement element={element} />;
-            break;
-          case 'code':
-            content = <CodeElement element={element} />;
-            break;
-          default:
-            break;
+        case 'text':
+          content = <TextElement element={element} />;
+          break;
+        case 'image':
+          content = <ImageElement element={element} />;
+          break;
+        case 'video':
+          content = <VideoElement element={element} />;
+          break;
+        case 'code':
+          content = <CodeElement element={element} />;
+          break;
+        default:
+          break;
         }
 
         return (

@@ -486,8 +486,10 @@ function Presentation({ token }) {
               style={{
                 cursor: 'pointer',
                 marginBottom: '20px',
-                border: '1px solid #ccc',
+                border: index === thumbnailSlideIndex ? '2px solid blue' : '1px solid #ccc',
                 padding: '10px',
+                borderRadius: '4px',
+                backgroundColor: index === thumbnailSlideIndex ? '#e0f7fa' : '#fff',
               }}
             >
               <p>Slide {index + 1}</p>
