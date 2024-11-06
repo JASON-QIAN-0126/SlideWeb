@@ -6,6 +6,7 @@ function Dashboard({ onLogout, token }) {
   const [presentations, setPresentations] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newPresentationName, setNewPresentationName] = useState('');
+  // const thumbnailIndex = presentation.thumbnailSlideIndex || 0;
   const navigate = useNavigate();
 
 

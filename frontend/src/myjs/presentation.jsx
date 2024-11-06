@@ -13,8 +13,12 @@ function Presentation({ token }) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showTitleModal, setShowTitleModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [newDescription, setNewDescription] = useState('');
+
+  // add 'text', 'image', 'video', 'code'
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState(''); // 'text', 'image', 'video', 'code'
+  const [modalType, setModalType] = useState('');
   const [elementProperties, setElementProperties] = useState({});
   const [editingElementId, setEditingElementId] = useState(null);
   const navigate = useNavigate();
@@ -55,6 +59,16 @@ function Presentation({ token }) {
     } catch (err) {
       console.error('Failed to update store', err);
     }
+  };
+
+  const handleUpdateDescription = () => {
+    const updatedPresentation = {
+      ...presentation,
+      description: newDescription,
+    };
+    updateStore(updatedPresentation);
+    setShowDescriptionModal(false);
+    setNewDescription('');
   };
 
   const handleAddSlide = async () => {
@@ -354,6 +368,29 @@ function Presentation({ token }) {
         </div>
         )}
 
+        <button onClick={() => setShowDescriptionModal(true)}>Edit Description</button>
+        {showDescriptionModal && (
+            <div className="modal" style={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: '#fff',
+                padding: '20px',
+                boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+                zIndex: 1000,
+            }}>
+            <h3>Edit Description</h3>
+            <textarea
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              placeholder="New Description"
+            />
+            <button onClick={handleUpdateDescription}>Update</button>
+            <button onClick={() => setShowDescriptionModal(false)}>Cancel</button>
+          </div>
+        )}
+        
     <div
         className="slide-container"
         style={{
@@ -376,20 +413,24 @@ function Presentation({ token }) {
         >
           {currentSlideIndex + 1}
         </div>
-        <button
-          onClick={handlePrevSlide}
-          disabled={currentSlideIndex === 0}
-          style={{ position: 'absolute', top: '50%', left: '0' }}
-        >
-          &lt;
-        </button>
-        <button
-          onClick={handleNextSlide}
-          disabled={currentSlideIndex === presentation.slides.length - 1}
-          style={{ position: 'absolute', top: '50%', right: '0' }}
-        >
-          &gt;
-        </button>
+        {presentation.slides.length > 1 && (
+          <>
+            <button
+              onClick={handlePrevSlide}
+              disabled={currentSlideIndex === 0}
+              style={{ position: 'absolute', top: '50%', left: '0' }}
+            >
+              &lt;
+            </button>
+            <button
+              onClick={handleNextSlide}
+              disabled={currentSlideIndex === presentation.slides.length - 1}
+              style={{ position: 'absolute', top: '50%', right: '0' }}
+            >
+              &gt;
+            </button>
+          </>
+        )}
       </div>
 
       <div>
