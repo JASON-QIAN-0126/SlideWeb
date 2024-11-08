@@ -18,7 +18,7 @@ import styled from 'styled-components';
 import DeletePresentation from './modal/DeletePresentation';
 
 const PresentationContainer = styled.div`
-  background-color: #6950a1;
+  background-color: #a594d8;
   min-height: 100vh;
   padding: 20px;
 `;
@@ -42,7 +42,8 @@ const Button = styled.button`
   transition: background-color 0.3s ease, transform 0.1s ease;
 
   &:hover {
-    background-color: #ddd;
+    background-color: #6950a1;
+    color: white;
   }
 
   &:active {

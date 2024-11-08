@@ -76,6 +76,13 @@ const PresentationCard = styled.div`
   background-color: white;
   border-radius: 8px;
   color: #000;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    border-color: #494e8f;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
 `;
 
 function Dashboard({ onLogout, token}) {

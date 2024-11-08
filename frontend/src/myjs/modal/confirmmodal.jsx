@@ -14,7 +14,7 @@ const Overlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  background-color: #fff;
+  background-color: #f7f5ff;
   padding: 20px;
   border-radius: 8px;
   width: 400px;
@@ -24,6 +24,7 @@ const ModalContainer = styled.div`
 
 const ModalHeader = styled.h3`
   margin-top: 0;
+  color: #6950a1;
 `;
 
 const ModalButtons = styled.div`
@@ -32,7 +33,27 @@ const ModalButtons = styled.div`
   margin-top: 20px;
 
   button {
-    margin-left: 10px;
+    padding: 8px 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    
+    &:first-child {
+      background-color: #ddd;
+      color: #333;
+      margin-right: 10px;
+    }
+    
+    &:last-child {
+      background-color: #6950a1;
+      color: white;
+    }
+
+    &:hover {
+      background-color: #afb4db;
+    }
   }
 `;
 
