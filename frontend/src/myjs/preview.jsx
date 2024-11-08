@@ -6,6 +6,7 @@ import TextElement from './textelement';
 import ImageElement from './imageelement';
 import VideoElement from './videoelement';
 import CodeElement from './codeelement';
+import Animation from './animation'; // Import Animation component
 
 function Preview({ token }) {
   const { id, slideIndex } = useParams();
@@ -67,6 +68,7 @@ function Preview({ token }) {
   }
 
   const currentSlide = presentation.slides[currentSlideIndex];
+  const animationsEnabled = presentation.animationsEnabled || false;
 
   const renderElements = () => {
     const elements = currentSlide.elements || [];
@@ -130,7 +132,13 @@ function Preview({ token }) {
 
   return (
     <div style={slideStyle}>
-      {renderElements()}
+      {animationsEnabled ? (
+        <Animation slideKey={currentSlideIndex}>
+          {renderElements()}
+        </Animation>
+      ) : (
+        renderElements()
+      )}
       {presentation.slides.length > 1 && (
         <>
           <button

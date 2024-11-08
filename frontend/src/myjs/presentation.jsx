@@ -11,6 +11,7 @@ import BackgroundPicker from './background';
 import ConfirmModal from './confirmmodal';
 import NotificationModal from './notificationmodal';
 import MoveAndResize from './moveandresize';
+import Animation from './animation';
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -41,6 +42,9 @@ function Presentation({ token }) {
   // move and resize
   const [selectedElementId, setSelectedElementId] = useState(null);
 
+  // animation
+  const [animationsEnabled, setAnimationsEnabled] = useState(false);
+
   useEffect(() => {
     axios.get('http://localhost:5005/store', {
       headers: { 'Authorization': `Bearer ${token}` },
@@ -59,12 +63,20 @@ function Presentation({ token }) {
       });
   }, [id, token]);
 
-  // Thumbnail
+  // Thumbnail and animation
   useEffect(() => {
     if (presentation && presentation.thumbnailSlideIndex !== undefined) {
       setThumbnailSlideIndex(presentation.thumbnailSlideIndex);
     } else {
       setThumbnailSlideIndex(0);
+    }
+  }, [presentation]);
+
+  useEffect(() => {
+    if (presentation && presentation.animationsEnabled !== undefined) {
+      setAnimationsEnabled(presentation.animationsEnabled);
+    } else {
+      setAnimationsEnabled(false);
     }
   }, [presentation]);
 
@@ -370,6 +382,7 @@ function Presentation({ token }) {
               <MoveAndResize
                 element={element}
                 updateElementPositionSize={updateElementPositionSize}
+                onMoveOrResizeEnd={handleMoveOrResizeEnd}
               >
                 {content}
               </MoveAndResize>
@@ -454,6 +467,20 @@ function Presentation({ token }) {
   
     updateStore(updatedPresentation);
     setIsDefaultBackground(false);
+  };
+
+  // move or resize
+  const handleMoveOrResizeEnd = () => {
+    updateStore(presentation);
+  };
+
+  // animation
+  const toggleAnimations = () => {
+    const newAnimationsEnabled = !animationsEnabled;
+    const updatedPresentation = { ...presentation, animationsEnabled: newAnimationsEnabled };
+    setPresentation(updatedPresentation);
+    setAnimationsEnabled(newAnimationsEnabled);
+    updateStore(updatedPresentation);
   };
 
   return (
@@ -574,24 +601,48 @@ function Presentation({ token }) {
       />
 
       <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
-        
+
+      <button onClick={toggleAnimations}>
+        {animationsEnabled ? 'Disable Animation' : 'Add Animation'}
+      </button>
+
       <div
         className="slide-container"
         style={slideStyle}
       >
-        {renderElements()}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '10px',
-            left: '10px',
-            fontSize: '1em',
-            width: '50px',
-            height: '50px',
-          }}
-        >
-          {currentSlideIndex + 1}
-        </div>
+        {animationsEnabled ? (
+          <Animation slideKey={currentSlideIndex}>
+            {renderElements()}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: '10px',
+                fontSize: '1em',
+                width: '50px',
+                height: '50px',
+              }}
+            >
+              {currentSlideIndex + 1}
+            </div>
+          </Animation>
+        ) : (
+          <>
+            {renderElements()}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: '10px',
+                fontSize: '1em',
+                width: '50px',
+                height: '50px',
+              }}
+            >
+              {currentSlideIndex + 1}
+            </div>
+          </>
+        )}
         {presentation.slides.length > 1 && (
           <>
             <button

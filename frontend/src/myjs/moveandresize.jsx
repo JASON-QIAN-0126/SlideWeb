@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-function MoveAndResize({ element, updateElementPositionSize, children }) {
+function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, children }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [resizeDirection, setResizeDirection] = useState('');
@@ -94,6 +94,9 @@ function MoveAndResize({ element, updateElementPositionSize, children }) {
     setIsDragging(false);
     setIsResizing(false);
     setResizeDirection('');
+    if (onMoveOrResizeEnd) {
+        onMoveOrResizeEnd();
+      }
   };
 
   const handleResizeMouseDown = (e, direction) => {
