@@ -121,7 +121,7 @@ function Presentation({ token }) {
 
   const handleDeleteSlide = () => {
     if (presentation.slides.length === 1) {
-      setNotificationOpen(true); // 显示通知模态框
+      setNotificationOpen(true);
       return;
     }
     const updatedSlides = presentation.slides.filter(
@@ -153,14 +153,12 @@ function Presentation({ token }) {
   };
 
   const handleDeletePresentation = () => {
-    setIsConfirmModalOpen(true); // 打开确认模态框
+    setIsConfirmModalOpen(true);
   };
 
-  // 确认删除后的逻辑
   const handleConfirmDelete = () => {
-    setIsConfirmModalOpen(false); // 关闭确认模态框
+    setIsConfirmModalOpen(false);
 
-    // 执行删除操作
     axios.get('http://localhost:5005/store', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
@@ -182,9 +180,8 @@ function Presentation({ token }) {
       });
   };
 
-  // 取消删除操作
   const handleCancelDelete = () => {
-    setIsConfirmModalOpen(false); // 关闭确认模态框
+    setIsConfirmModalOpen(false);
   };
 
   const handleUpdateTitle = () => {
