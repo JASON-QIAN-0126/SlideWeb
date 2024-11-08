@@ -7,15 +7,22 @@ const ModalContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #fff;
+  background-color: #f3edf9;
   padding: 20px;
   max-height: 80vh;
   width: 80vw;
   overflow-y: auto;
-  box-shadow: 0px 0px 15px rgba(255, 182, 193, 0.4);
-  border: 3px solid #ffc0cb;
+  box-shadow: 0px 0px 15px rgba(182, 150, 193, 0.3);
+  border: 3px solid #d1b3e0;
   border-radius: 8px;
   z-index: 1000;
+`;
+
+const Title = styled.h3`
+  color: #9c81b5;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 1.5rem;
 `;
 
 const ThumbnailGrid = styled.div`
@@ -27,38 +34,39 @@ const ThumbnailGrid = styled.div`
 
 const ThumbnailCard = styled.div`
   cursor: pointer;
-  border: ${({ selected }) => (selected ? '2px solid blue' : '1px solid #ccc')};
+  border: ${({ selected }) => (selected ? '2px solid #9c81b5' : '1px solid #ccc')};
   padding: 10px;
   border-radius: 4px;
-  background-color: ${({ selected }) => (selected ? '#e0f7fa' : '#fff')};
+  background-color: ${({ selected }) => (selected ? '#e8dff0' : '#fff')};
   text-align: center;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    background-color: #f1e8f6;
+  }
 `;
 
 const CancelButton = styled.button`
   padding: 10px 20px;
   font-size: 1rem;
-  color: #fff;
-  background-color: #ff69b4;
+  color: white;
+  background-color: #9c81b5;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   margin-top: 20px;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  
   &:hover {
-    background-color: #ff85c2;
-  }
-
-  &:active {
-    background-color: #ff4da6;
-    transform: scale(0.98);
+    transform: scale(1.1);
   }
 `;
 
 function ThumbnailModal({ presentation, thumbnailSlideIndex, handleUpdateThumbnail, onClose }) {
   return (
     <ModalContainer>
-      <h3>Select Thumbnail Slide</h3>
+      <Title>Select Thumbnail Slide</Title>
       <ThumbnailGrid>
         {presentation.slides.map((slide, index) => (
           <ThumbnailCard

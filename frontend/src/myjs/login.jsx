@@ -70,10 +70,12 @@ const Button = styled.button`
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 
   &:hover {
-    background-color: #ddd;
+    background-color: #9999cc;
+    color: white;
+    transform: scale(1.1);
   }
 
   &:active {

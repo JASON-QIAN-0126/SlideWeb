@@ -41,11 +41,12 @@ const Button = styled.button`
   font-weight: bold;
   cursor: pointer;
   margin: 10px;
-  transition: background-color 0.3s ease, transform 0.1s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 
   &:hover {
     background-color: #6950a1;
     color: white;
+    transform: scale(1.1);
   }
 
   &:active {

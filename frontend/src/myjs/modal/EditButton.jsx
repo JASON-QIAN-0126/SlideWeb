@@ -5,7 +5,7 @@ const ButtonBarContainer = styled.div`
   display: flex;
   justify-content: flex-start;
   margin-bottom: 20px;
-  gap: 10px;
+  gap: 15px;
 `;
 
 const StyledButton = styled.button`
@@ -17,11 +17,12 @@ const StyledButton = styled.button`
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   
   &:hover {
     background-color: #6950a1;
     color: white;
+    transform: scale(1.1);
   }
 `;
 

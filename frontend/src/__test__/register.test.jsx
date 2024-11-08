@@ -31,20 +31,20 @@ describe('Register Component', () => {
     // Render the form and verify presence of all input fields and button
     renderRegister();
     expect(screen.getByRole('heading', { name: /register/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('name')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('email')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('password')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('confirmed password')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Name')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Confirm Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /register/i })).toBeInTheDocument();
   });
 
   test('displays error when passwords do not match', async () => {
     // Render the form and enter mismatched passwords to trigger validation error
     renderRegister();
-    fireEvent.change(screen.getByPlaceholderText('name'), { target: { value: 'Test User' } });
-    fireEvent.change(screen.getByPlaceholderText('email'), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByPlaceholderText('password'), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByPlaceholderText('confirmed password'), { target: { value: 'password321' } });
+    fireEvent.change(screen.getByPlaceholderText('Name'), { target: { value: 'Test User' } });
+    fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText('Confirm Password'), { target: { value: 'password321' } });
     fireEvent.click(screen.getByRole('button', { name: /register/i }));
   
     // Assert that the "passwords do not match" error message is displayed
@@ -62,10 +62,10 @@ describe('Register Component', () => {
 
     // Render the form and enter valid details to simulate failed registration
     renderRegister();
-    fireEvent.change(screen.getByPlaceholderText('name'), { target: { value: 'Test User' } });
-    fireEvent.change(screen.getByPlaceholderText('email'), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByPlaceholderText('password'), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByPlaceholderText('confirmed password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText('Name'), { target: { value: 'Test User' } });
+    fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText('Confirm Password'), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: /register/i }));
 
     // Assert that the "Email already in use" error message is displayed
@@ -80,10 +80,10 @@ describe('Register Component', () => {
 
     // Render the form and enter valid details to simulate successful registration
     renderRegister();
-    fireEvent.change(screen.getByPlaceholderText('name'), { target: { value: 'Test User' } });
-    fireEvent.change(screen.getByPlaceholderText('email'), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByPlaceholderText('password'), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByPlaceholderText('confirmed password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText('Name'), { target: { value: 'Test User' } });
+    fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText('Confirm Password'), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: /register/i }));
 
     // Wait for registration to complete and verify that onRegister was called with the token

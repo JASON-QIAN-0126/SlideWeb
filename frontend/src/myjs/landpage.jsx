@@ -31,7 +31,7 @@ const Title = styled.h1`
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: 15px;
+  gap: 30px;
 `;
 
 const StyledButton = styled(Link)`
@@ -43,10 +43,12 @@ const StyledButton = styled(Link)`
   border-radius: 5px;
   text-decoration: none;
   font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.1s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 
   &:hover {
-    background-color: #ddd;
+    background-color: #9999cc;
+    color: white;
+    transform: scale(1.1); /* 悬停时放大效果 */
   }
 `;
 

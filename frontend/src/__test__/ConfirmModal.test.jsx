@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import ConfirmModal from '../myjs/confirmmodal.jsx';
+import ConfirmModal from '../myjs/modal/confirmmodal.jsx';
 import '@testing-library/jest-dom';
 
 describe('ConfirmModal Component', () => {
