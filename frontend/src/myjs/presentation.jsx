@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid'; // for id
+import { v4 as uuidv4 } from 'uuid';
 import TextElement from './textelement';
 import ImageElement from './imageelement';
 import VideoElement from './videoelement';
@@ -12,6 +12,8 @@ import ConfirmModal from './confirmmodal';
 import NotificationModal from './notificationmodal';
 import MoveAndResize from './moveandresize';
 import Animation from './animation';
+import RearrangeSlides from './rearrange';
+import RevisionHistory from './revision';
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -44,6 +46,13 @@ function Presentation({ token }) {
 
   // animation
   const [animationsEnabled, setAnimationsEnabled] = useState(false);
+
+  // rearrange
+  const [showRearrangeModal, setShowRearrangeModal] = useState(false);
+
+  // revision
+  const [lastSavedTime, setLastSavedTime] = useState(null);
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
 
   useEffect(() => {
     axios.get('http://localhost:5005/store', {
@@ -91,6 +100,17 @@ function Presentation({ token }) {
 
   const updateStore = async (updatedPresentation) => {
     try {
+      const currentTime = Date.now();
+      if (!lastSavedTime || currentTime - lastSavedTime >= 60000) {
+        // save history if more than 1min
+        const historyEntry = {
+          timestamp: currentTime,
+          slides: presentation.slides,
+        };
+        updatedPresentation.history = updatedPresentation.history || [];
+        updatedPresentation.history.push(historyEntry);
+        setLastSavedTime(currentTime);
+      }
       const response = await axios.get('http://localhost:5005/store', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -122,7 +142,7 @@ function Presentation({ token }) {
   // add and delete slide
   const handleAddSlide = async () => {
     const newSlide = {
-      id: Date.now(),
+      id: uuidv4(),
       elements: [],
     };
     const updatedPresentation = {
@@ -483,6 +503,31 @@ function Presentation({ token }) {
     updateStore(updatedPresentation);
   };
 
+  // handle rearrange
+  const handleRearrangeSlides = (newSlidesOrder) => {
+    const updatedPresentation = { ...presentation, slides: newSlidesOrder };
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+    setShowRearrangeModal(false);
+  };
+
+  // handle history
+  const handleRestoreRevision = (entry) => {
+    const updatedPresentation = {
+      ...presentation,
+      slides: entry.slides,
+    };
+    updateStore(updatedPresentation).then(() => {
+      setCurrentSlideIndex((prevIndex) => {
+        if (prevIndex >= updatedPresentation.slides.length) {
+          return updatedPresentation.slides.length - 1;
+        }
+        return prevIndex;
+      });
+      setShowRevisionModal(false);
+    });
+  };
+
   return (
     <div>
       <h2>
@@ -605,7 +650,26 @@ function Presentation({ token }) {
       <button onClick={toggleAnimations}>
         {animationsEnabled ? 'Disable Animation' : 'Add Animation'}
       </button>
+      
+      <button onClick={() => setShowRearrangeModal(true)}>Rearrange Slides</button>
+      {showRearrangeModal && (
+        <RearrangeSlides
+          slides={presentation.slides}
+          onRearrange={handleRearrangeSlides}
+          onClose={() => setShowRearrangeModal(false)}
+        />
+      )}
 
+      <button onClick={() => setShowRevisionModal(true)}>Revision History</button>
+      {showRevisionModal && (
+        <RevisionHistory
+          history={presentation.history || []}
+          onRestore={handleRestoreRevision}
+          onClose={() => setShowRevisionModal(false)}
+        />
+      )}
+
+      {/* slide content part */}
       <div
         className="slide-container"
         style={slideStyle}

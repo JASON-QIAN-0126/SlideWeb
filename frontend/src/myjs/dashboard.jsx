@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import SlideThumbnail from './SlideThumbnail';
 
@@ -39,7 +40,7 @@ function Dashboard({ onLogout, token }) {
       name: newPresentationName,
       description: '',
       thumbnailSlideIndex: 0,
-      slides: [{ id: Date.now(), elements: [] }],
+      slides: [{ id: uuidv4(), elements: [] }],
     };
 
     axios.get('http://localhost:5005/store', {

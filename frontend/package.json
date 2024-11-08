@@ -11,9 +11,11 @@
     "test": "vitest --run && cypress run"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^17.0.0",
     "axios": "^1.7.7",
     "highlight.js": "^11.10.0",
     "react": "^18.3.1",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",
     "styled-components": "^6.1.13",
