@@ -16,6 +16,8 @@ import RevisionHistory from './revision';
 
 import styled from 'styled-components';
 import DeletePresentation from './modal/DeletePresentation';
+import ButtonBar from './modal/EditButton';
+import EditModal from './modal/EditModal';
 
 const PresentationContainer = styled.div`
   background-color: #a594d8;
@@ -579,7 +581,6 @@ function Presentation({ token }) {
   return (
     <PresentationContainer>
       <Title>{presentation.name}</Title>
-      <button onClick={() => setShowTitleModal(true)}>Edit Title</button>
       <BackButton onClick={() => navigate('/dashboard')}>Back</BackButton>
       <DeletePresentation
         isConfirmModalOpen={isConfirmModalOpen} 
@@ -588,61 +589,44 @@ function Presentation({ token }) {
         handleCancelDelete={handleCancelDelete}
       />
 
+      <ButtonBar
+        onEditTitle={() => setShowTitleModal(true)}
+        onEditDescription={() => setShowDescriptionModal(true)}
+        onUpdateThumbnail={() => setShowThumbnailModal(true)}
+      />
+
       {showTitleModal && (
-        <div className="modal" style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: '#fff',
-          padding: '20px',
-          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-          zIndex: 1000,
-        }}>
-          <h3>Edit Title</h3>
-          <input
-            type="text"
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            placeholder="New Title"
-          />
-          <button onClick={handleUpdateTitle}>Update</button>
-          <button onClick={() => setShowTitleModal(false)}>Cancel</button>
-        </div>
+        <EditModal
+          title="Edit Title"
+          value={newTitle}
+          onChange={setNewTitle}
+          onSave={handleUpdateTitle}
+          onClose={() => setShowTitleModal(false)}
+          placeholder="New Title"
+          isTextArea={false}
+        />
       )}
 
-      <button onClick={() => setShowDescriptionModal(true)}>Edit Description</button>
       {showDescriptionModal && (
-        <div className="modal" style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: '#fff',
-          padding: '20px',
-          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-          zIndex: 1000,
-        }}>
-          <h3>Edit Description</h3>
-          <textarea
-            value={newDescription}
-            onChange={(e) => setNewDescription(e.target.value)}
-            placeholder="New Description"
-          />
-          <button onClick={handleUpdateDescription}>Update</button>
-          <button onClick={() => setShowDescriptionModal(false)}>Cancel</button>
-        </div>
+        <EditModal
+          title="Edit Description"
+          value={newDescription}
+          onChange={setNewDescription}
+          onSave={handleUpdateDescription}
+          onClose={() => setShowDescriptionModal(false)}
+          placeholder="New Description"
+          isTextArea={true}
+        />
       )}
-        
-        <button onClick={() => setShowThumbnailModal(true)}>Update Thumbnail</button>
-        {showThumbnailModal && (
-          <ThumbnailModal
-            presentation={presentation}
-            thumbnailSlideIndex={thumbnailSlideIndex}
-            handleUpdateThumbnail={handleUpdateThumbnail}
-            onClose={() => setShowThumbnailModal(false)}
-          />
-        )}
+
+      {showThumbnailModal && (
+        <ThumbnailModal
+          presentation={presentation}
+          thumbnailSlideIndex={thumbnailSlideIndex}
+          handleUpdateThumbnail={handleUpdateThumbnail}
+          onClose={() => setShowThumbnailModal(false)}
+        />
+      )}
 
       <button onClick={() => setShowBackgroundModal(true)}>Change Background</button>
       <BackgroundPicker
