@@ -6,7 +6,7 @@ import TextElement from './textelement';
 import ImageElement from './imageelement';
 import VideoElement from './videoelement';
 import CodeElement from './codeelement';
-import SlideThumbnail from './SlideThumbnail';
+import ThumbnailModal from './modal/UpdateThumbnailModal';
 import BackgroundPicker from './background';
 import ConfirmModal from './confirmmodal';
 import NotificationModal from './notificationmodal';
@@ -454,10 +454,12 @@ function Presentation({ token }) {
 
   const slideStyle = {
     position: 'relative',
-    width: '600px',
-    height: '400px',
+    width: '100%',
+    maxWidth: '1000px',
+    margin: '0 auto',
+    aspectRatio: '16 / 9' ,
     border: '1px solid #000',
-    backgroundColor: '#fff', // 默认背景色
+    backgroundColor: '#fff',
   };
 
   if (slideBackground.type === 'color') {
@@ -594,46 +596,15 @@ function Presentation({ token }) {
         </div>
       )}
         
-      <button onClick={() => setShowThumbnailModal(true)}>Update Thumbnail</button>
-      {showThumbnailModal && (
-        <div className="modal" style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: '#fff',
-          padding: '20px',
-          maxHeight: '80vh',
-          overflowY: 'auto',
-          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-          zIndex: 1000,
-        }}>
-          <h3>Select Thumbnail Slide</h3>
-          {presentation.slides.map((slide, index) => (
-            <div
-              key={slide.id}
-              onClick={() => { handleUpdateThumbnail(index); setShowThumbnailModal(false); }}
-              style={{
-                cursor: 'pointer',
-                marginBottom: '20px',
-                border: index === thumbnailSlideIndex ? '2px solid blue' : '1px solid #ccc',
-                padding: '10px',
-                borderRadius: '4px',
-                backgroundColor: index === thumbnailSlideIndex ? '#e0f7fa' : '#fff',
-              }}
-            >
-              <p>Slide {index + 1}</p>
-              <SlideThumbnail 
-                slide={{ 
-                  ...slide, 
-                  background: slide.background || presentation.defaultBackground || {} 
-                }} 
-              />
-            </div>
-          ))}
-          <button onClick={() => setShowThumbnailModal(false)}>Cancel</button>
-        </div>
-      )}
+        <button onClick={() => setShowThumbnailModal(true)}>Update Thumbnail</button>
+        {showThumbnailModal && (
+          <ThumbnailModal
+            presentation={presentation}
+            thumbnailSlideIndex={thumbnailSlideIndex}
+            handleUpdateThumbnail={handleUpdateThumbnail}
+            onClose={() => setShowThumbnailModal(false)}
+          />
+        )}
 
       <button onClick={() => setShowBackgroundModal(true)}>Change Background</button>
       <BackgroundPicker

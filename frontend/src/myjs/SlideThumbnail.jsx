@@ -3,8 +3,11 @@ function SlideThumbnail({ slide }) {
     return (
       <div
         style={{
-          width: '200px',
-          height: '150px',
+          position: 'relative',
+          width: '100%',
+          maxWidth: '200px',
+          margin: '0 auto',
+          aspectRatio: '16 / 9',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -13,71 +16,30 @@ function SlideThumbnail({ slide }) {
           fontSize: '0.9em',
         }}
       >
-        No Content
       </div>
     );
   }
 
   const renderBackground = () => {
-    if (!slide.background) {
-      return null;
-    }
-
-    const { type, value } = slide.background;
-
-    switch (type) {
-    case 'color':
-      return (
-        <div
-          style={{
-            backgroundColor: value,
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
-        ></div>
-      );
-    case 'gradient':
-      return (
-        <div
-          style={{
-            backgroundImage: value,
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
-        ></div>
-      );
-    case 'image':
-      return (
-        <div
-          style={{
-            backgroundImage: `url(${value})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
-        ></div>
-      );
-    default:
+    if (!slide.background){
       return null;
     }
   };
 
+  const originalSlideWidth = 1000;
+  const originalSlideHeight = 562.5;
+
+  const containerMaxWidth = 200;
+  const scalingFactor = containerMaxWidth / originalSlideWidth;
+
   return (
     <div
       style={{
-        width: '200px',
-        height: '150px',
         position: 'relative',
+        width: '100%',
+        maxWidth: `${containerMaxWidth}px`,
+        margin: '0 auto',
+        aspectRatio: '16 / 9',
         overflow: 'hidden',
         backgroundColor: '#fff',
       }}
@@ -85,19 +47,21 @@ function SlideThumbnail({ slide }) {
       {renderBackground()}
       <div
         style={{
-          transform: 'scale(0.4)',
-          transformOrigin: 'top left',
           position: 'absolute',
-          width: '600px',
-          height: '400px',
+          width: `${originalSlideWidth}px`,
+          height: `${originalSlideHeight}px`,
+          transform: `scale(${scalingFactor})`,
+          transformOrigin: 'top left',
+          top: 0,
+          left: 0,
           pointerEvents: 'none',
         }}
       >
         <div
           style={{
             position: 'relative',
-            width: '600px',
-            height: '400px',
+            width: `${originalSlideWidth}px`,
+            height: `${originalSlideHeight}px`,
           }}
         >
           {slide.elements.map((element) => {
@@ -111,53 +75,54 @@ function SlideThumbnail({ slide }) {
             };
             let content = null;
             switch (element.type) {
-            case 'text':
-              content = (
-                <div
-                  style={{
-                    fontSize: `${element.properties.fontSize}em`,
-                    color: element.properties.color,
-                    whiteSpace: 'pre-wrap',
-                    fontFamily: element.properties.fontFamily,
-                  }}
-                >
-                  {element.properties.text}
-                </div>
-              );
-              break;
-            case 'image':
-              content = (
-                <img
-                  src={element.properties.src}
-                  alt={element.properties.alt}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              );
-              break;
-            case 'video':
-              content = (
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={`https://www.youtube.com/embed/${element.properties.videoId}`}
-                ></iframe>
-              );
-              break;
-            case 'code':
-              content = (
-                <pre
-                  style={{
-                    fontSize: `${element.properties.fontSize}em`,
-                    fontFamily: 'monospace',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
-                  {element.properties.code}
-                </pre>
-              );
-              break;
-            default:
-              break;
+              case 'text':
+                content = (
+                  <div
+                    style={{
+                      fontSize: `${element.properties.fontSize}em`,
+                      color: element.properties.color,
+                      whiteSpace: 'pre-wrap',
+                      fontFamily: element.properties.fontFamily,
+                    }}
+                  >
+                    {element.properties.text}
+                  </div>
+                );
+                break;
+              case 'image':
+                content = (
+                  <img
+                    src={element.properties.src}
+                    alt={element.properties.alt}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                );
+                break;
+              case 'video':
+                content = (
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${element.properties.videoId}`}
+                    allowFullScreen
+                  ></iframe>
+                );
+                break;
+              case 'code':
+                content = (
+                  <pre
+                    style={{
+                      fontSize: `${element.properties.fontSize}em`,
+                      fontFamily: 'monospace',
+                      whiteSpace: 'pre-wrap',
+                    }}
+                  >
+                    {element.properties.code}
+                  </pre>
+                );
+                break;
+              default:
+                break;
             }
             return (
               <div key={element.id} style={style}>
