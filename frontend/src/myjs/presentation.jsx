@@ -10,6 +10,7 @@ import SlideThumbnail from './SlideThumbnail';
 import BackgroundPicker from './background';
 import ConfirmModal from './confirmmodal';
 import NotificationModal from './notificationmodal';
+import MoveAndResize from './moveandresize';
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -36,6 +37,9 @@ function Presentation({ token }) {
   // background
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
   const [isDefaultBackground, setIsDefaultBackground] = useState(false);
+
+  // move and resize
+  const [selectedElementId, setSelectedElementId] = useState(null);
 
   useEffect(() => {
     axios.get('http://localhost:5005/store', {
@@ -296,10 +300,6 @@ function Presentation({ token }) {
             width: parseFloat(elementProperties.size?.width) || 0,
             height: parseFloat(elementProperties.size?.height) || 0,
           },
-          position: {
-            x: parseFloat(elementProperties.position?.x) || 0,
-            y: parseFloat(elementProperties.position?.y) || 0,
-          },
           properties: updatedProperties,
         };
       }
@@ -310,51 +310,85 @@ function Presentation({ token }) {
     setShowModal(false);
   };
 
+  const handleElementClick = (e, element) => {
+    e.stopPropagation();
+    setSelectedElementId(element.id);
+  };
+
+  const updateElementPositionSize = (elementId, { position, size }) => {
+    const updatedPresentation = { ...presentation };
+    const elements = currentSlide.elements.map((el) => {
+      if (el.id === elementId) {
+        return {
+          ...el,
+          position: position,
+          size: size,
+        };
+      }
+      return el;
+    });
+    updatedPresentation.slides[currentSlideIndex].elements = elements;
+    setPresentation(updatedPresentation);
+  };
+
   const renderElements = () => {
     const elements = currentSlide.elements || [];
     return elements
       .sort((a, b) => a.layer - b.layer)
       .map((element) => {
-        const style = {
-          position: 'absolute',
-          top: `${element.position.y}%`,
-          left: `${element.position.x}%`,
-          width: `${element.size.width}%`,
-          height: `${element.size.height}%`,
-          border: '1px solid grey',
-          overflow: 'hidden',
-          cursor: 'pointer',
-        };
-  
+        const isSelected = element.id === selectedElementId;
+
         let content = null;
         switch (element.type) {
-        case 'text':
-          content = <TextElement element={element} onEdit={handleEditElement} />;
-          break;
-        case 'image':
-          content = <ImageElement element={element} onEdit={handleEditElement} />;
-          break;
-        case 'video':
-          content = <VideoElement element={element} onEdit={handleEditElement} />;
-          break;
-        case 'code':
-          content = <CodeElement element={element} onEdit={handleEditElement} />;
-          break;
-        default:
-          break;
+          case 'text':
+            content = <TextElement element={element} onEdit={handleEditElement} />;
+            break;
+          case 'image':
+            content = <ImageElement element={element} onEdit={handleEditElement} />;
+            break;
+          case 'video':
+            content = <VideoElement element={element} onEdit={handleEditElement} />;
+            break;
+          case 'code':
+            content = <CodeElement element={element} onEdit={handleEditElement} />;
+            break;
+          default:
+            break;
         }
-  
+
         return (
           <div
             key={element.id}
-            style={style}
+            onClick={(e) => handleElementClick(e, element)}
             onDoubleClick={() => handleEditElement(element)}
             onContextMenu={(e) => {
               e.preventDefault();
               handleDeleteElement(element.id);
             }}
           >
-            {content}
+            {isSelected ? (
+              <MoveAndResize
+                element={element}
+                updateElementPositionSize={updateElementPositionSize}
+              >
+                {content}
+              </MoveAndResize>
+            ) : (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: `${element.position.y}%`,
+                  left: `${element.position.x}%`,
+                  width: `${element.size.width}%`,
+                  height: `${element.size.height}%`,
+                  border: '1px solid grey',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                }}
+              >
+                {content}
+              </div>
+            )}
           </div>
         );
       });
@@ -645,42 +679,6 @@ function Presentation({ token }) {
               }
             />
           </label>
-          {editingElementId && (
-            <>
-              <label>
-                X Position (%):
-                <input
-                  type="number"
-                  value={elementProperties.position?.x || ''}
-                  onChange={(e) =>
-                    setElementProperties({
-                      ...elementProperties,
-                      position: {
-                        ...elementProperties.position,
-                        x: e.target.value,
-                      },
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Y Position (%):
-                <input
-                  type="number"
-                  value={elementProperties.position?.y || ''}
-                  onChange={(e) =>
-                    setElementProperties({
-                      ...elementProperties,
-                      position: {
-                        ...elementProperties.position,
-                        y: e.target.value,
-                      },
-                    })
-                  }
-                />
-              </label>
-            </>
-          )}
           {modalType === 'text' && (
             <>
               <label>
