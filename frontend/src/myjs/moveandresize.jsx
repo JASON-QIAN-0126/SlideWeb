@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, children }) {
   const [isDragging, setIsDragging] = useState(false);
@@ -9,6 +9,24 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
   const [originalPosition, setOriginalPosition] = useState({ x: 0, y: 0 });
   const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
 
+  // Refs to hold latest state
+  const isDraggingRef = useRef(isDragging);
+  const isResizingRef = useRef(isResizing);
+  const resizeDirectionRef = useRef(resizeDirection);
+  const startXRef = useRef(startX);
+  const startYRef = useRef(startY);
+  const originalPositionRef = useRef(originalPosition);
+  const originalSizeRef = useRef(originalSize);
+
+  // Update refs whenever state changes
+  useEffect(() => { isDraggingRef.current = isDragging; }, [isDragging]);
+  useEffect(() => { isResizingRef.current = isResizing; }, [isResizing]);
+  useEffect(() => { resizeDirectionRef.current = resizeDirection; }, [resizeDirection]);
+  useEffect(() => { startXRef.current = startX; }, [startX]);
+  useEffect(() => { startYRef.current = startY; }, [startY]);
+  useEffect(() => { originalPositionRef.current = originalPosition; }, [originalPosition]);
+  useEffect(() => { originalSizeRef.current = originalSize; }, [originalSize]);
+
   const handleMouseDown = (e) => {
     e.stopPropagation();
     if (e.button !== 0) return; // 只响应左键
@@ -17,85 +35,6 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
     setStartY(e.clientY);
     setOriginalPosition({ ...element.position });
     setOriginalSize({ ...element.size });
-  };
-
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      const deltaX = ((e.clientX - startX) / 600) * 100; // 600为幻灯片宽度
-      const deltaY = ((e.clientY - startY) / 400) * 100; // 400为幻灯片高度
-
-      let newX = originalPosition.x + deltaX;
-      let newY = originalPosition.y + deltaY;
-
-      // 限制在幻灯片范围内
-      newX = Math.max(0, Math.min(newX, 100 - element.size.width));
-      newY = Math.max(0, Math.min(newY, 100 - element.size.height));
-
-      updateElementPositionSize(element.id, {
-        position: {
-          x: newX,
-          y: newY,
-        },
-        size: element.size,
-      });
-    }
-
-    if (isResizing) {
-      const deltaX = ((e.clientX - startX) / 600) * 100; // 600为幻灯片宽度
-
-      let aspectRatio = originalSize.width / originalSize.height;
-      let newWidth, newHeight;
-
-      if (resizeDirection === 'nw') {
-        newWidth = originalSize.width - deltaX;
-      } else if (resizeDirection === 'ne') {
-        newWidth = originalSize.width + deltaX;
-      } else if (resizeDirection === 'sw') {
-        newWidth = originalSize.width - deltaX;
-      } else if (resizeDirection === 'se') {
-        newWidth = originalSize.width + deltaX;
-      }
-
-      newHeight = newWidth / aspectRatio;
-
-      // 限制最小尺寸为1%
-      newWidth = Math.max(newWidth, 1);
-      newHeight = Math.max(newHeight, 1);
-
-      // 限制不超出幻灯片范围
-      let newX = originalPosition.x;
-      let newY = originalPosition.y;
-
-      if (resizeDirection === 'nw' || resizeDirection === 'sw') {
-        newX = originalPosition.x + (originalSize.width - newWidth);
-      }
-      if (resizeDirection === 'nw' || resizeDirection === 'ne') {
-        newY = originalPosition.y + (originalSize.height - newHeight);
-      }
-
-      newX = Math.max(0, Math.min(newX, 100 - newWidth));
-      newY = Math.max(0, Math.min(newY, 100 - newHeight));
-
-      updateElementPositionSize(element.id, {
-        position: {
-          x: newX,
-          y: newY,
-        },
-        size: {
-          width: newWidth,
-          height: newHeight,
-        },
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    setIsResizing(false);
-    setResizeDirection('');
-    if (onMoveOrResizeEnd) {
-      onMoveOrResizeEnd();
-    }
   };
 
   const handleResizeMouseDown = (e, direction) => {
@@ -109,19 +48,87 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
     setOriginalSize({ ...element.size });
   };
 
+  const handleMouseMove = useCallback((e) => {
+    if (isDraggingRef.current) {
+      const deltaX = ((e.clientX - startXRef.current) / 600) * 100; // 600为幻灯片宽度
+      const deltaY = ((e.clientY - startYRef.current) / 400) * 100; // 400为幻灯片高度
+
+      let newX = originalPositionRef.current.x + deltaX;
+      let newY = originalPositionRef.current.y + deltaY;
+
+      // 限制在幻灯片范围内
+      newX = Math.max(0, Math.min(newX, 100 - element.size.width));
+      newY = Math.max(0, Math.min(newY, 100 - element.size.height));
+
+      updateElementPositionSize(element.id, {
+        position: { x: newX, y: newY },
+        size: element.size,
+      });
+    }
+
+    if (isResizingRef.current) {
+      const deltaX = ((e.clientX - startXRef.current) / 600) * 100; // 600为幻灯片宽度
+
+      let aspectRatio = originalSizeRef.current.width / originalSizeRef.current.height;
+      let newWidth, newHeight;
+
+      if (resizeDirectionRef.current === 'nw') {
+        newWidth = originalSizeRef.current.width - deltaX;
+      } else if (resizeDirectionRef.current === 'ne') {
+        newWidth = originalSizeRef.current.width + deltaX;
+      } else if (resizeDirectionRef.current === 'sw') {
+        newWidth = originalSizeRef.current.width - deltaX;
+      } else if (resizeDirectionRef.current === 'se') {
+        newWidth = originalSizeRef.current.width + deltaX;
+      }
+
+      newHeight = newWidth / aspectRatio;
+
+      // 限制最小尺寸为1%
+      newWidth = Math.max(newWidth, 1);
+      newHeight = Math.max(newHeight, 1);
+
+      // 限制不超出幻灯片范围
+      let newX = originalPositionRef.current.x;
+      let newY = originalPositionRef.current.y;
+
+      if (resizeDirectionRef.current === 'nw' || resizeDirectionRef.current === 'sw') {
+        newX = originalPositionRef.current.x + (originalSizeRef.current.width - newWidth);
+      }
+      if (resizeDirectionRef.current === 'nw' || resizeDirectionRef.current === 'ne') {
+        newY = originalPositionRef.current.y + (originalSizeRef.current.height - newHeight);
+      }
+
+      newX = Math.max(0, Math.min(newX, 100 - newWidth));
+      newY = Math.max(0, Math.min(newY, 100 - newHeight));
+
+      updateElementPositionSize(element.id, {
+        position: { x: newX, y: newY },
+        size: { width: newWidth, height: newHeight },
+      });
+    }
+  }, [element.id, element.size, updateElementPositionSize]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    setIsResizing(false);
+    setResizeDirection('');
+    if (onMoveOrResizeEnd) {
+      onMoveOrResizeEnd();
+    }
+  }, [onMoveOrResizeEnd]);
+
   useEffect(() => {
     if (isDragging || isResizing) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
-    } else {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
     }
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, isResizing]);
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
   return (
     <div
