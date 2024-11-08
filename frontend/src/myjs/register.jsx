@@ -1,6 +1,86 @@
 import { useState } from 'react';
 import { Navigate,useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import styled from 'styled-components';
+
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #6950a1;
+  color: white;
+`;
+
+const MainTitle = styled.h1`
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+`;
+
+const RegisterBox = styled.div`
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const FormTitle = styled.h2`
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  margin: 8px 0;
+  width: 95%;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+
+  &:focus {
+    box-shadow: 0 0 5px #afb4db;
+  }
+`;
+
+const ErrorText = styled.p`
+  color: #ed1941;
+  font-size: 1.1rem;
+  margin: 5px 0;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 15px;
+`;
+
+const Button = styled.button`
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #6950a1;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+
+  &:hover {
+    background-color: #ddd;
+  }
+
+  &:active {
+    background-color: #afb4db;
+    transform: scale(0.98);
+  }
+`;
 
 function Register({ onRegister, isAuthenticated }) {
   const [email, setEmail] = useState('');
@@ -39,42 +119,47 @@ function Register({ onRegister, isAuthenticated }) {
 
 
   return (
-    <div>
-      <h2>Register</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        /><br/>
-        <input
-          type="email"
-          placeholder="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        /><br/>
-        <input
-          type="password"
-          placeholder="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        /><br/>
-        <input
-          type="password"
-          placeholder="confirmed password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        /><br/>
-        <button type="submit">Register</button>
-      </form>
-      <button onClick={() => navigate('/')}>Back</button>
-    </div>
+    <PageContainer>
+      <MainTitle>Welcome to Presto!</MainTitle>
+      <RegisterBox>
+        <FormTitle>Register</FormTitle>
+        <form onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          {error && <ErrorText>{error}</ErrorText>}
+          <ButtonContainer>
+            <Button type="button" onClick={() => navigate('/')}>Back</Button>
+            <Button type="submit">Register</Button>
+          </ButtonContainer>
+        </form>
+      </RegisterBox>
+    </PageContainer>
   );
 }
 
