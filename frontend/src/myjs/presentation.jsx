@@ -8,12 +8,54 @@ import VideoElement from './videoelement';
 import CodeElement from './codeelement';
 import ThumbnailModal from './modal/UpdateThumbnailModal';
 import BackgroundPicker from './background';
-import ConfirmModal from './modal/confirmmodal';
 import NotificationModal from './modal/notificationmodal';
 import MoveAndResize from './moveandresize';
 import Animation from './animation';
 import RearrangeSlides from './rearrange';
 import RevisionHistory from './revision';
+
+import styled from 'styled-components';
+import DeletePresentation from './modal/DeletePresentation';
+
+const PresentationContainer = styled.div`
+  background-color: #6950a1;
+  min-height: 100vh;
+  padding: 20px;
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  font-size: 2rem;
+  color: white;
+`;
+
+const Button = styled.button`
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #6950a1;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 10px;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+
+  &:hover {
+    background-color: #ddd;
+  }
+
+  &:active {
+    background-color: #afb4db;
+    transform: scale(0.98);
+  }
+`;
+
+const BackButton = styled(Button)`
+  position: absolute;
+  top: 20px;
+  left: 20px;
+`;
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -534,21 +576,16 @@ function Presentation({ token }) {
   };
 
   return (
-    <div>
-      <h2>
-        {presentation.name}
-        <button onClick={() => setShowTitleModal(true)}>Edit Title</button>
-      </h2>
-      <button onClick={() => navigate('/dashboard')}>Back</button>
-      <button onClick={handleDeletePresentation}>Delete Presentation</button>
-      {isConfirmModalOpen && (
-        <ConfirmModal
-          title="Delete Confirmation"
-          message="Are you sure you want to delete this presentation?"
-          onConfirm={handleConfirmDelete}
-          onCancel={handleCancelDelete}
-        />
-      )}
+    <PresentationContainer>
+      <Title>{presentation.name}</Title>
+      <button onClick={() => setShowTitleModal(true)}>Edit Title</button>
+      <BackButton onClick={() => navigate('/dashboard')}>Back</BackButton>
+      <DeletePresentation
+        isConfirmModalOpen={isConfirmModalOpen} 
+        handleDeletePresentation={handleDeletePresentation} 
+        handleConfirmDelete={handleConfirmDelete} 
+        handleCancelDelete={handleCancelDelete}
+      />
 
       {showTitleModal && (
         <div className="modal" style={{
@@ -929,7 +966,7 @@ function Presentation({ token }) {
           <button onClick={() => setShowModal(false)}>Cancel</button>
         </div>
       )}
-    </div>
+    </PresentationContainer>
   );
 }
 

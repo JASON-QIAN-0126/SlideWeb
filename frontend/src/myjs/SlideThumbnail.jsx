@@ -20,16 +20,10 @@ function SlideThumbnail({ slide }) {
     );
   }
 
-  const renderBackground = () => {
-    if (!slide.background){
-      return null;
-    }
-  };
-
   const originalSlideWidth = 1000;
   const originalSlideHeight = 562.5;
 
-  const containerMaxWidth = 200;
+  const containerMaxWidth = 200; 
   const scalingFactor = containerMaxWidth / originalSlideWidth;
 
   return (
@@ -44,7 +38,6 @@ function SlideThumbnail({ slide }) {
         backgroundColor: '#fff',
       }}
     >
-      {renderBackground()}
       <div
         style={{
           position: 'absolute',
@@ -54,9 +47,37 @@ function SlideThumbnail({ slide }) {
           transformOrigin: 'top left',
           top: 0,
           left: 0,
-          pointerEvents: 'none',
         }}
       >
+        {slide.background && (
+          <div
+            style={{
+              position: 'absolute',
+              width: `${originalSlideWidth}px`,
+              height: `${originalSlideHeight}px`,
+              top: 0,
+              left: 0,
+              ...(() => {
+                const { type, value } = slide.background;
+                switch (type) {
+                  case 'color':
+                    return { backgroundColor: value };
+                  case 'gradient':
+                    return { backgroundImage: value };
+                  case 'image':
+                    return {
+                      backgroundImage: `url(${value})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    };
+                  default:
+                    return {};
+                }
+              })(),
+            }}
+          ></div>
+        )}
+
         <div
           style={{
             position: 'relative',
