@@ -48,17 +48,22 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
     setOriginalSize({ ...element.size });
   };
 
+  const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+
   const handleMouseMove = useCallback((e) => {
+    const slideWidth = 600; // 幻灯片宽度（像素）
+    const slideHeight = 400; // 幻灯片高度（像素）
+
     if (isDraggingRef.current) {
-      const deltaX = ((e.clientX - startXRef.current) / 600) * 100; // 600为幻灯片宽度
-      const deltaY = ((e.clientY - startYRef.current) / 400) * 100; // 400为幻灯片高度
+      const deltaX = ((e.clientX - startXRef.current) / slideWidth) * 100;
+      const deltaY = ((e.clientY - startYRef.current) / slideHeight) * 100;
 
       let newX = originalPositionRef.current.x + deltaX;
       let newY = originalPositionRef.current.y + deltaY;
 
       // 限制在幻灯片范围内
-      newX = Math.max(0, Math.min(newX, 100 - element.size.width));
-      newY = Math.max(0, Math.min(newY, 100 - element.size.height));
+      newX = clamp(newX, 0, 100 - originalSizeRef.current.width);
+      newY = clamp(newY, 0, 100 - originalSizeRef.current.height);
 
       updateElementPositionSize(element.id, {
         position: { x: newX, y: newY },
@@ -67,40 +72,36 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
     }
 
     if (isResizingRef.current) {
-      const deltaX = ((e.clientX - startXRef.current) / 600) * 100; // 600为幻灯片宽度
+      const deltaX = ((e.clientX - startXRef.current) / slideWidth) * 100;
 
-      let aspectRatio = originalSizeRef.current.width / originalSizeRef.current.height;
-      let newWidth, newHeight;
-
-      if (resizeDirectionRef.current === 'nw') {
-        newWidth = originalSizeRef.current.width - deltaX;
-      } else if (resizeDirectionRef.current === 'ne') {
-        newWidth = originalSizeRef.current.width + deltaX;
-      } else if (resizeDirectionRef.current === 'sw') {
-        newWidth = originalSizeRef.current.width - deltaX;
-      } else if (resizeDirectionRef.current === 'se') {
-        newWidth = originalSizeRef.current.width + deltaX;
-      }
-
-      newHeight = newWidth / aspectRatio;
-
-      // 限制最小尺寸为1%
-      newWidth = Math.max(newWidth, 1);
-      newHeight = Math.max(newHeight, 1);
-
-      // 限制不超出幻灯片范围
+      let newWidth = originalSizeRef.current.width;
+      let newHeight = originalSizeRef.current.height;
       let newX = originalPositionRef.current.x;
       let newY = originalPositionRef.current.y;
 
-      if (resizeDirectionRef.current === 'nw' || resizeDirectionRef.current === 'sw') {
-        newX = originalPositionRef.current.x + (originalSizeRef.current.width - newWidth);
-      }
-      if (resizeDirectionRef.current === 'nw' || resizeDirectionRef.current === 'ne') {
-        newY = originalPositionRef.current.y + (originalSizeRef.current.height - newHeight);
+      const aspectRatio = originalSizeRef.current.width / originalSizeRef.current.height;
+
+      if (resizeDirectionRef.current === 'nw') {
+        newWidth = clamp(originalSizeRef.current.width - deltaX, 1, originalSizeRef.current.width + originalPositionRef.current.x);
+        newHeight = newWidth / aspectRatio;
+        newX = clamp(originalPositionRef.current.x + (originalSizeRef.current.width - newWidth), 0, 100 - newWidth);
+        newY = clamp(originalPositionRef.current.y + (originalSizeRef.current.height - newHeight), 0, 100 - newHeight);
+      } else if (resizeDirectionRef.current === 'ne') {
+        newWidth = clamp(originalSizeRef.current.width + deltaX, 1, 100 - originalPositionRef.current.x);
+        newHeight = newWidth / aspectRatio;
+        newY = clamp(originalPositionRef.current.y + (originalSizeRef.current.height - newHeight), 0, 100 - newHeight);
+      } else if (resizeDirectionRef.current === 'sw') {
+        newWidth = clamp(originalSizeRef.current.width - deltaX, 1, originalSizeRef.current.width + originalPositionRef.current.x);
+        newHeight = newWidth / aspectRatio;
+        newX = clamp(originalPositionRef.current.x + (originalSizeRef.current.width - newWidth), 0, 100 - newWidth);
+      } else if (resizeDirectionRef.current === 'se') {
+        newWidth = clamp(originalSizeRef.current.width + deltaX, 1, 100 - originalPositionRef.current.x);
+        newHeight = newWidth / aspectRatio;
       }
 
-      newX = Math.max(0, Math.min(newX, 100 - newWidth));
-      newY = Math.max(0, Math.min(newY, 100 - newHeight));
+      // 确保尺寸不会超出幻灯片
+      newWidth = clamp(newWidth, 1, 100 - newX);
+      newHeight = clamp(newHeight, 1, 100 - newY);
 
       updateElementPositionSize(element.id, {
         position: { x: newX, y: newY },
