@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, children }) {
   const [isDragging, setIsDragging] = useState(false);
@@ -42,7 +42,6 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
 
     if (isResizing) {
       const deltaX = ((e.clientX - startX) / 600) * 100; // 600为幻灯片宽度
-      const deltaY = ((e.clientY - startY) / 400) * 100; // 400为幻灯片高度
 
       let aspectRatio = originalSize.width / originalSize.height;
       let newWidth, newHeight;
@@ -95,8 +94,8 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
     setIsResizing(false);
     setResizeDirection('');
     if (onMoveOrResizeEnd) {
-        onMoveOrResizeEnd();
-      }
+      onMoveOrResizeEnd();
+    }
   };
 
   const handleResizeMouseDown = (e, direction) => {

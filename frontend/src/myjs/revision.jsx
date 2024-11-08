@@ -1,5 +1,3 @@
-import React from 'react';
-
 function RevisionHistory({ history, onRestore, onClose }) {
   return (
     <div

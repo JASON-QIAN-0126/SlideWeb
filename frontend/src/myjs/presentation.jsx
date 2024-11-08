@@ -106,6 +106,7 @@ function Presentation({ token }) {
         const historyEntry = {
           timestamp: currentTime,
           slides: presentation.slides,
+          animationsEnabled: presentation.animationsEnabled,
         };
         updatedPresentation.history = updatedPresentation.history || [];
         updatedPresentation.history.push(historyEntry);
@@ -372,20 +373,20 @@ function Presentation({ token }) {
 
         let content = null;
         switch (element.type) {
-          case 'text':
-            content = <TextElement element={element} onEdit={handleEditElement} />;
-            break;
-          case 'image':
-            content = <ImageElement element={element} onEdit={handleEditElement} />;
-            break;
-          case 'video':
-            content = <VideoElement element={element} onEdit={handleEditElement} />;
-            break;
-          case 'code':
-            content = <CodeElement element={element} onEdit={handleEditElement} />;
-            break;
-          default:
-            break;
+        case 'text':
+          content = <TextElement element={element} onEdit={handleEditElement} />;
+          break;
+        case 'image':
+          content = <ImageElement element={element} onEdit={handleEditElement} />;
+          break;
+        case 'video':
+          content = <VideoElement element={element} onEdit={handleEditElement} />;
+          break;
+        case 'code':
+          content = <CodeElement element={element} onEdit={handleEditElement} />;
+          break;
+        default:
+          break;
         }
 
         return (
@@ -516,6 +517,7 @@ function Presentation({ token }) {
     const updatedPresentation = {
       ...presentation,
       slides: entry.slides,
+      animationsEnabled: entry.animationsEnabled,
     };
     updateStore(updatedPresentation).then(() => {
       setCurrentSlideIndex((prevIndex) => {
@@ -524,6 +526,7 @@ function Presentation({ token }) {
         }
         return prevIndex;
       });
+      setAnimationsEnabled(entry.animationsEnabled);
       setShowRevisionModal(false);
     });
   };
