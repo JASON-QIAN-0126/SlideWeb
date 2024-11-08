@@ -3,8 +3,81 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import SlideThumbnail from './SlideThumbnail';
+import styled from 'styled-components';
 
-function Dashboard({ onLogout, token }) {
+const DashboardContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #6950a1;
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+`;
+
+const Title = styled.h2`
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+`;
+
+const Button = styled.button`
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #6950a1;
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 10px;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+
+  &:hover {
+    background-color: #ddd;
+  }
+
+  &:active {
+    background-color: #afb4db;
+    transform: scale(0.98);
+  }
+`;
+
+const Modal = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  text-align: center;
+  color: #6950a1;
+`;
+
+const PresentationList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const PresentationCard = styled.div`
+  width: 360px;
+  height: 180px;
+  border: 1px solid #ccc;
+  margin: 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: white;
+  border-radius: 8px;
+  color: #000;
+`;
+
+function Dashboard({ onLogout, token}) {
   const [presentations, setPresentations] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newPresentationName, setNewPresentationName] = useState('');
@@ -27,12 +100,11 @@ function Dashboard({ onLogout, token }) {
   function handleLogout() {
     onLogout();
     navigate('/');
-  };
+  }
 
   function handleCreatePresentation() {
     setShowModal(true);
-  };
-
+  }
 
   function handleSavePresentation() {
     const newPresentation = {
@@ -65,63 +137,44 @@ function Dashboard({ onLogout, token }) {
       .catch((err) => {
         console.error('Failed to save presentation', err);
       });
-  };
+  }
 
   function handlePresentationClick(id) {
     navigate(`/presentation/${id}`);
-  };
+  }
 
   return (
-    <div>
-      <h2>Dashboard</h2>
-      <button onClick={handleLogout}>Log out</button>
-      <button onClick={handleCreatePresentation}>New Presentation</button>
+    <DashboardContainer>
+      <Title>Welcome to dashboard!</Title>
+      <div>
+        <Button onClick={handleLogout}>Log out</Button>
+        <Button onClick={handleCreatePresentation}>New Presentation</Button>
+      </div>
 
       {showModal && (
-        <div className="modal" style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: '#fff',
-          padding: '20px',
-          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-          zIndex: 1000,
-        }}>
+        <Modal>
           <h3>Create New Presentation</h3>
           <input
             type="text"
             value={newPresentationName}
             onChange={(e) => setNewPresentationName(e.target.value)}
             placeholder="Presentation Name"
+            style={{ padding: '10px', width: '80%', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
           />
-          <button onClick={handleSavePresentation}>Create</button>
-          <button onClick={() => setShowModal(false)}>Cancel</button>
-        </div>
+          <div>
+            <Button onClick={handleSavePresentation}>Create</Button>
+            <Button onClick={() => setShowModal(false)}>Cancel</Button>
+          </div>
+        </Modal>
       )}
 
-      <div className="presentation-list">
+      <PresentationList>
         {presentations.map((presentation) => (
-          <div
+          <PresentationCard
             key={presentation.id}
-            className="presentation-card"
             onClick={() => handlePresentationClick(presentation.id)}
-            style={{
-              width: '360px',
-              height: '180px',
-              border: '1px solid #ccc',
-              margin: '20px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              position: 'relative',
-              alignItems: 'center',
-              padding: '10px',
-            }}
           >
             <div
-              className="thumbnail"
               style={{
                 width: '100%',
                 height: '100%',
@@ -130,10 +183,8 @@ function Dashboard({ onLogout, token }) {
                 justifyContent: 'center',
                 backgroundColor: '#fff',
                 overflow: 'hidden',
-                position: 'relative',
               }}
             >
-              {/* 渲染缩略图幻灯片 */}
               {presentation.slides && presentation.slides.length > 0 ? (
                 <SlideThumbnail 
                   slide={{ 
@@ -145,31 +196,15 @@ function Dashboard({ onLogout, token }) {
                 <SlideThumbnail />
               )}
             </div>
-            <div
-              style={{
-                alignSelf: 'flex-start',
-                color: '#000',
-              }}
-            >
-              <h3 style={{ margin: '5px 0', fontSize: '1em', fontWeight: 'bold' }}>{presentation.name}</h3>
-              {presentation.description && (
-                <p style={{ margin: '5px 0 0 0', fontSize: '0.85em' }}>{presentation.description}</p>
-              )}
-            </div>
-
-            <div
-              style={{
-                alignSelf: 'flex-end',
-                fontSize: '0.85em',
-                color: '#666',
-              }}
-            >
-              <p style={{ margin: '0' }}>Slides: {presentation.slides.length}</p>
-            </div>
-          </div>
+            <h3 style={{ margin: '5px 0', fontSize: '1em', fontWeight: 'bold' }}>{presentation.name}</h3>
+            {presentation.description && (
+              <p style={{ margin: '5px 0 0 0', fontSize: '0.85em' }}>{presentation.description}</p>
+            )}
+            <p style={{ fontSize: '0.85em', color: '#666' }}>Slides: {presentation.slides.length}</p>
+          </PresentationCard>
         ))}
-      </div>
-    </div>
+      </PresentationList>
+    </DashboardContainer>
   );
 }
 
