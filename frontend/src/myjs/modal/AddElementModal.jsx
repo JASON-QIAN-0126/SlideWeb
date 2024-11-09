@@ -1,6 +1,89 @@
 import React from 'react';
 import styled from 'styled-components';
 
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 5%;
+  z-index: 1000;
+`;
+
+const ModalContainer = styled.div`
+  background-color: #fff;
+  padding: 20px;
+  max-height: 80vh;
+  width: 400px;
+  overflow-y: auto;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const Title = styled.h3`
+  color: #6950a1;
+  margin-bottom: 20px;
+  text-align: center;
+  width: 100%;
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  width: 100%;
+
+  label {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #333;
+  }
+
+  input, select, textarea {
+    flex: 2;
+    padding: 5px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+  margin-top: 20px;
+`;
+
+const StyledButton = styled.button`
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  color: ${({ $cancel }) => ($cancel ? '#6950a1' : 'white')};
+  background-color: ${({ $cancel }) => ($cancel ? 'white' : '#6950a1')};
+  border: ${({ $cancel }) => ($cancel ? '1px solid #6950a1' : 'none')};
+
+  &:hover {
+    background-color: ${({ $cancel }) => ($cancel ? '#ddd' : '#4d3a78')};
+  }
+`;
+
 function AddElementModal({
   showModal,
   modalType,
