@@ -20,6 +20,7 @@ import ButtonBar from './modal/EditButton';
 import EditModal from './modal/EditModal';
 import { SlideChangeButtonBar } from './modal/SlideChangeButton';
 import SlidePageControl from './modal/SlidePageControl';
+import SlideArrow from './modal/SlideArrow';
 
 const PresentationContainer = styled.div`
   background-color: #a594d8;
@@ -712,20 +713,12 @@ function Presentation({ token }) {
         )}
         {presentation.slides.length > 1 && (
           <>
-            <button
-              onClick={handlePrevSlide}
-              disabled={currentSlideIndex === 0}
-              style={{ position: 'absolute', top: '50%', left: '0' }}
-            >
-              &lt;
-            </button>
-            <button
-              onClick={handleNextSlide}
-              disabled={currentSlideIndex === presentation.slides.length - 1}
-              style={{ position: 'absolute', top: '50%', right: '0' }}
-            >
-              &gt;
-            </button>
+            <SlideArrow
+              handlePrevSlide={handlePrevSlide}
+              handleNextSlide={handleNextSlide}
+              currentSlideIndex={currentSlideIndex}
+              totalSlides={presentation.slides.length}
+            />
           </>
         )}
       </div>
