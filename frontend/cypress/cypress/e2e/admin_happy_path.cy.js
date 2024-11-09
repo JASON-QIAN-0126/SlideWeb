@@ -65,7 +65,9 @@ describe('Admin Happy Path', () => {
   it('Add some slides in a slideshow deck successfully', () => {
     cy.contains(presentation.updatedName).click();
     cy.get('button').contains('Add Slide').click();
+    cy.wait(1000);
     cy.get('button').contains('Add Slide').click();
+    cy.wait(1000);
     cy.contains('4').should('be.visible');
   });
 
