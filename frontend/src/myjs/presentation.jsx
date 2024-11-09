@@ -19,6 +19,7 @@ import DeletePresentation from './modal/DeletePresentation';
 import ButtonBar from './modal/EditButton';
 import EditModal from './modal/EditModal';
 import { SlideChangeButtonBar } from './modal/SlideChangeButton';
+import SlidePageControl from './modal/SlidePageControl';
 
 const PresentationContainer = styled.div`
   background-color: #a594d8;
@@ -580,6 +581,11 @@ function Presentation({ token }) {
     });
   };
 
+  // handle preview
+  const handlePreview = () => {
+    window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank');
+  };
+
   return (
     <PresentationContainer>
       <Title>{presentation.name}</Title>
@@ -723,18 +729,15 @@ function Presentation({ token }) {
           </>
         )}
       </div>
-
-      <div>
-        <button onClick={handleAddSlide}>Add Slide</button>
-        <button onClick={handleDeleteSlide}>Delete Slide</button>
-        {isNotificationOpen && (
-          <NotificationModal
-            message="Cannot delete the only slide. Consider deleting the presentation."
-            onClose={() => setNotificationOpen(false)}
-          />
-        )}
-        <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
-      </div>
+      
+      <SlidePageControl
+        handleAddSlide={handleAddSlide}
+        handleDeleteSlide={handleDeleteSlide}
+        onPreview={handlePreview}
+        isNotificationOpen={isNotificationOpen}
+        setNotificationOpen={setNotificationOpen}
+        NotificationModal={NotificationModal}
+      />
         
       <div>
         <button onClick={() => handleAddElement('text')}>Add Text</button>

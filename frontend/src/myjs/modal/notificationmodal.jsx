@@ -40,13 +40,17 @@ const ModalButtons = styled.div`
     padding: 8px 16px;
     border: none;
     border-radius: 4px;
-    background-color: #007bff;
-    color: white;
+    background-color: white;
+    color: #6950a1;
+    border: 1px solid #6950a1;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 
     &:hover {
-      background-color: #0056b3;
+      background-color: #6950a1;
+      color: white;
+      transform: scale(1.05);
     }
   }
 `;
