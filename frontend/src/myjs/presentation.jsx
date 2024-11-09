@@ -18,6 +18,7 @@ import styled from 'styled-components';
 import DeletePresentation from './modal/DeletePresentation';
 import ButtonBar from './modal/EditButton';
 import EditModal from './modal/EditModal';
+import { SlideChangeButtonBar } from './modal/SlideChangeButton';
 
 const PresentationContainer = styled.div`
   background-color: #a594d8;
@@ -629,7 +630,14 @@ function Presentation({ token }) {
         />
       )}
 
-      <button onClick={() => setShowBackgroundModal(true)}>Change Background</button>
+      <SlideChangeButtonBar
+        onBackgroundChange={() => setShowBackgroundModal(true)}
+        onToggleAnimations={toggleAnimations}
+        animationsEnabled={animationsEnabled}
+        onRearrangeSlides={() => setShowRearrangeModal(true)}
+        onRevisionHistory={() => setShowRevisionModal(true)}
+      />
+
       <BackgroundPicker
         show={showBackgroundModal}
         onClose={() => {
@@ -642,11 +650,6 @@ function Presentation({ token }) {
         setIsDefault={setIsDefaultBackground}
       />
 
-      <button onClick={toggleAnimations}>
-        {animationsEnabled ? 'Disable Animation' : 'Add Animation'}
-      </button>
-
-      <button onClick={() => setShowRearrangeModal(true)}>Rearrange Slides</button>
       {showRearrangeModal && (
         <RearrangeSlides
           slides={presentation.slides}
@@ -655,8 +658,6 @@ function Presentation({ token }) {
         />
       )}
 
-      <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
-      <button onClick={() => setShowRevisionModal(true)}>Revision History</button>
       {showRevisionModal && (
         <RevisionHistory
           history={presentation.history || []}
@@ -732,8 +733,9 @@ function Presentation({ token }) {
             onClose={() => setNotificationOpen(false)}
           />
         )}
+        <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
       </div>
-
+        
       <div>
         <button onClick={() => handleAddElement('text')}>Add Text</button>
         <button onClick={() => handleAddElement('image')}>Add Image</button>
