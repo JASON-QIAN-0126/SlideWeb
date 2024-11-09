@@ -62,6 +62,102 @@ function AddElementModal({
           }
         />
       </label>
+      {modalType === 'text' && (
+        <>
+          <label>
+            Text:
+            <textarea
+              value={elementProperties.text || ''}
+              onChange={(e) =>
+                setElementProperties({
+                  ...elementProperties,
+                  text: e.target.value,
+                })
+              }
+            />
+          </label>
+          <label>
+            Font Size (em):
+            <input
+              type="number"
+              value={elementProperties.fontSize || ''}
+              onChange={(e) =>
+                setElementProperties({
+                  ...elementProperties,
+                  fontSize: e.target.value,
+                })
+              }
+            />
+          </label>
+          <label>
+            Font Family:
+            <select
+              value={elementProperties.fontFamily || 'Arial'}
+              onChange={(e) =>
+                setElementProperties({
+                  ...elementProperties,
+                  fontFamily: e.target.value,
+                })
+              }
+            >
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Courier New">Courier New</option>
+            </select>
+          </label>
+          <label>
+            Color (HEX):
+            <input
+              type="text"
+              value={elementProperties.color || ''}
+              onChange={(e) =>
+                setElementProperties({
+                  ...elementProperties,
+                  color: e.target.value,
+                })
+              }
+            />
+          </label>
+        </>
+      )}
+      {modalType === 'image' && (
+        <>
+          <label>
+            Image URL:
+            <input
+              type="text"
+              value={elementProperties.src || ''}
+              onChange={(e) =>
+                setElementProperties({
+                  ...elementProperties,
+                  src: e.target.value,
+                })
+              }
+            />
+          </label>
+          <label>
+            OR Upload Image:
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageFileChange}
+            />
+          </label>
+          <label>
+            Alt Text:
+            <input
+              type="text"
+              value={elementProperties.alt || ''}
+              onChange={(e) =>
+                setElementProperties({
+                  ...elementProperties,
+                  alt: e.target.value,
+                })
+              }
+            />
+          </label>
+        </>
+      )}
       {modalType === 'video' && (
         <>
           <label>
