@@ -49,13 +49,26 @@ const Modal = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #d3c4f3;
+  background-color: white;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   text-align: center;
   color: #6950a1;
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 `;
 
 const PresentationList = styled.div`
@@ -84,6 +97,45 @@ const PresentationCard = styled.div`
     border-color: #494e8f;
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+`;
+
+const CreateButton = styled.button`
+  padding: 8px 16px;
+  border: 1px solid #6950a1;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #6950a1;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #4d3a78;
+    transform: scale(1.05);
+  }
+`;
+
+const CancelButton = styled.button`
+  padding: 8px 16px;
+  border: 1px solid #6950a1;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: white;
+  color: #6950a1;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #ddd;
+    transform: scale(1.05);
   }
 `;
 
@@ -162,20 +214,22 @@ function Dashboard({ onLogout, token}) {
       </div>
 
       {showModal && (
-        <Modal>
-          <h3>Create New Presentation</h3>
-          <input
-            type="text"
-            value={newPresentationName}
-            onChange={(e) => setNewPresentationName(e.target.value)}
-            placeholder="Presentation Name"
-            style={{ padding: '10px', width: '80%', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-          />
-          <div>
-            <Button onClick={handleSavePresentation}>Create</Button>
-            <Button onClick={() => setShowModal(false)}>Cancel</Button>
-          </div>
-        </Modal>
+        <ModalOverlay>
+          <Modal>
+            <h3>Create New Presentation</h3>
+            <input
+              type="text"
+              value={newPresentationName}
+              onChange={(e) => setNewPresentationName(e.target.value)}
+              placeholder="Presentation Name"
+              style={{ padding: '10px', width: '80%', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+            />
+            <ButtonContainer>
+              <CancelButton onClick={() => setShowModal(false)}>Cancel</CancelButton>
+              <CreateButton onClick={handleSavePresentation}>Create</CreateButton>
+            </ButtonContainer>
+          </Modal>
+        </ModalOverlay>
       )}
 
       <PresentationList>

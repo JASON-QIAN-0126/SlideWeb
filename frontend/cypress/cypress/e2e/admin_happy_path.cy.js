@@ -12,10 +12,10 @@ describe('Admin Happy Path', () => {
 
   it('Registers successfully', () => {
     cy.visit('/register');
-    cy.get('input[placeholder="name"]').type(adminUser.username);
-    cy.get('input[placeholder="email"]').type(adminUser.email);
-    cy.get('input[placeholder="password"]').type(adminUser.password);
-    cy.get('input[placeholder="confirmed password"]').type(adminUser.password);
+    cy.get('input[placeholder="Name"]').type(adminUser.username);
+    cy.get('input[placeholder="Email"]').type(adminUser.email);
+    cy.get('input[placeholder="Password"]').type(adminUser.password);
+    cy.get('input[placeholder="Confirm Password"]').type(adminUser.password);
     cy.get('button[type="submit"]').click();
 
     // Assert registration success and redirect to dashboard
@@ -45,12 +45,13 @@ describe('Admin Happy Path', () => {
 
     // Update title
     cy.get('input').clear().type(presentation.updatedName);
-    cy.get('button').contains('Update').click();
+    cy.wait(1000);
+    cy.contains('button', /^Update$/).click();
 
     // Assert title
     cy.contains(presentation.updatedName).should('be.visible');
 
-    // Update thumbnail to a image
+    // Update thumbnail
     cy.get('button').contains('Add Slide').click();
     cy.get('button').contains('Change Background').click();
     cy.get('button').contains('Apply').click();
@@ -70,8 +71,7 @@ describe('Admin Happy Path', () => {
 
   it('Switch between slides successfully', () => {
     cy.contains(presentation.updatedName).click();
-    cy.get('button[style*="position: absolute; top: 50%; right: 0px;"]')
-      .click();
+    cy.get('button').contains('>').click();
     cy.contains('2').should('be.visible');
   });
 
