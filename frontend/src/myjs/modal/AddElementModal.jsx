@@ -176,7 +176,35 @@ function AddElementModal({
             </FormGroup>
           </>
         )}
-        
+        {modalType === 'code' && (
+          <>
+            <FormGroup>
+              <label>Code:</label>
+              <textarea
+                value={elementProperties.code || ''}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    code: e.target.value,
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>Font Size (em):</label>
+              <input
+                type="number"
+                value={elementProperties.fontSize || ''}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    fontSize: e.target.value,
+                  })
+                }
+              />
+            </FormGroup>
+          </>
+        )}
         <ButtonContainer>
           <StyledButton onClick={() => setShowModal(false)} $cancel>
             Cancel
