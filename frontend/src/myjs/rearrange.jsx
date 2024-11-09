@@ -32,7 +32,7 @@ const ModalContainer = styled.div`
 `;
 
 const Title = styled.h3`
-  color: Black;
+  color: #6950a1;
   margin-bottom: 0px;
   text-align: center;
   font-size: 1.5rem;
