@@ -4,8 +4,8 @@ import styled from 'styled-components';
 const ButtonBarContainer = styled.div`
   display: flex;
   justify-content: flex-start;
-  margin-bottom: 20px;
-  gap: 15px;
+  margin-bottom: 10px;
+  gap: 10px;
 `;
 
 const StyledButton = styled.button`
@@ -13,7 +13,7 @@ const StyledButton = styled.button`
   font-size: 1rem;
   color: #6950a1;
   background-color: white;
-  border: none;
+  border: 1px solid #6950a1;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;

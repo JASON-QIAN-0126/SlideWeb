@@ -4,7 +4,8 @@ import styled from 'styled-components';
 const ButtonContainer = styled.div`
   display: flex;
   gap: 15px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   justify-content: center;
 `;
 
