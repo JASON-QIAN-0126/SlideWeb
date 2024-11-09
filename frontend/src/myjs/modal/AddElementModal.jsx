@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 const ModalOverlay = styled.div`
@@ -97,10 +96,14 @@ function AddElementModal({
 }) {
   if (!showModal) return null;
 
+  const titleText = editingElementId
+    ? `Edit ${modalType.charAt(0).toUpperCase() + modalType.slice(1)}`
+    : `Add ${modalType.charAt(0).toUpperCase() + modalType.slice(1)}`;
+
   return (
     <ModalOverlay>
       <ModalContainer>
-        <Title>{editingElementId ? 'Edit Element' : 'Add Element'}</Title>
+        <Title>{titleText}</Title>
         <FormGroup>
           <label>Width (%):</label>
           <input

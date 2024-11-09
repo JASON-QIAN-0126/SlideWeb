@@ -95,6 +95,12 @@ const CheckboxContainer = styled.div`
   margin-top: 10px;
 `;
 
+const extractColors = (gradientValue) => {
+  const colorRegex = /#([0-9A-Fa-f]{3,6})/g;
+  const matches = gradientValue.match(colorRegex);
+  return matches ? matches : ['#ff0000', '#0000ff'];
+};
+
 function BackgroundPicker({ show, onClose, onApply, currentBackground, isDefault, setIsDefault }) {
   const [backgroundType, setBackgroundType] = useState(currentBackground.type || 'color');
   const [colorValue, setColorValue] = useState(currentBackground.type === 'color' ? currentBackground.value : '#ffffff');
