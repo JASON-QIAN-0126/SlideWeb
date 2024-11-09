@@ -9,7 +9,7 @@ const ButtonBarContainer = styled.div`
 `;
 
 const StyledButton = styled.button`
-  padding: 10px 20px;
+  padding: 6px 8px;
   font-size: 1rem;
   color: #6950a1;
   background-color: white;

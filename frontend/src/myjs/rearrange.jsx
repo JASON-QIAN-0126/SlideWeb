@@ -1,6 +1,106 @@
 import { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import SlideThumbnail from './SlideThumbnail';
+import styled from 'styled-components';
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+const ModalContainer = styled.div`
+  background-color: white;
+  padding: 20px;
+  max-height: 80vh;
+  width: 40vw;
+  overflow-y: auto;
+  box-shadow: 0px 0px 15px rgba(182, 150, 193, 0.3);
+  border: 3px solid white;
+  border-radius: 8px;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Title = styled.h3`
+  color: Black;
+  margin-bottom: 0px;
+  text-align: center;
+  font-size: 1.5rem;
+`;
+
+const SlidesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+`;
+
+const SlideItem = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 0 10px;
+`;
+
+const ThumbnailCard = styled.div`
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: #f9f9f9;
+  width: 200px;
+  height: 112.5px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    background-color: #9b95c9;
+  }
+`;
+
+const SlideIndex = styled.div`
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+`;
+
+const CancelButton = styled.button`
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: white;
+  color: #6950a1;
+  border: 1px solid #6950a1;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #ddd;
+    transform: scale(1.05);
+  }
+`;
 
 function RearrangeSlides({ slides, onRearrange, onClose }) {
   const [localSlides, setLocalSlides] = useState([]);
@@ -30,101 +130,40 @@ function RearrangeSlides({ slides, onRearrange, onClose }) {
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        zIndex: 1000,
-      }}
-    >
-      <div
-        style={{
-          margin: '50px auto',
-          padding: '20px',
-          backgroundColor: '#fff',
-          maxWidth: '800px',
-          borderRadius: '8px',
-          height: '80vh',
-          overflowY: 'auto', // 保留滚动
-        }}
-      >
-        <h2>Rearrange Slides</h2>
-        <button onClick={onClose} style={{ marginRight: '10px' }}>Close</button>
+    <Overlay>
+      <ModalContainer>
+        <Title>Rearrange Slides</Title>
+        <CancelButton onClick={onClose}>Close</CancelButton>
         <DragDropContext onDragEnd={handleOnDragEnd}>
-          <Droppable droppableId="slides" direction="horizontal">
+          <Droppable droppableId="slides" direction="vertical">
             {(provided) => (
-              <div
-                className="slides-container"
+              <SlidesContainer
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                style={{
-                  display: 'flex',
-                  padding: '10px',
-                  marginTop: '20px',
-                }}
               >
                 {localSlides.map((slide, index) => (
-                  <Draggable
-                    key={String(slide.id)}
-                    draggableId={String(slide.id)}
-                    index={index}
-                  >
+                  <Draggable key={String(slide.id)} draggableId={String(slide.id)} index={index}>
                     {(provided) => (
-                      <div
-                        className="slide-item"
+                      <SlideItem
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        style={{
-                          margin: '0 10px',
-                          ...provided.draggableProps.style,
-                        }}
                       >
-                        <div
-                          style={{
-                            position: 'relative',
-                            border: '1px solid #ccc',
-                            borderRadius: '4px',
-                            padding: '5px',
-                            backgroundColor: '#f9f9f9',
-                          }}
-                          onMouseDown={(e) => e.stopPropagation()}
-                        >
+                        <ThumbnailCard>
                           <SlideThumbnail slide={slide} />
-                          <div
-                            style={{
-                              position: 'absolute',
-                              top: '5px',
-                              left: '5px',
-                              backgroundColor: 'rgba(0,0,0,0.7)',
-                              color: '#fff',
-                              borderRadius: '50%',
-                              width: '24px',
-                              height: '24px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '12px',
-                            }}
-                          >
-                            {index + 1}
-                          </div>
-                        </div>
-                      </div>
+                          <SlideIndex>{index + 1}</SlideIndex>
+                        </ThumbnailCard>
+                      </SlideItem>
                     )}
                   </Draggable>
                 ))}
                 {provided.placeholder}
-              </div>
+              </SlidesContainer>
             )}
           </Droppable>
         </DragDropContext>
-      </div>
-    </div>
+      </ModalContainer>
+    </Overlay>
   );
 }
 

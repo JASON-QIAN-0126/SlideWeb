@@ -642,12 +642,10 @@ function Presentation({ token }) {
         setIsDefault={setIsDefaultBackground}
       />
 
-      <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
-
       <button onClick={toggleAnimations}>
         {animationsEnabled ? 'Disable Animation' : 'Add Animation'}
       </button>
-      
+
       <button onClick={() => setShowRearrangeModal(true)}>Rearrange Slides</button>
       {showRearrangeModal && (
         <RearrangeSlides
@@ -657,6 +655,7 @@ function Presentation({ token }) {
         />
       )}
 
+      <button onClick={() => window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank')}>Preview</button>
       <button onClick={() => setShowRevisionModal(true)}>Revision History</button>
       {showRevisionModal && (
         <RevisionHistory
