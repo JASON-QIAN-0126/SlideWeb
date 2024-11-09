@@ -48,7 +48,7 @@ const StyledButton = styled(Link)`
   &:hover {
     background-color: #9999cc;
     color: white;
-    transform: scale(1.1); /* 悬停时放大效果 */
+    transform: scale(1.1);
   }
 `;
 

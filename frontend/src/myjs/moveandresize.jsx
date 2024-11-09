@@ -29,7 +29,7 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
 
   const handleMouseDown = (e) => {
     e.stopPropagation();
-    if (e.button !== 0) return; // 只响应左键
+    if (e.button !== 0) return;
     setIsDragging(true);
     setStartX(e.clientX);
     setStartY(e.clientY);
@@ -51,8 +51,8 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 
   const handleMouseMove = useCallback((e) => {
-    const slideWidth = 600; // 幻灯片宽度（像素）
-    const slideHeight = 400; // 幻灯片高度（像素）
+    const slideWidth = 600;
+    const slideHeight = 400;
 
     if (isDraggingRef.current) {
       const deltaX = ((e.clientX - startXRef.current) / slideWidth) * 100;
@@ -61,7 +61,6 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
       let newX = originalPositionRef.current.x + deltaX;
       let newY = originalPositionRef.current.y + deltaY;
 
-      // 限制在幻灯片范围内
       newX = clamp(newX, 0, 100 - originalSizeRef.current.width);
       newY = clamp(newY, 0, 100 - originalSizeRef.current.height);
 
@@ -99,7 +98,6 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
         newHeight = newWidth / aspectRatio;
       }
 
-      // 确保尺寸不会超出幻灯片
       newWidth = clamp(newWidth, 1, 100 - newX);
       newHeight = clamp(newHeight, 1, 100 - newY);
 
@@ -146,7 +144,6 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
       onMouseDown={handleMouseDown}
     >
       {children}
-      {/* 四个角的调整框 */}
       <div
         style={{
           position: 'absolute',
