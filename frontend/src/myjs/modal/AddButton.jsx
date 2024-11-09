@@ -9,8 +9,8 @@ const ButtonContainer = styled.div`
 `;
 
 const StyledButton = styled.button`
-  padding: 8px 16px;
-  font-size: 1rem;
+  padding: 2px 8px;
+  font-size: 0.8rem;
   color: #6950a1;
   background-color: white;
   border: 1px solid #6950a1;
@@ -27,6 +27,11 @@ const StyledButton = styled.button`
 
   &:focus {
     outline: none;
+  }
+
+  @media (min-width: 600px) {
+    padding: 8px 16px;
+    font-size: 1rem;
   }
 `;
 

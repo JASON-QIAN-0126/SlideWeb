@@ -32,20 +32,28 @@ const PresentationContainer = styled.div`
 
 const Title = styled.h2`
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: white;
+  margin-top: 26px;
+  margin-bottom: 6px;
+
+  @media (min-width: 600px) {
+    font-size: 2rem;
+    margin-top: 26px;
+    margin-bottom: 16px;
+  }
 `;
 
 const Button = styled.button`
-  padding: 10px 20px;
-  font-size: 1rem;
+  padding: 6px 15px;
+  font-size: 0.9rem;
   color: #6950a1;
   background-color: white;
   border: 1px solid #6950a1;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
-  margin: 10px;
+  margin: 1px;
   transition: background-color 0.3s ease, transform 0.2s ease;
 
   &:hover {
@@ -57,6 +65,12 @@ const Button = styled.button`
   &:active {
     background-color: #afb4db;
     transform: scale(0.98);
+  }
+  
+  @media (min-width: 600px) {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin: 10px;
   }
 `;
 

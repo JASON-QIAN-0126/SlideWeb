@@ -16,12 +16,17 @@ const DashboardContainer = styled.div`
 `;
 
 const Title = styled.h2`
-  font-size: 2.5rem;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+
+  @media (min-width: 600px) {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
 `;
 
 const Button = styled.button`
-  padding: 10px 20px;
+  padding: 6px 16px;
   font-size: 1rem;
   color: #6950a1;
   background-color: white;
@@ -41,6 +46,11 @@ const Button = styled.button`
   &:active {
     background-color: #afb4db;
     transform: scale(0.98);
+  }
+  
+  @media (min-width: 600px) {
+    padding: 10px 20px;
+    font-size: 1rem;
   }
 `;
 
@@ -78,8 +88,8 @@ const PresentationList = styled.div`
 `;
 
 const PresentationCard = styled.div`
-  width: 360px;
-  height: 180px;
+  width: 330px;
+  height: 165px;
   border: 1px solid #ccc;
   margin: 20px;
   cursor: pointer;
@@ -97,6 +107,11 @@ const PresentationCard = styled.div`
     border-color: #494e8f;
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  @media (min-width: 600px) {
+    width: 360px;
+    height: 180px;
   }
 `;
 

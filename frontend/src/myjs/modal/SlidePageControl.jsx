@@ -2,15 +2,21 @@ import styled from 'styled-components';
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  gap: 5px;
+  margin-top: 15px;
+  margin-bottom: 15px;
   justify-content: center;
+
+  @media (min-width: 600px) {
+    gap: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
 `;
 
 const StyledButton = styled.button`
-  padding: 8px 16px;
-  font-size: 1rem;
+  padding: 2px 8px;
+  font-size: 0.8rem;
   color: #6950a1;
   background-color: white;
   border: 1px solid #6950a1;
@@ -23,6 +29,11 @@ const StyledButton = styled.button`
     background-color: #6950a1;
     color: white;
     transform: scale(1.05);
+  }
+
+  @media (min-width: 600px) {
+    padding: 8px 16px;
+    font-size: 1rem;
   }
 `;
 

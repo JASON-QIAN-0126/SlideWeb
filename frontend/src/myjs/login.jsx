@@ -14,29 +14,39 @@ const PageContainer = styled.div`
 `;
 
 const MainTitle = styled.h1`
-  font-size: 2.5rem;
-  margin-bottom: 40px;
+  font-size: 2rem;
+  margin-bottom: 20px;
+
+  @media (min-width: 600px) {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+  }
 `;
 
 const LoginBox = styled.div`
   background-color: rgba(255, 255, 255, 0.1);
   padding: 20px;
   border-radius: 8px;
-  width: 400px;
+  width: 90%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 `;
 
 const FormTitle = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   margin-bottom: 10px;
+
+  @media (min-width: 600px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const Input = styled.input`
   padding: 10px;
   margin: 8px 0;
-  width: 100%;
+  width: 90%;
   font-size: 1rem;
   border: none;
   border-radius: 5px;

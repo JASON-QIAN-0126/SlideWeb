@@ -8,17 +8,23 @@ const ButtonBarContainer = styled.div`
 
 const LeftButtonGroup = styled.div`
   display: flex;
-  gap: 15px;
+
+  @media (min-width: 600px) {
+      gap: 15px;
+  }
 `;
 
 const RightButtonGroup = styled.div`
   display: flex;
-  gap: 15px;
+
+  @media (min-width: 600px) {
+      gap: 15px;
+  }
 `;
 
 const StyledButton = styled.button`
-  padding: 6px 8px;
-  font-size: 1rem;
+  padding: 2px 4px;
+  font-size: 0.8rem;
   color: #6950a1;
   background-color: white;
   border: 1px solid #6950a1;
@@ -31,6 +37,11 @@ const StyledButton = styled.button`
     background-color: #6950a1;
     color: white;
     transform: scale(1.1);
+  }
+
+  @media (min-width: 600px) {
+    padding: 6px 8px;
+    font-size: 1rem;
   }
 `;
 
