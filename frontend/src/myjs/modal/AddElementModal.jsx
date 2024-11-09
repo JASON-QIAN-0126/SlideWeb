@@ -105,38 +105,42 @@ function AddElementModal({
     <ModalOverlay>
       <ModalContainer>
         <Title>{titleText}</Title>
-        <FormGroup>
-          <label>Width (%):</label>
-          <input
-            type="number"
-            value={elementProperties.size?.width || ''}
-            onChange={(e) =>
-              setElementProperties({
-                ...elementProperties,
-                size: {
-                  ...elementProperties.size,
-                  width: e.target.value,
-                },
-              })
-            }
-          />
-        </FormGroup>
-        <FormGroup>
-          <label>Height (%):</label>
-          <input
-            type="number"
-            value={elementProperties.size?.height || ''}
-            onChange={(e) =>
-              setElementProperties({
-                ...elementProperties,
-                size: {
-                  ...elementProperties.size,
-                  height: e.target.value,
-                },
-              })
-            }
-          />
-        </FormGroup>
+        {!editingElementId && (
+          <>
+            <FormGroup>
+              <label>Width (%):</label>
+              <input
+                type="number"
+                value={elementProperties.size?.width || ''}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    size: {
+                      ...elementProperties.size,
+                      width: e.target.value,
+                    },
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>Height (%):</label>
+              <input
+                type="number"
+                value={elementProperties.size?.height || ''}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    size: {
+                      ...elementProperties.size,
+                      height: e.target.value,
+                    },
+                  })
+                }
+              />
+            </FormGroup>
+          </>
+        )}
         {modalType === 'text' && (
           <>
             <FormGroup>
