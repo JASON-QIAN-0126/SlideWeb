@@ -20,7 +20,8 @@ const ModalContainer = styled.div`
   background-color: white;
   padding: 20px;
   max-height: 80vh;
-  width: 40vw;
+  width: 80vw;
+  max-width: 400px;
   overflow-y: auto;
   box-shadow: 0px 0px 15px rgba(182, 150, 193, 0.3);
   border: 3px solid white;
@@ -102,7 +103,7 @@ const CancelButton = styled.button`
   }
 `;
 
-function RearrangeSlides({ slides, onRearrange, onClose }) {
+function RearrangeSlides({ slides, defaultBackground, onRearrange, onClose }) {
   const [localSlides, setLocalSlides] = useState([]);
 
   useEffect(() => {
@@ -150,7 +151,12 @@ function RearrangeSlides({ slides, onRearrange, onClose }) {
                         {...provided.dragHandleProps}
                       >
                         <ThumbnailCard>
-                          <SlideThumbnail slide={slide} />
+                          <SlideThumbnail 
+                            slide={{ 
+                              ...slide, 
+                              background: slide.background || defaultBackground || {} 
+                            }} 
+                          />
                           <SlideIndex>{index + 1}</SlideIndex>
                         </ThumbnailCard>
                       </SlideItem>

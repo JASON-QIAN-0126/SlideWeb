@@ -676,6 +676,7 @@ function Presentation({ token }) {
       {showRearrangeModal && (
         <RearrangeSlides
           slides={presentation.slides}
+          defaultBackground={presentation.defaultBackground}
           onRearrange={handleRearrangeSlides}
           onClose={() => setShowRearrangeModal(false)}
         />
