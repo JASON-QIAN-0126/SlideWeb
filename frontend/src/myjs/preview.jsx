@@ -6,7 +6,7 @@ import TextElement from './textelement';
 import ImageElement from './imageelement';
 import VideoElement from './videoelement';
 import CodeElement from './codeelement';
-import Animation from './animation'; // Import Animation component
+import Animation from './animation';
 
 function Preview({ token }) {
   const { id, slideIndex } = useParams();

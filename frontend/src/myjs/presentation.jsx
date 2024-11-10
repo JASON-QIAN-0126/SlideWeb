@@ -154,16 +154,16 @@ function Presentation({ token }) {
     }
   }, [presentation]);
 
-  const handleUpdateThumbnail = (index) => {
+  function handleUpdateThumbnail(index) {
     const updatedPresentation = {
       ...presentation,
       thumbnailSlideIndex: index,
     };
     updateStore(updatedPresentation);
     setThumbnailSlideIndex(index);
-  };
+  }
 
-  const updateStore = async (updatedPresentation) => {
+  async function updateStore(updatedPresentation) {
     try {
       const currentTime = Date.now();
       if (!lastSavedTime || currentTime - lastSavedTime >= 60000) {
@@ -195,7 +195,7 @@ function Presentation({ token }) {
     }
   };
 
-  const handleUpdateDescription = () => {
+  function handleUpdateDescription() {
     const updatedPresentation = {
       ...presentation,
       description: newDescription,
@@ -206,7 +206,7 @@ function Presentation({ token }) {
   };
 
   // add and delete slide
-  const handleAddSlide = async () => {
+  async function handleAddSlide() {
     const newSlide = {
       id: uuidv4(),
       elements: [],
@@ -221,7 +221,7 @@ function Presentation({ token }) {
     }
   };
 
-  const handleDeleteSlide = () => {
+  function handleDeleteSlide() {
     if (presentation.slides.length === 1) {
       setNotificationOpen(true);
       return;
@@ -238,7 +238,7 @@ function Presentation({ token }) {
     setCurrentSlideIndex((prevIndex) => Math.max(0, prevIndex - 1));
   };
 
-  const handleNextSlide = () => {
+  function handleNextSlide() {
     if (currentSlideIndex < presentation.slides.length - 1) {
       const newIndex = currentSlideIndex + 1;
       setCurrentSlideIndex(newIndex);
@@ -246,7 +246,7 @@ function Presentation({ token }) {
     }
   };
   
-  const handlePrevSlide = () => {
+  function handlePrevSlide() {
     if (currentSlideIndex > 0) {
       const newIndex = currentSlideIndex - 1;
       setCurrentSlideIndex(newIndex);
@@ -254,11 +254,11 @@ function Presentation({ token }) {
     }
   };
 
-  const handleDeletePresentation = () => {
+  function handleDeletePresentation() {
     setIsConfirmModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  function handleConfirmDelete() {
     setIsConfirmModalOpen(false);
 
     axios.get('http://localhost:5005/store', {
@@ -282,11 +282,11 @@ function Presentation({ token }) {
       });
   };
 
-  const handleCancelDelete = () => {
+  function handleCancelDelete()  {
     setIsConfirmModalOpen(false);
   };
 
-  const handleUpdateTitle = () => {
+  function handleUpdateTitle() {
     const updatedPresentation = {
       ...presentation,
       name: newTitle,
@@ -321,14 +321,14 @@ function Presentation({ token }) {
     return <div>Loading slide...</div>;
   }
 
-  const handleAddElement = (type) => {
+  function handleAddElement(type) {
     setModalType(type);
     setElementProperties({});
     setEditingElementId(null);
     setShowModal(true);
   };
 
-  const handleSaveElement = () => {
+  function handleSaveElement() {
     let updatedProperties = { ...elementProperties };
     if (modalType === 'video') {
       const videoId = parseYouTubeId(elementProperties.videoUrl);
@@ -359,7 +359,7 @@ function Presentation({ token }) {
     setShowModal(false);
   };
 
-  const handleDeleteElement = (elementId) => {
+  function handleDeleteElement(elementId) {
     const updatedPresentation = { ...presentation };
     updatedPresentation.slides[currentSlideIndex].elements = currentSlide.elements.filter(
       (el) => el.id !== elementId
@@ -367,7 +367,7 @@ function Presentation({ token }) {
     updateStore(updatedPresentation);
   };
 
-  const handleEditElement = (element) => {
+  function handleEditElement(element) {
     setModalType(element.type);
     setElementProperties({
       ...element.properties,
@@ -378,7 +378,7 @@ function Presentation({ token }) {
     setShowModal(true);
   };
 
-  const handleUpdateElement = () => {
+  function handleUpdateElement() {
     let updatedProperties = { ...elementProperties };
     if (modalType === 'video') {
       const videoId = parseYouTubeId(elementProperties.videoUrl);
@@ -429,7 +429,7 @@ function Presentation({ token }) {
     setPresentation(updatedPresentation);
   };
 
-  const renderElements = () => {
+  function renderElements() {
     const elements = currentSlide.elements || [];
     return elements
       .sort((a, b) => a.layer - b.layer)
@@ -558,12 +558,12 @@ function Presentation({ token }) {
   };
 
   // move or resize
-  const handleMoveOrResizeEnd = () => {
+  function handleMoveOrResizeEnd() {
     updateStore(presentation);
   };
 
   // animation
-  const toggleAnimations = () => {
+  function toggleAnimations() {
     const newAnimationsEnabled = !animationsEnabled;
     const updatedPresentation = { ...presentation, animationsEnabled: newAnimationsEnabled };
     setPresentation(updatedPresentation);
@@ -572,7 +572,7 @@ function Presentation({ token }) {
   };
 
   // handle rearrange
-  const handleRearrangeSlides = (newSlidesOrder) => {
+  function handleRearrangeSlides(newSlidesOrder) {
     const updatedPresentation = { ...presentation, slides: newSlidesOrder };
     setPresentation(updatedPresentation);
     updateStore(updatedPresentation);
@@ -599,7 +599,7 @@ function Presentation({ token }) {
   };
 
   // handle preview
-  const handlePreview = () => {
+  function handlePreview() {
     window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank');
   };
 
