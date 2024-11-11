@@ -7,6 +7,7 @@ import ImageElement from './imageelement';
 import VideoElement from './videoelement';
 import CodeElement from './codeelement';
 import Animation from './animation';
+import SlideArrow from './modal/SlideArrow';
 
 function Preview({ token }) {
   const { id, slideIndex } = useParams();
@@ -140,22 +141,12 @@ function Preview({ token }) {
         renderElements()
       )}
       {presentation.slides.length > 1 && (
-        <>
-          <button
-            onClick={handlePrevSlide}
-            disabled={currentSlideIndex === 0}
-            style={{ position: 'absolute', top: '50%', left: '10px' }}
-          >
-            &lt;
-          </button>
-          <button
-            onClick={handleNextSlide}
-            disabled={currentSlideIndex === presentation.slides.length - 1}
-            style={{ position: 'absolute', top: '50%', right: '10px' }}
-          >
-            &gt;
-          </button>
-        </>
+        <SlideArrow
+        handlePrevSlide={handlePrevSlide}
+        handleNextSlide={handleNextSlide}
+        currentSlideIndex={currentSlideIndex}
+        totalSlides={presentation.slides.length}
+      />
       )}
       <div
         style={{
