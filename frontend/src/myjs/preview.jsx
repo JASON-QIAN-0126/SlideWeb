@@ -142,11 +142,11 @@ function Preview({ token }) {
       )}
       {presentation.slides.length > 1 && (
         <SlideArrow
-        handlePrevSlide={handlePrevSlide}
-        handleNextSlide={handleNextSlide}
-        currentSlideIndex={currentSlideIndex}
-        totalSlides={presentation.slides.length}
-      />
+          handlePrevSlide={handlePrevSlide}
+          handleNextSlide={handleNextSlide}
+          currentSlideIndex={currentSlideIndex}
+          totalSlides={presentation.slides.length}
+        />
       )}
       <div
         style={{

@@ -158,6 +158,7 @@ function Dashboard({ onLogout, token}) {
   const [presentations, setPresentations] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newPresentationName, setNewPresentationName] = useState('');
+  const [newPresentationDescription, setNewPresentationDescription] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -183,37 +184,52 @@ function Dashboard({ onLogout, token}) {
     setShowModal(true);
   }
 
+  function handleCancel() {
+    setShowModal(false);
+    setNewPresentationName('');
+    setNewPresentationDescription('');
+  }
+  
   function handleSavePresentation() {
     const newPresentation = {
       id: Date.now(),
       name: newPresentationName,
-      description: '',
+      description: newPresentationDescription,
       thumbnailSlideIndex: 0,
       slides: [{ id: uuidv4(), elements: [] }],
     };
 
-    axios.get('http://localhost:5005/store', {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
-      .then((response) => {
-        const store = response.data.store || {};
-        store[newPresentation.id] = newPresentation;
+    const savePresentation = () => {
+      axios
+        .get('http://localhost:5005/store', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          const store = response.data.store || {};
+          store[newPresentation.id] = newPresentation;
 
-        return axios.put('http://localhost:5005/store', {
-          store: store,
-        }, {
-          headers: { 'Authorization': `Bearer ${token}` },
+          return axios.put(
+            'http://localhost:5005/store',
+            {
+              store: store,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+        })
+        .then(() => {
+          setPresentations([...presentations, newPresentation]);
+          setShowModal(false);
+          setNewPresentationName('');
+          setNewPresentationDescription('');
+          console.log('Presentation saved successfully in global store');
+        })
+        .catch((err) => {
+          console.error('Failed to save presentation', err);
         });
-      })
-      .then(() => {
-        setPresentations([...presentations, newPresentation]);
-        setShowModal(false);
-        setNewPresentationName('');
-        console.log('Presentation saved successfully in global store');
-      })
-      .catch((err) => {
-        console.error('Failed to save presentation', err);
-      });
+    };
+    savePresentation();
   }
 
   function handlePresentationClick(id) {
@@ -237,10 +253,32 @@ function Dashboard({ onLogout, token}) {
               value={newPresentationName}
               onChange={(e) => setNewPresentationName(e.target.value)}
               placeholder="Presentation Name"
-              style={{ padding: '10px', width: '80%', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+              style={{
+                padding: '10px',
+                width: '80%',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+                marginBottom: '10px',
+              }}
             />
+
+            <input
+              type="text"
+              value={newPresentationDescription}
+              onChange={(e) => setNewPresentationDescription(e.target.value)}
+              placeholder="Description"
+              style={{
+                padding: '10px',
+                width: '80%',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+                marginBottom: '10px',
+              }}
+            />
+            <label style={{display: 'block', marginBottom: '5px' }}>Thumbnail can be chosen in each presentation</label>
+            <label style={{display: 'block', marginBottom: '5px' }}>(default wil be slide 1)</label>
             <ButtonContainer>
-              <CancelButton onClick={() => setShowModal(false)}>Cancel</CancelButton>
+              <CancelButton onClick={handleCancel}>Cancel</CancelButton>
               <CreateButton onClick={handleSavePresentation}>Create</CreateButton>
             </ButtonContainer>
           </Modal>
@@ -256,7 +294,7 @@ function Dashboard({ onLogout, token}) {
             <div
               style={{
                 width: '100%',
-                height: '100%',
+                height: '80%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -275,11 +313,19 @@ function Dashboard({ onLogout, token}) {
                 <SlideThumbnail />
               )}
             </div>
-            <h3 style={{ margin: '5px 0', fontSize: '1em', fontWeight: 'bold' }}>{presentation.name}</h3>
-            {presentation.description && (
-              <p style={{ margin: '5px 0 0 0', fontSize: '0.85em' }}>{presentation.description}</p>
-            )}
-            <p style={{ fontSize: '0.85em', color: '#666' }}>Slides: {presentation.slides.length}</p>
+            <div style={{ width: '100%', padding: '5px 0' }}>
+              <h3 style={{ margin: '2px 0', fontSize: '0.9em', fontWeight: 'bold', textAlign: 'center' }}>
+                {presentation.name}
+              </h3>
+              {presentation.description && (
+                <p style={{ margin: '2px 0', fontSize: '0.75em', textAlign: 'center' }}>
+                  {presentation.description}
+                </p>
+              )}
+              <p style={{ fontSize: '0.75em', color: '#666', textAlign: 'center', margin: '2px 0' }}>
+                Slides: {presentation.slides.length}
+              </p>
+            </div>
           </PresentationCard>
         ))}
       </PresentationList>
