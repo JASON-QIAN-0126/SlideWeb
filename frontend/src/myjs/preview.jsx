@@ -16,7 +16,7 @@ function Preview({ token }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:5005/store', {
+    axios.get('https://z5503600-presto-backend.vercel.app/store', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {

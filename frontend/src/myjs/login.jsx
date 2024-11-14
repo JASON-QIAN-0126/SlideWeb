@@ -107,7 +107,7 @@ function Login({ onLogin, isAuthenticated }) {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const response = await axios.post('http://z5503600-presto-backend.vercel.app/admin/auth/login', {
+      const response = await axios.post('https://z5503600-presto-backend.vercel.app/admin/auth/login', {
         email,
         password,
       });

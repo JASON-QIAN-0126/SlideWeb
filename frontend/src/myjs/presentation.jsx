@@ -120,7 +120,7 @@ function Presentation({ token }) {
   const [showRevisionModal, setShowRevisionModal] = useState(false);
 
   useEffect(() => {
-    axios.get('http://localhost:5005/store', {
+    axios.get('https://z5503600-presto-backend.vercel.app/store', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {
@@ -177,13 +177,13 @@ function Presentation({ token }) {
         updatedPresentation.history.push(historyEntry);
         setLastSavedTime(currentTime);
       }
-      const response = await axios.get('http://localhost:5005/store', {
+      const response = await axios.get('https://z5503600-presto-backend.vercel.app/store', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const store = response.data.store || {};
       store[updatedPresentation.id] = updatedPresentation;
   
-      await axios.put('http://localhost:5005/store', {
+      await axios.put('https://z5503600-presto-backend.vercel.app/store', {
         store: store,
       }, {
         headers: { 'Authorization': `Bearer ${token}` },
@@ -261,14 +261,14 @@ function Presentation({ token }) {
   function handleConfirmDelete() {
     setIsConfirmModalOpen(false);
 
-    axios.get('http://localhost:5005/store', {
+    axios.get('https://z5503600-presto-backend.vercel.app/store', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {
         const store = response.data.store || {};
         delete store[presentation.id];
 
-        return axios.put('http://localhost:5005/store', {
+        return axios.put('https://z5503600-presto-backend.vercel.app/store', {
           store: store,
         }, {
           headers: { 'Authorization': `Bearer ${token}` },
