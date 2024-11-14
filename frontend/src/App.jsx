@@ -18,7 +18,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5005/admin/auth/logout', {}, {
+      await axios.post('http://z5503600-presto-backend.vercel.app/admin/auth/logout', {}, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
     } catch (err) {

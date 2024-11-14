@@ -162,7 +162,7 @@ function Dashboard({ onLogout, token}) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:5005/store', {
+    axios.get('http://z5503600-presto-backend.vercel.app/store', {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {
@@ -201,7 +201,7 @@ function Dashboard({ onLogout, token}) {
 
     const savePresentation = () => {
       axios
-        .get('http://localhost:5005/store', {
+        .get('http://z5503600-presto-backend.vercel.app/store', {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -209,7 +209,7 @@ function Dashboard({ onLogout, token}) {
           store[newPresentation.id] = newPresentation;
 
           return axios.put(
-            'http://localhost:5005/store',
+            'http://z5503600-presto-backend.vercel.app/store',
             {
               store: store,
             },

@@ -104,7 +104,7 @@ function Register({ onRegister, isAuthenticated }) {
       return;
     }
     try {
-      const response = await axios.post('http://localhost:5005/admin/auth/register', {
+      const response = await axios.post('http://z5503600-presto-backend.vercel.app/admin/auth/register', {
         email,
         password,
         name,
