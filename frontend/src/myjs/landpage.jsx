@@ -26,7 +26,7 @@ function LandingPage() {
         {/* BlurText 标题效果 */}
         <BlurText
           text="LoveSlide"
-          delay={100}
+          delay={10}
           animateBy="words"
           direction="top"
           onAnimationComplete={handleAnimationComplete}
@@ -49,7 +49,8 @@ function LandingPage() {
           maxWidth: '600px',
           lineHeight: '1.6',
           color: '#e5e5e5',
-          animation: 'fadeIn 1.5s ease-in-out 0.8s both'
+          animation: 'fadeIn 0.5s ease-in-out 0.5s both',
+          pointerEvents: 'none' // 让文字不阻挡鼠标事件
         }}>
           创建精美的演示文稿，展示您的创意和想法
         </p>
@@ -59,7 +60,7 @@ function LandingPage() {
           gap: '30px',
           flexWrap: 'wrap',
           justifyContent: 'center',
-          animation: 'fadeIn 1.5s ease-in-out 1.2s both'
+          animation: 'fadeIn 0.8s ease-in-out 0.8s both'
         }}>
           <button 
             className="landing-btn landing-btn-primary" 

@@ -1,5 +1,3 @@
-/* 登录和注册页面样式 */
-
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -21,6 +19,7 @@
   animation: authCardSlideIn 0.8s ease-out;
   position: relative;
   overflow: hidden;
+  pointer-events: auto; /* 恢复表单的交互功能 */
 }
 
 @keyframes authCardSlideIn {
@@ -103,6 +102,7 @@
   outline: none;
   background: #fff;
   box-sizing: border-box;
+  pointer-events: auto; /* 确保输入框可以点击和输入 */
 }
 
 .auth-input:focus {
@@ -150,6 +150,7 @@
   overflow: hidden;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  pointer-events: auto; /* 确保提交按钮可以点击 */
 }
 
 .auth-submit:before {
@@ -291,4 +292,8 @@
     padding: 14px 20px;
     font-size: 0.9rem;
   }
+}
+
+a, button, input, select, textarea {
+  pointer-events: auto !important;
 } 

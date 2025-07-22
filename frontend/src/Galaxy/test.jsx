@@ -31,7 +31,8 @@ export default function GalaxyTest() {
         borderRadius: '10px',
         zIndex: 1000,
         fontSize: '12px',
-        maxWidth: '300px'
+        maxWidth: '300px',
+        pointerEvents: 'auto' // 确保控制面板可以交互
       }}>
         <h3>Galaxy Controls</h3>
         
