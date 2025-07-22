@@ -1,89 +1,9 @@
 import { useState } from 'react';
 import { Navigate,useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import styled from 'styled-components';
-
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #6950a1;
-  color: white;
-`;
-
-const MainTitle = styled.h1`
-  font-size: 2.5rem;
-  margin-bottom: 40px;
-`;
-
-const RegisterBox = styled.div`
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 8px;
-  width:90%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
-const FormTitle = styled.h2`
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  margin: 8px 0;
-  width: 95%;
-  font-size: 1rem;
-  border: none;
-  border-radius: 5px;
-  outline: none;
-  transition: box-shadow 0.3s ease;
-
-  &:focus {
-    box-shadow: 0 0 5px #afb4db;
-  }
-`;
-
-const ErrorText = styled.p`
-  color: #ed1941;
-  font-size: 1.1rem;
-  margin: 5px 0;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 15px;
-`;
-
-const Button = styled.button`
-  padding: 10px 20px;
-  font-size: 1rem;
-  color: #6950a1;
-  background-color: white;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-
-  &:hover {
-    background-color: #9999cc;
-    color: white;
-    transform: scale(1.1);
-  }
-
-  &:active {
-    background-color: #afb4db;
-    transform: scale(0.98);
-  }
-`;
+import { API_BASE_URL } from '../config.js';
+import Galaxy_backend from '../components/Galaxy_backend';
+import '../styles/auth.css';
 
 function Register({ onRegister, isAuthenticated }) {
   const [email, setEmail] = useState('');
@@ -104,7 +24,7 @@ function Register({ onRegister, isAuthenticated }) {
       return;
     }
     try {
-      const response = await axios.post('https://z5503600-presto-backend.vercel.app/admin/auth/register', {
+      const response = await axios.post(`${API_BASE_URL}/admin/auth/register`, {
         email,
         password,
         name,
@@ -122,47 +42,84 @@ function Register({ onRegister, isAuthenticated }) {
 
 
   return (
-    <PageContainer>
-      <MainTitle>Welcome to Presto!</MainTitle>
-      <RegisterBox>
-        <FormTitle>Register</FormTitle>
-        <form onSubmit={handleSubmit}>
-          <Input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <Input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          {error && <ErrorText>{error}</ErrorText>}
-          <ButtonContainer>
-            <Button type="button" onClick={() => navigate('/')}>Back</Button>
-            <Button type="submit">Register</Button>
-          </ButtonContainer>
-        </form>
-      </RegisterBox>
-    </PageContainer>
+    <Galaxy_backend variant="auth">
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <h1 className="auth-title">加入Presto</h1>
+            <p className="auth-subtitle">创建您的演示文稿账户</p>
+          </div>
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="name">姓名</label>
+              <input
+                className="auth-input"
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="请输入您的姓名"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="email">邮箱地址</label>
+              <input
+                className="auth-input"
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="请输入您的邮箱"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="password">密码</label>
+              <input
+                className="auth-input"
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="请输入密码"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="confirmPassword">确认密码</label>
+              <input
+                className="auth-input"
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="请再次输入密码"
+                required
+              />
+              {password && confirmPassword && (
+                <div className={`password-match-info ${password === confirmPassword ? 'success' : 'error'}`}>
+                  {password === confirmPassword ? '密码匹配' : '密码不匹配'}
+                </div>
+              )}
+            </div>
+            {error && <div className="auth-error">{error}</div>}
+            <div className="btn-group">
+              <button className="btn btn-outline" type="button" onClick={() => navigate('/')}>
+                返回
+              </button>
+              <button className="auth-submit" type="submit">
+                注册
+              </button>
+            </div>
+          </form>
+          <div className="auth-link">
+            <span className="auth-link-text">已有账户？</span>
+            <a className="auth-link-button" href="/login">立即登录</a>
+          </div>
+        </div>
+      </div>
+    </Galaxy_backend>
   );
 }
 

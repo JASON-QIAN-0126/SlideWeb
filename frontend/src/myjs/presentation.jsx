@@ -14,7 +14,8 @@ import Animation from './animation';
 import RearrangeSlides from './rearrange';
 import RevisionHistory from './revision';
 
-import styled from 'styled-components';
+import { API_BASE_URL } from '../config.js';
+import '../styles/presentation.css';
 import DeletePresentation from './modal/DeletePresentation';
 import ButtonBar from './modal/EditButton';
 import EditModal from './modal/EditModal';
@@ -23,62 +24,6 @@ import SlidePageControl from './modal/SlidePageControl';
 import SlideArrow from './modal/SlideArrow';
 import AddButton from './modal/AddButton';
 import AddElementModal from './modal/AddElementModal';
-
-const PresentationContainer = styled.div`
-  background-color: #a594d8;
-  min-height: 100vh;
-  padding: 20px;
-`;
-
-const Title = styled.h2`
-  text-align: center;
-  font-size: 1.8rem;
-  color: white;
-  margin-top: 26px;
-  margin-bottom: 6px;
-
-  @media (min-width: 600px) {
-    font-size: 2rem;
-    margin-top: 26px;
-    margin-bottom: 16px;
-  }
-`;
-
-const Button = styled.button`
-  padding: 6px 15px;
-  font-size: 0.9rem;
-  color: #6950a1;
-  background-color: white;
-  border: 1px solid #6950a1;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 1px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-
-  &:hover {
-    background-color: #6950a1;
-    color: white;
-    transform: scale(1.1);
-  }
-
-  &:active {
-    background-color: #afb4db;
-    transform: scale(0.98);
-  }
-  
-  @media (min-width: 600px) {
-    padding: 10px 20px;
-    font-size: 1rem;
-    margin: 10px;
-  }
-`;
-
-const BackButton = styled(Button)`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-`;
 
 function Presentation({ token }) {
   const { id } = useParams();
@@ -120,7 +65,7 @@ function Presentation({ token }) {
   const [showRevisionModal, setShowRevisionModal] = useState(false);
 
   useEffect(() => {
-    axios.get('https://z5503600-presto-backend.vercel.app/store', {
+    axios.get(`${API_BASE_URL}/store`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {
@@ -177,13 +122,13 @@ function Presentation({ token }) {
         updatedPresentation.history.push(historyEntry);
         setLastSavedTime(currentTime);
       }
-      const response = await axios.get('https://z5503600-presto-backend.vercel.app/store', {
+      const response = await axios.get(`${API_BASE_URL}/store`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const store = response.data.store || {};
       store[updatedPresentation.id] = updatedPresentation;
   
-      await axios.put('https://z5503600-presto-backend.vercel.app/store', {
+      await axios.put(`${API_BASE_URL}/store`, {
         store: store,
       }, {
         headers: { 'Authorization': `Bearer ${token}` },
@@ -261,14 +206,14 @@ function Presentation({ token }) {
   function handleConfirmDelete() {
     setIsConfirmModalOpen(false);
 
-    axios.get('https://z5503600-presto-backend.vercel.app/store', {
+    axios.get(`${API_BASE_URL}/store`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {
         const store = response.data.store || {};
         delete store[presentation.id];
 
-        return axios.put('https://z5503600-presto-backend.vercel.app/store', {
+        return axios.put(`${API_BASE_URL}/store`, {
           store: store,
         }, {
           headers: { 'Authorization': `Bearer ${token}` },
@@ -604,42 +549,111 @@ function Presentation({ token }) {
   };
 
   return (
-    <PresentationContainer>
-      <Title>{presentation.name}</Title>
-      <BackButton onClick={() => navigate('/dashboard')}>Back</BackButton>
-      <DeletePresentation
-        isConfirmModalOpen={isConfirmModalOpen} 
-        handleDeletePresentation={handleDeletePresentation} 
-        handleConfirmDelete={handleConfirmDelete} 
-        handleCancelDelete={handleCancelDelete}
-      />
+    <div className="presentation-container">
+      <h1 className="presentation-title">{presentation.name}</h1>
+      
+      <button className="back-btn" onClick={() => navigate('/dashboard')}>
+        返回
+      </button>
+      
+      <button className="delete-presentation-btn" onClick={handleDeletePresentation}>
+        删除演示文稿
+      </button>
 
-      <ButtonBar
-        onEditTitle={() => setShowTitleModal(true)}
-        onEditDescription={() => setShowDescriptionModal(true)}
-        onUpdateThumbnail={() => setShowThumbnailModal(true)}
-      />
+      {isConfirmModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="modal-title">删除确认</h3>
+            <p>您确定要删除这个演示文稿吗？</p>
+            <div className="modal-actions">
+              <button className="btn-modal-secondary" onClick={handleCancelDelete}>取消</button>
+              <button className="btn-modal-primary" onClick={handleConfirmDelete}>确认删除</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="toolbar-container">
+        <div className="main-toolbar">
+          <div className="toolbar-group left">
+            <div className="toolbar-section">
+              <h4 className="toolbar-section-title">编辑</h4>
+              <div className="toolbar-section-buttons">
+                <button className="toolbar-btn" onClick={() => setShowTitleModal(true)}>
+                  编辑标题
+                </button>
+                <button className="toolbar-btn" onClick={() => setShowDescriptionModal(true)}>
+                  编辑描述
+                </button>
+                <button className="toolbar-btn" onClick={() => setShowThumbnailModal(true)}>
+                  更新缩略图
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="toolbar-group center">
+            <div className="toolbar-section">
+              <h4 className="toolbar-section-title">幻灯片控制</h4>
+              <div className="toolbar-section-buttons">
+                <button className="toolbar-btn secondary" onClick={() => setShowBackgroundModal(true)}>
+                  更改背景
+                </button>
+                <button 
+                  className={`toolbar-btn ${animationsEnabled ? 'success' : ''}`} 
+                  onClick={toggleAnimations}
+                >
+                  {animationsEnabled ? '禁用动画' : '启用动画'}
+                </button>
+                <button className="toolbar-btn" onClick={() => setShowRearrangeModal(true)}>
+                  重排幻灯片
+                </button>
+                <button className="toolbar-btn" onClick={() => setShowRevisionModal(true)}>
+                  历史版本
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="toolbar-group right">
+            <div className="toolbar-section">
+              <h4 className="toolbar-section-title">操作</h4>
+              <div className="toolbar-section-buttons">
+                <button className="toolbar-btn primary" onClick={handleAddSlide}>
+                  添加幻灯片
+                </button>
+                <button className="toolbar-btn danger" onClick={handleDeleteSlide}>
+                  删除幻灯片
+                </button>
+                <button className="toolbar-btn success" onClick={handlePreview}>
+                  预览
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {showTitleModal && (
         <EditModal
-          title="Edit Title"
+          title="编辑标题"
           value={newTitle}
           onChange={setNewTitle}
           onSave={handleUpdateTitle}
           onClose={() => setShowTitleModal(false)}
-          placeholder="New Title"
+          placeholder="新标题"
           isTextArea={false}
         />
       )}
 
       {showDescriptionModal && (
         <EditModal
-          title="Edit Description"
+          title="编辑描述"
           value={newDescription}
           onChange={setNewDescription}
           onSave={handleUpdateDescription}
           onClose={() => setShowDescriptionModal(false)}
-          placeholder="New Description"
+          placeholder="新描述"
           isTextArea={true}
         />
       )}
@@ -652,14 +666,6 @@ function Presentation({ token }) {
           onClose={() => setShowThumbnailModal(false)}
         />
       )}
-
-      <SlideChangeButtonBar
-        onBackgroundChange={() => setShowBackgroundModal(true)}
-        onToggleAnimations={toggleAnimations}
-        animationsEnabled={animationsEnabled}
-        onRearrangeSlides={() => setShowRearrangeModal(true)}
-        onRevisionHistory={() => setShowRevisionModal(true)}
-      />
 
       <BackgroundPicker
         show={showBackgroundModal}
@@ -690,66 +696,64 @@ function Presentation({ token }) {
         />
       )}
 
-      {/* slide content part */}
-      <div
-        className="slide-container"
-        style={slideStyle}
-      >
+      {/* 幻灯片内容 */}
+      <div className="slide-container" style={slideStyle}>
         {animationsEnabled ? (
           <Animation slideKey={currentSlideIndex}>
             {renderElements()}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '10px',
-                left: '10px',
-                fontSize: '1em',
-                width: '50px',
-                height: '50px',
-              }}
-            >
+            <div className="slide-number">
               {currentSlideIndex + 1}
             </div>
           </Animation>
         ) : (
           <>
             {renderElements()}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '10px',
-                left: '10px',
-                fontSize: '1em',
-                width: '50px',
-                height: '50px',
-              }}
-            >
+            <div className="slide-number">
               {currentSlideIndex + 1}
             </div>
           </>
         )}
         {presentation.slides.length > 1 && (
-          <>
-            <SlideArrow
-              handlePrevSlide={handlePrevSlide}
-              handleNextSlide={handleNextSlide}
-              currentSlideIndex={currentSlideIndex}
-              totalSlides={presentation.slides.length}
-            />
-          </>
+          <SlideArrow
+            handlePrevSlide={handlePrevSlide}
+            handleNextSlide={handleNextSlide}
+            currentSlideIndex={currentSlideIndex}
+            totalSlides={presentation.slides.length}
+          />
         )}
       </div>
-      
-      <SlidePageControl
-        handleAddSlide={handleAddSlide}
-        handleDeleteSlide={handleDeleteSlide}
-        onPreview={handlePreview}
-        isNotificationOpen={isNotificationOpen}
-        setNotificationOpen={setNotificationOpen}
-        NotificationModal={NotificationModal}
-      />
 
-      <AddButton handleAddElement={handleAddElement} />
+      {/* 添加元素工具栏 */}
+      <div className="toolbar-container">
+        <div className="main-toolbar">
+          <div className="toolbar-group center">
+            <div className="toolbar-section">
+              <h4 className="toolbar-section-title">添加元素</h4>
+              <div className="toolbar-section-buttons">
+                <button className="toolbar-btn secondary" onClick={() => handleAddElement('text')}>
+                  📝 文本
+                </button>
+                <button className="toolbar-btn secondary" onClick={() => handleAddElement('image')}>
+                  🖼️ 图片
+                </button>
+                <button className="toolbar-btn secondary" onClick={() => handleAddElement('video')}>
+                  🎥 视频
+                </button>
+                <button className="toolbar-btn secondary" onClick={() => handleAddElement('code')}>
+                  💻 代码
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {isNotificationOpen && (
+        <NotificationModal
+          message="无法删除唯一的幻灯片。请考虑删除整个演示文稿。"
+          onClose={() => setNotificationOpen(false)}
+        />
+      )}
 
       <AddElementModal
         showModal={showModal}
@@ -762,7 +766,7 @@ function Presentation({ token }) {
         setShowModal={setShowModal}
         handleImageFileChange={handleImageFileChange}
       />
-    </PresentationContainer>
+    </div>
   );
 }
 

@@ -7,6 +7,7 @@ import Dashboard from './myjs/dashboard';
 import axios from 'axios';
 import Presentation from './myjs/presentation';
 import Preview from './myjs/preview';
+import { API_BASE_URL } from './config.js';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -18,7 +19,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('https://z5503600-presto-backend.vercel.app/admin/auth/logout', {}, {
+      await axios.post(`${API_BASE_URL}/admin/auth/logout`, {}, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
     } catch (err) {

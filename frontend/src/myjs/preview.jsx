@@ -8,6 +8,7 @@ import VideoElement from './videoelement';
 import CodeElement from './codeelement';
 import Animation from './animation';
 import SlideArrow from './modal/SlideArrow';
+import { API_BASE_URL } from '../config.js';
 
 function Preview({ token }) {
   const { id, slideIndex } = useParams();
@@ -16,7 +17,7 @@ function Preview({ token }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('https://z5503600-presto-backend.vercel.app/store', {
+    axios.get(`${API_BASE_URL}/store`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {
