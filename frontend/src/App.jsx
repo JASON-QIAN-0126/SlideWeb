@@ -7,6 +7,7 @@ import Dashboard from './myjs/dashboard';
 import axios from 'axios';
 import Presentation from './myjs/presentation';
 import Preview from './myjs/preview';
+import GalaxyTest from './Galaxy/test';
 import { API_BASE_URL } from './config.js';
 
 function App() {
@@ -77,6 +78,10 @@ function App() {
         <Route
           path="/preview/:id/:slideIndex?"
           element={<Preview token={token} />}
+        />
+        <Route
+          path="/galaxy-test"
+          element={<GalaxyTest />}
         />
       </Routes>
     </Router>

@@ -5,19 +5,19 @@
 
 /* CSS 变量定义 */
 :root {
-  /* 主色调 */
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --secondary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  /* 主色调 - 黑白灰设计 */
+  --primary-gradient: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  --secondary-gradient: linear-gradient(135deg, #718096 0%, #a0aec0 100%);
   --success-gradient: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  --danger-gradient: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-  --warning-gradient: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+  --danger-gradient: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  --warning-gradient: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
   
   /* 颜色 */
-  --primary-color: #667eea;
-  --secondary-color: #4facfe;
+  --primary-color: #2d3748;
+  --secondary-color: #718096;
   --success-color: #48bb78;
-  --danger-color: #ff758c;
-  --warning-color: #feca57;
+  --danger-color: #e53e3e;
+  --warning-color: #ed8936;
   --text-primary: #2d3748;
   --text-secondary: #6c757d;
   --text-light: rgba(255, 255, 255, 0.9);
@@ -128,7 +128,7 @@ body {
 }
 
 .btn:focus {
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 0 0 3px rgba(45, 55, 72, 0.3);
 }
 
 .btn:disabled {
@@ -175,12 +175,12 @@ body {
 .btn-primary {
   background: var(--primary-gradient);
   color: var(--text-white);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(45, 55, 72, 0.4);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 8px 25px rgba(45, 55, 72, 0.6);
 }
 
 .btn-primary:active {
@@ -190,12 +190,12 @@ body {
 .btn-secondary {
   background: var(--secondary-gradient);
   color: var(--text-white);
-  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+  box-shadow: 0 4px 15px rgba(113, 128, 150, 0.4);
 }
 
 .btn-secondary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6);
+  box-shadow: 0 8px 25px rgba(113, 128, 150, 0.6);
 }
 
 .btn-success {
@@ -301,7 +301,7 @@ body {
 }
 
 .btn-text:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(45, 55, 72, 0.1);
   transform: none;
   box-shadow: none;
 }
@@ -481,7 +481,7 @@ body {
 
 .form-input:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(45, 55, 72, 0.1);
 }
 
 .form-input::placeholder {

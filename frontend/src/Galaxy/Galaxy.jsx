@@ -1,3 +1,7 @@
+/*
+	Installed from https://reactbits.dev/default/
+*/
+
 import { Renderer, Program, Mesh, Color, Triangle } from "ogl";
 import { useEffect, useRef } from "react";
 import "./Galaxy.css";
@@ -294,6 +298,7 @@ export default function Galaxy({
     ctn.appendChild(gl.canvas);
 
     function handleMouseMove(e) {
+      if (!mouseInteraction) return;
       const rect = ctn.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = 1.0 - (e.clientY - rect.top) / rect.height;
@@ -302,12 +307,19 @@ export default function Galaxy({
     }
 
     function handleMouseLeave() {
+      if (!mouseInteraction) return;
       targetMouseActive.current = 0.0;
+    }
+
+    function handleMouseEnter() {
+      if (!mouseInteraction) return;
+      targetMouseActive.current = 1.0;
     }
 
     if (mouseInteraction) {
       ctn.addEventListener("mousemove", handleMouseMove);
       ctn.addEventListener("mouseleave", handleMouseLeave);
+      ctn.addEventListener("mouseenter", handleMouseEnter);
     }
 
     return () => {
@@ -316,10 +328,9 @@ export default function Galaxy({
       if (mouseInteraction) {
         ctn.removeEventListener("mousemove", handleMouseMove);
         ctn.removeEventListener("mouseleave", handleMouseLeave);
+        ctn.removeEventListener("mouseenter", handleMouseEnter);
       }
-      if (ctn.contains(gl.canvas)) {
-        ctn.removeChild(gl.canvas);
-      }
+      ctn.removeChild(gl.canvas);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, [
@@ -342,4 +353,4 @@ export default function Galaxy({
   ]);
 
   return <div ref={ctnDom} className="galaxy-container" {...rest} />;
-} 
+}

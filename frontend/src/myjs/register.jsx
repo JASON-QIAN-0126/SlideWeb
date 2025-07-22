@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Navigate,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config.js';
-import Galaxy_backend from '../components/Galaxy_backend';
+import Galaxy_backend from '../Galaxy/Galaxy_backend';
 import '../styles/auth.css';
 
 function Register({ onRegister, isAuthenticated }) {
