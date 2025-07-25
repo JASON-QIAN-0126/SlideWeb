@@ -15,7 +15,7 @@ export default function Galaxy_backend({
           mouseRepulsion: true,
           mouseInteraction: true,
           density: 1,
-          glowIntensity: 0.7,
+          glowIntensity: 0.3,
           saturation: 0.0, // 黑白灰，无饱和度
           hueShift: 140, // 无色调偏移
           speed: 0.5,

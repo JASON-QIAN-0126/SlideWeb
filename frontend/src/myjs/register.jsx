@@ -46,7 +46,7 @@ function Register({ onRegister, isAuthenticated }) {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <h1 className="auth-title">加入Presto</h1>
+            <h1 className="auth-title">加入Love Slide</h1>
             <p className="auth-subtitle">创建您的演示文稿账户</p>
           </div>
           <form className="auth-form" onSubmit={handleSubmit}>

@@ -39,7 +39,7 @@ function Login({ onLogin, isAuthenticated }) {
         <div className="auth-card">
           <div className="auth-header">
             <h1 className="auth-title">欢迎回来</h1>
-            <p className="auth-subtitle">登录您的Presto账户</p>
+            <p className="auth-subtitle">登录您的Love Slide账户</p>
           </div>
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">

@@ -6,13 +6,14 @@ import TextElement from './textelement';
 import ImageElement from './imageelement';
 import VideoElement from './videoelement';
 import CodeElement from './codeelement';
-import ThumbnailModal from './modal/UpdateThumbnailModal';
+
 import BackgroundPicker from './background';
 import NotificationModal from './modal/notificationmodal';
 import MoveAndResize from './moveandresize';
 import Animation from './animation';
 import RearrangeSlides from './rearrange';
 import RevisionHistory from './revision';
+import SlideThumbnail from './SlideThumbnail';
 
 import { API_BASE_URL } from '../config.js';
 import '../styles/presentation.css';
@@ -33,8 +34,7 @@ function Presentation({ token }) {
   const [newTitle, setNewTitle] = useState('');
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [newDescription, setNewDescription] = useState('');
-  const [thumbnailSlideIndex, setThumbnailSlideIndex] = useState(0);
-  const [showThumbnailModal, setShowThumbnailModal] = useState(false);
+
   
   // query modal
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -52,17 +52,21 @@ function Presentation({ token }) {
   const [isDefaultBackground, setIsDefaultBackground] = useState(false);
 
   // move and resize
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
   const [selectedElementId, setSelectedElementId] = useState(null);
 
-  // animation
+  // animations
   const [animationsEnabled, setAnimationsEnabled] = useState(false);
 
-  // rearrange
+  // slide rearrange
   const [showRearrangeModal, setShowRearrangeModal] = useState(false);
 
-  // revision
-  const [lastSavedTime, setLastSavedTime] = useState(null);
+  // revision history
   const [showRevisionModal, setShowRevisionModal] = useState(false);
+
+  // drag and drop for slide reordering
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
   useEffect(() => {
     axios.get(`${API_BASE_URL}/store`, {
@@ -73,6 +77,10 @@ function Presentation({ token }) {
         const presentationData = store[id];
         if (presentationData) {
           setPresentation(presentationData);
+          setAnimationsEnabled(presentationData.animationsEnabled || false);
+          if (presentationData.slides.length > 0 && !presentationData.slides[0].elements) {
+            presentationData.slides[0].elements = [];
+          }
         } else {
           console.error('Presentation not found');
         }
@@ -82,140 +90,329 @@ function Presentation({ token }) {
       });
   }, [id, token]);
 
-  // Thumbnail and animation
-  useEffect(() => {
-    if (presentation && presentation.thumbnailSlideIndex !== undefined) {
-      setThumbnailSlideIndex(presentation.thumbnailSlideIndex);
-    } else {
-      setThumbnailSlideIndex(0);
-    }
-  }, [presentation]);
+  async function updateStore(updatedPresentation) {
+    const storeResponse = await axios.get(`${API_BASE_URL}/store`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    const store = storeResponse.data.store || {};
+    store[id] = updatedPresentation;
 
-  useEffect(() => {
-    if (presentation && presentation.animationsEnabled !== undefined) {
-      setAnimationsEnabled(presentation.animationsEnabled);
-    } else {
-      setAnimationsEnabled(false);
-    }
-  }, [presentation]);
-
-  function handleUpdateThumbnail(index) {
-    const updatedPresentation = {
-      ...presentation,
-      thumbnailSlideIndex: index,
-    };
-    updateStore(updatedPresentation);
-    setThumbnailSlideIndex(index);
+    await axios.put(`${API_BASE_URL}/store`, { store }, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
   }
 
-  async function updateStore(updatedPresentation) {
-    try {
-      const currentTime = Date.now();
-      if (!lastSavedTime || currentTime - lastSavedTime >= 60000) {
-        // save history if more than 1min
-        const historyEntry = {
-          timestamp: currentTime,
-          slides: presentation.slides,
-          animationsEnabled: presentation.animationsEnabled,
-        };
-        updatedPresentation.history = updatedPresentation.history || [];
-        updatedPresentation.history.push(historyEntry);
-        setLastSavedTime(currentTime);
+  if (!presentation) {
+    return <div>Loading...</div>;
+  }
+
+  const currentSlide = presentation.slides[currentSlideIndex] || {};
+
+  const slideStyle = {
+    background: (() => {
+      const bg = currentSlide.background || presentation.defaultBackground || {};
+      switch (bg.type) {
+        case 'solid':
+          return bg.value || '#ffffff';
+        case 'gradient':
+          return `linear-gradient(${bg.direction || '45deg'}, ${bg.from || '#ffffff'}, ${bg.to || '#000000'})`;
+        case 'image':
+          return `url(${bg.url}) center/cover no-repeat`;
+        default:
+          return '#ffffff';
       }
-      const response = await axios.get(`${API_BASE_URL}/store`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      const store = response.data.store || {};
-      store[updatedPresentation.id] = updatedPresentation;
-  
-      await axios.put(`${API_BASE_URL}/store`, {
-        store: store,
-      }, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      setPresentation(updatedPresentation);
-      return updatedPresentation;
-    } catch (err) {
-      console.error('Failed to update store', err);
-    }
+    })(),
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+    borderRadius: '8px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
   };
 
-  function handleUpdateDescription() {
+  // 渲染元素
+  function renderElements() {
+    return (currentSlide.elements || []).map((element) => {
+      // 确保element有必要的属性
+      if (!element || !element.id) {
+        return null;
+      }
+
+      // 确保position、size和properties存在并有默认值
+      const elementWithDefaults = {
+        ...element,
+        position: element.position || { x: 0, y: 0 },
+        size: element.size || { width: 30, height: 20 },
+        properties: element.properties || {}
+      };
+
+      const isSelected = selectedElementId === element.id;
+      
+      let ElementComponent;
+      switch (element.type) {
+        case 'text':
+          ElementComponent = TextElement;
+          break;
+        case 'image':
+          ElementComponent = ImageElement;
+          break;
+        case 'video':
+          ElementComponent = VideoElement;
+          break;
+        case 'code':
+          ElementComponent = CodeElement;
+          break;
+        default:
+          return null;
+      }
+
+      return (
+        <MoveAndResize
+          key={element.id}
+          element={elementWithDefaults}
+          updateElementPositionSize={(elementId, { position, size }) => {
+            const updatedSlide = {
+              ...currentSlide,
+              elements: (currentSlide.elements || []).map(el =>
+                el.id === elementId ? { ...el, position: position, size: size } : el
+              )
+            };
+            const updatedPresentation = {
+              ...presentation,
+              slides: presentation.slides.map((slide, index) =>
+                index === currentSlideIndex ? updatedSlide : slide
+              )
+            };
+            setPresentation(updatedPresentation);
+            updateStore(updatedPresentation);
+          }}
+          onMoveOrResizeEnd={() => {
+            // 保存更新到后端
+            updateStore(presentation);
+          }}
+        >
+          <div 
+            onClick={() => setSelectedElementId(element.id)}
+            style={{ 
+              width: '100%', 
+              height: '100%',
+              cursor: isSelected ? 'move' : 'pointer'
+            }}
+          >
+            <ElementComponent element={elementWithDefaults} />
+          </div>
+        </MoveAndResize>
+      );
+    });
+  }
+
+  // 处理幻灯片切换
+  function handleSlideChange(index) {
+    setCurrentSlideIndex(index);
+    setSelectedElementId(null);
+  }
+
+  // 拖动排序功能
+  function handleDragStart(e, index) {
+    e.dataTransfer.setData('text/plain', index);
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedIndex(index);
+  }
+
+  function handleDragEnd() {
+    setDraggedIndex(null);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDragEnter(e) {
+    e.preventDefault();
+  }
+
+  function handleDrop(e, dropIndex) {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    
+    if (dragIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    const newSlides = [...presentation.slides];
+    const draggedSlide = newSlides[dragIndex];
+    
+    // 移除被拖动的幻灯片
+    newSlides.splice(dragIndex, 1);
+    // 在新位置插入
+    newSlides.splice(dropIndex, 0, draggedSlide);
+
     const updatedPresentation = {
       ...presentation,
-      description: newDescription,
+      slides: newSlides
     };
-    updateStore(updatedPresentation);
-    setShowDescriptionModal(false);
-    setNewDescription('');
-  };
 
-  // add and delete slide
-  async function handleAddSlide() {
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+
+    // 更新当前选中的幻灯片索引
+    if (currentSlideIndex === dragIndex) {
+      setCurrentSlideIndex(dropIndex);
+    } else if (dragIndex < currentSlideIndex && dropIndex >= currentSlideIndex) {
+      setCurrentSlideIndex(currentSlideIndex - 1);
+    } else if (dragIndex > currentSlideIndex && dropIndex <= currentSlideIndex) {
+      setCurrentSlideIndex(currentSlideIndex + 1);
+    }
+
+    setDraggedIndex(null);
+  }
+
+  // 添加幻灯片
+  function handleAddSlide() {
     const newSlide = {
       id: uuidv4(),
-      elements: [],
+      elements: []
     };
     const updatedPresentation = {
       ...presentation,
-      slides: [...presentation.slides, newSlide],
+      slides: [...presentation.slides, newSlide]
     };
-    const newPresentation = await updateStore(updatedPresentation);
-    if (newPresentation) {
-      setCurrentSlideIndex(newPresentation.slides.length - 1);
-    }
-  };
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+    setCurrentSlideIndex(presentation.slides.length);
+  }
 
+  // 删除幻灯片
   function handleDeleteSlide() {
-    if (presentation.slides.length === 1) {
+    if (presentation.slides.length <= 1) {
       setNotificationOpen(true);
       return;
     }
-    const updatedSlides = presentation.slides.filter(
-      (_, index) => index !== currentSlideIndex
-    );
+    
+    const updatedSlides = presentation.slides.filter((_, index) => index !== currentSlideIndex);
     const updatedPresentation = {
       ...presentation,
-      slides: updatedSlides,
+      slides: updatedSlides
     };
+    setPresentation(updatedPresentation);
     updateStore(updatedPresentation);
-
-    setCurrentSlideIndex((prevIndex) => Math.max(0, prevIndex - 1));
-  };
-
-  function handleNextSlide() {
-    if (currentSlideIndex < presentation.slides.length - 1) {
-      const newIndex = currentSlideIndex + 1;
-      setCurrentSlideIndex(newIndex);
-      navigate(`/presentation/${id}/${newIndex}`);
+    
+    if (currentSlideIndex >= updatedSlides.length) {
+      setCurrentSlideIndex(updatedSlides.length - 1);
     }
-  };
-  
-  function handlePrevSlide() {
-    if (currentSlideIndex > 0) {
-      const newIndex = currentSlideIndex - 1;
-      setCurrentSlideIndex(newIndex);
-      navigate(`/presentation/${id}/${newIndex}`);
-    }
-  };
+  }
 
+  // 添加元素
+  function handleAddElement(type) {
+    setModalType(type);
+    setEditingElementId(null);
+    setElementProperties({});
+    setShowModal(true);
+  }
+
+  // 保存元素
+  function handleSaveElement() {
+    const newElement = {
+      id: uuidv4(),
+      type: modalType,
+      position: { x: 10, y: 10 },
+      size: { width: 30, height: 20 },
+      properties: { ...elementProperties }
+    };
+
+    const updatedSlide = {
+      ...currentSlide,
+      elements: [...(currentSlide.elements || []), newElement]
+    };
+    
+    const updatedPresentation = {
+      ...presentation,
+      slides: presentation.slides.map((slide, index) =>
+        index === currentSlideIndex ? updatedSlide : slide
+      )
+    };
+
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+    setShowModal(false);
+  }
+
+  // 更新元素
+  function handleUpdateElement() {
+    const updatedSlide = {
+      ...currentSlide,
+      elements: (currentSlide.elements || []).map(el =>
+        el.id === editingElementId ? { 
+          ...el, 
+          properties: { ...el.properties, ...elementProperties }
+        } : el
+      )
+    };
+    
+    const updatedPresentation = {
+      ...presentation,
+      slides: presentation.slides.map((slide, index) =>
+        index === currentSlideIndex ? updatedSlide : slide
+      )
+    };
+
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+    setShowModal(false);
+  }
+
+  // 设置背景
+  function handleSetBackground(backgroundConfig) {
+    if (isDefaultBackground) {
+      const updatedPresentation = {
+        ...presentation,
+        defaultBackground: backgroundConfig
+      };
+      setPresentation(updatedPresentation);
+      updateStore(updatedPresentation);
+    } else {
+      const updatedSlide = {
+        ...currentSlide,
+        background: backgroundConfig
+      };
+      const updatedPresentation = {
+        ...presentation,
+        slides: presentation.slides.map((slide, index) =>
+          index === currentSlideIndex ? updatedSlide : slide
+        )
+      };
+      setPresentation(updatedPresentation);
+      updateStore(updatedPresentation);
+    }
+    setShowBackgroundModal(false);
+  }
+
+  // 切换动画
+  function toggleAnimations() {
+    const newAnimationsEnabled = !animationsEnabled;
+    setAnimationsEnabled(newAnimationsEnabled);
+    const updatedPresentation = {
+      ...presentation,
+      animationsEnabled: newAnimationsEnabled
+    };
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+  }
+
+  // 删除演示文稿
   function handleDeletePresentation() {
     setIsConfirmModalOpen(true);
-  };
+  }
 
   function handleConfirmDelete() {
-    setIsConfirmModalOpen(false);
-
     axios.get(`${API_BASE_URL}/store`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
       .then((response) => {
         const store = response.data.store || {};
-        delete store[presentation.id];
-
-        return axios.put(`${API_BASE_URL}/store`, {
-          store: store,
-        }, {
+        delete store[id];
+        return axios.put(`${API_BASE_URL}/store`, { store }, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
       })
@@ -225,415 +422,190 @@ function Presentation({ token }) {
       .catch((err) => {
         console.error('Failed to delete presentation', err);
       });
-  };
+  }
 
-  function handleCancelDelete()  {
+  function handleCancelDelete() {
     setIsConfirmModalOpen(false);
-  };
+  }
 
+  // 更新标题
   function handleUpdateTitle() {
     const updatedPresentation = {
       ...presentation,
-      name: newTitle,
+      name: newTitle
     };
+    setPresentation(updatedPresentation);
     updateStore(updatedPresentation);
     setShowTitleModal(false);
-    setNewTitle('');
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'ArrowRight') {
-      handleNextSlide();
-    } else if (e.key === 'ArrowLeft') {
-      handlePrevSlide();
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  });
-
-  if (!presentation) {
-    return <div>Loading...</div>;
   }
 
-  const currentSlide = presentation.slides[currentSlideIndex];
-
-  if (!currentSlide) {
-    return <div>Loading slide...</div>;
-  }
-
-  function handleAddElement(type) {
-    setModalType(type);
-    setElementProperties({});
-    setEditingElementId(null);
-    setShowModal(true);
-  };
-
-  function handleSaveElement() {
-    let updatedProperties = { ...elementProperties };
-    if (modalType === 'video') {
-      const videoId = parseYouTubeId(elementProperties.videoUrl);
-      if (videoId) {
-        updatedProperties.videoId = videoId;
-      } else {
-        alert('Invalid YouTube URL');
-        return;
-      }
-    }
-    const newElement = {
-      id: uuidv4(),
-      type: modalType,
-      position: { x: 0, y: 0 },
-      size: {
-        width: parseFloat(elementProperties.size?.width) || 0,
-        height: parseFloat(elementProperties.size?.height) || 0,
-      },
-      properties: updatedProperties,
-      layer: Date.now(),
+  // 更新描述
+  function handleUpdateDescription() {
+    const updatedPresentation = {
+      ...presentation,
+      description: newDescription
     };
-    const updatedPresentation = { ...presentation };
-    updatedPresentation.slides[currentSlideIndex].elements = [
-      ...(currentSlide.elements || []),
-      newElement,
-    ];
-    updateStore(updatedPresentation);
-    setShowModal(false);
-  };
-
-  function handleDeleteElement(elementId) {
-    const updatedPresentation = { ...presentation };
-    updatedPresentation.slides[currentSlideIndex].elements = currentSlide.elements.filter(
-      (el) => el.id !== elementId
-    );
-    updateStore(updatedPresentation);
-  };
-
-  function handleEditElement(element) {
-    setModalType(element.type);
-    setElementProperties({
-      ...element.properties,
-      size: element.size,
-      position: element.position,
-    });
-    setEditingElementId(element.id);
-    setShowModal(true);
-  };
-
-  function handleUpdateElement() {
-    let updatedProperties = { ...elementProperties };
-    if (modalType === 'video') {
-      const videoId = parseYouTubeId(elementProperties.videoUrl);
-      if (videoId) {
-        updatedProperties.videoId = videoId;
-      } else {
-        alert('Invalid YouTube URL');
-        return;
-      }
-    }
-    const updatedPresentation = { ...presentation };
-    const elements = currentSlide.elements.map((el) => {
-      if (el.id === editingElementId) {
-        return {
-          ...el,
-          size: {
-            width: parseFloat(elementProperties.size?.width) || 0,
-            height: parseFloat(elementProperties.size?.height) || 0,
-          },
-          properties: updatedProperties,
-        };
-      }
-      return el;
-    });
-    updatedPresentation.slides[currentSlideIndex].elements = elements;
-    updateStore(updatedPresentation);
-    setShowModal(false);
-  };
-
-  const handleElementClick = (e, element) => {
-    e.stopPropagation();
-    setSelectedElementId(element.id);
-  };
-
-  const updateElementPositionSize = (elementId, { position, size }) => {
-    const updatedPresentation = { ...presentation };
-    const elements = currentSlide.elements.map((el) => {
-      if (el.id === elementId) {
-        return {
-          ...el,
-          position: position,
-          size: size,
-        };
-      }
-      return el;
-    });
-    updatedPresentation.slides[currentSlideIndex].elements = elements;
     setPresentation(updatedPresentation);
-  };
+    updateStore(updatedPresentation);
+    setShowDescriptionModal(false);
+  }
 
-  function renderElements() {
-    const elements = currentSlide.elements || [];
-    return elements
-      .sort((a, b) => a.layer - b.layer)
-      .map((element) => {
-        const isSelected = element.id === selectedElementId;
 
-        let content = null;
-        switch (element.type) {
-        case 'text':
-          content = <TextElement element={element} onEdit={handleEditElement} />;
-          break;
-        case 'image':
-          content = <ImageElement element={element} onEdit={handleEditElement} />;
-          break;
-        case 'video':
-          content = <VideoElement element={element} onEdit={handleEditElement} />;
-          break;
-        case 'code':
-          content = <CodeElement element={element} onEdit={handleEditElement} />;
-          break;
-        default:
-          break;
-        }
 
-        return (
-          <div
-            key={element.id}
-            onClick={(e) => handleElementClick(e, element)}
-            onDoubleClick={() => handleEditElement(element)}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              handleDeleteElement(element.id);
-            }}
-          >
-            {isSelected ? (
-              <MoveAndResize
-                element={element}
-                updateElementPositionSize={updateElementPositionSize}
-                onMoveOrResizeEnd={handleMoveOrResizeEnd}
-              >
-                {content}
-              </MoveAndResize>
-            ) : (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: `${element.position.y}%`,
-                  left: `${element.position.x}%`,
-                  width: `${element.size.width}%`,
-                  height: `${element.size.height}%`,
-                  border: '1px solid grey',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                }}
-              >
-                {content}
-              </div>
-            )}
-          </div>
-        );
-      });
-  };
+  // 预览
+  function handlePreview() {
+    window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank');
+  }
 
-  const parseYouTubeId = (url) => {
-    const regExp =
-      /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : null;
-  };
-
-  const handleImageFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+  // 处理图片文件变更
+  function handleImageFileChange(file) {
+    if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setElementProperties({
-          ...elementProperties,
-          src: reader.result, // base64 string
-        });
+      reader.onload = (e) => {
+        setElementProperties(prev => ({
+          ...prev,
+          src: e.target.result,
+          alt: file.name
+        }));
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  // background
-  const slideBackground = currentSlide.background || presentation.defaultBackground || {};
-
-  const slideStyle = {
-    position: 'relative',
-    width: '100%',
-    maxWidth: '1000px',
-    margin: '0 auto',
-    aspectRatio: '16 / 9' ,
-    border: '1px solid #000',
-    backgroundColor: '#fff',
-  };
-
-  if (slideBackground.type === 'color') {
-    slideStyle.backgroundColor = slideBackground.value;
-  } else if (slideBackground.type === 'gradient') {
-    slideStyle.backgroundImage = slideBackground.value;
-  } else if (slideBackground.type === 'image') {
-    slideStyle.backgroundImage = `url(${slideBackground.value})`;
-    slideStyle.backgroundSize = 'cover';
   }
 
-  const handleSetBackground = (background) => {
-    let updatedPresentation = { ...presentation };
-  
-    if (isDefaultBackground) {
-      updatedPresentation.defaultBackground = background;
-    } else {
-      updatedPresentation.slides = presentation.slides.map((slide, index) => {
-        if (index === currentSlideIndex) {
-          return {
-            ...slide,
-            background: background,
-          };
-        }
-        return slide;
-      });
-    }
-  
-    updateStore(updatedPresentation);
-    setIsDefaultBackground(false);
-  };
-
-  // move or resize
-  function handleMoveOrResizeEnd() {
-    updateStore(presentation);
-  };
-
-  // animation
-  function toggleAnimations() {
-    const newAnimationsEnabled = !animationsEnabled;
-    const updatedPresentation = { ...presentation, animationsEnabled: newAnimationsEnabled };
-    setPresentation(updatedPresentation);
-    setAnimationsEnabled(newAnimationsEnabled);
-    updateStore(updatedPresentation);
-  };
-
-  // handle rearrange
-  function handleRearrangeSlides(newSlidesOrder) {
-    const updatedPresentation = { ...presentation, slides: newSlidesOrder };
-    setPresentation(updatedPresentation);
-    updateStore(updatedPresentation);
-    setShowRearrangeModal(false);
-  };
-
-  // handle history
-  const handleRestoreRevision = (entry) => {
-    const updatedPresentation = {
-      ...presentation,
-      slides: entry.slides,
-      animationsEnabled: entry.animationsEnabled,
-    };
-    updateStore(updatedPresentation).then(() => {
-      setCurrentSlideIndex((prevIndex) => {
-        if (prevIndex >= updatedPresentation.slides.length) {
-          return updatedPresentation.slides.length - 1;
-        }
-        return prevIndex;
-      });
-      setAnimationsEnabled(entry.animationsEnabled);
-      setShowRevisionModal(false);
-    });
-  };
-
-  // handle preview
-  function handlePreview() {
-    window.open(`/preview/${presentation.id}/${currentSlideIndex}`, '_blank');
-  };
-
   return (
-    <div className="presentation-container">
-      <h1 className="presentation-title">{presentation.name}</h1>
-      
-      <button className="back-btn" onClick={() => navigate('/dashboard')}>
-        返回
-      </button>
-      
-      <button className="delete-presentation-btn" onClick={handleDeletePresentation}>
-        删除演示文稿
-      </button>
+    <div className="presentation-container-new">
+      {/* 顶部工具栏 */}
+      <div className="presentation-header">
+        <h1 className="presentation-title">{presentation.name}</h1>
+        <div className="header-actions">
+          <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
+            返回Dashboard
+          </button>
+          <button className="btn btn-primary" onClick={handlePreview}>
+            预览演示
+          </button>
+          <button className="btn btn-danger" onClick={handleDeletePresentation}>
+            删除演示文稿
+          </button>
+        </div>
+      </div>
 
-      {isConfirmModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 className="modal-title">删除确认</h3>
-            <p>您确定要删除这个演示文稿吗？</p>
-            <div className="modal-actions">
-              <button className="btn-modal-secondary" onClick={handleCancelDelete}>取消</button>
-              <button className="btn-modal-primary" onClick={handleConfirmDelete}>确认删除</button>
-            </div>
+      {/* 主体内容区 */}
+      <div className="presentation-main">
+        {/* 左侧缩略图滚动区域 */}
+        <div className="thumbnails-sidebar">
+          <div className="thumbnails-header">
+            <h3>幻灯片</h3>
+            <button className="btn btn-sm btn-primary" onClick={handleAddSlide}>
+              添加幻灯片
+            </button>
+          </div>
+          
+          <div className="thumbnails-scroll">
+            {presentation.slides.map((slide, index) => (
+              <div
+                key={slide.id}
+                className={`thumbnail-item ${index === currentSlideIndex ? 'active' : ''} ${draggedIndex === index ? 'dragging' : ''}`}
+                onClick={() => handleSlideChange(index)}
+                draggable="true"
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragEnter}
+                onDrop={(e) => handleDrop(e, index)}
+              >
+                <div className="thumbnail-preview">
+                  <SlideThumbnail 
+                    slide={{
+                      ...slide,
+                      background: slide.background || presentation.defaultBackground || {}
+                    }}
+                  />
+                </div>
+                <div className="thumbnail-info">
+                  <div className="thumbnail-left">
+                    <span className="drag-handle" title="拖动排序">⋮⋮</span>
+                    <span className="slide-number">{index + 1}</span>
+                  </div>
+                  <button 
+                    className="btn btn-xs btn-danger"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (presentation.slides.length > 1) {
+                        handleSlideChange(index);
+                        setTimeout(() => handleDeleteSlide(), 100);
+                      } else {
+                        setNotificationOpen(true);
+                      }
+                    }}
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      )}
 
-      <div className="toolbar-container">
-        <div className="main-toolbar">
-          <div className="toolbar-group left">
+        {/* 右侧编辑区域 */}
+        <div className="editor-area">
+          {/* 编辑工具栏 */}
+          <div className="editor-toolbar">
             <div className="toolbar-section">
-              <h4 className="toolbar-section-title">编辑</h4>
-              <div className="toolbar-section-buttons">
-                <button className="toolbar-btn" onClick={() => setShowTitleModal(true)}>
-                  编辑标题
-                </button>
-                <button className="toolbar-btn" onClick={() => setShowDescriptionModal(true)}>
-                  编辑描述
-                </button>
-                <button className="toolbar-btn" onClick={() => setShowThumbnailModal(true)}>
-                  更新缩略图
-                </button>
+              <h4>添加元素</h4>
+              <div className="toolbar-buttons">
+                <button className="btn btn-sm" onClick={() => handleAddElement('text')}>📝 文本</button>
+                <button className="btn btn-sm" onClick={() => handleAddElement('image')}>🖼️ 图片</button>
+                <button className="btn btn-sm" onClick={() => handleAddElement('video')}>🎥 视频</button>
+                <button className="btn btn-sm" onClick={() => handleAddElement('code')}>💻 代码</button>
               </div>
             </div>
-          </div>
-          
-          <div className="toolbar-group center">
+            
             <div className="toolbar-section">
-              <h4 className="toolbar-section-title">幻灯片控制</h4>
-              <div className="toolbar-section-buttons">
-                <button className="toolbar-btn secondary" onClick={() => setShowBackgroundModal(true)}>
-                  更改背景
+              <h4>设置</h4>
+              <div className="toolbar-buttons">
+                <button className="btn btn-sm" onClick={() => setShowBackgroundModal(true)}>
+                  🎨 背景
                 </button>
                 <button 
-                  className={`toolbar-btn ${animationsEnabled ? 'success' : ''}`} 
+                  className={`btn btn-sm ${animationsEnabled ? 'btn-success' : ''}`}
                   onClick={toggleAnimations}
                 >
-                  {animationsEnabled ? '禁用动画' : '启用动画'}
+                  {animationsEnabled ? '✅ 动画' : '⭕ 动画'}
                 </button>
-                <button className="toolbar-btn" onClick={() => setShowRearrangeModal(true)}>
-                  重排幻灯片
+              </div>
+            </div>
+
+            <div className="toolbar-section">
+              <h4>编辑</h4>
+              <div className="toolbar-buttons">
+                <button className="btn btn-sm" onClick={() => setShowTitleModal(true)}>
+                  编辑标题
                 </button>
-                <button className="toolbar-btn" onClick={() => setShowRevisionModal(true)}>
-                  历史版本
+                <button className="btn btn-sm" onClick={() => setShowDescriptionModal(true)}>
+                  编辑描述
                 </button>
               </div>
             </div>
           </div>
-          
-          <div className="toolbar-group right">
-            <div className="toolbar-section">
-              <h4 className="toolbar-section-title">操作</h4>
-              <div className="toolbar-section-buttons">
-                <button className="toolbar-btn primary" onClick={handleAddSlide}>
-                  添加幻灯片
-                </button>
-                <button className="toolbar-btn danger" onClick={handleDeleteSlide}>
-                  删除幻灯片
-                </button>
-                <button className="toolbar-btn success" onClick={handlePreview}>
-                  预览
-                </button>
-              </div>
+
+          {/* 幻灯片编辑区 */}
+          <div className="slide-editor">
+            <div className="slide-container" style={slideStyle}>
+              {animationsEnabled ? (
+                <Animation slideKey={currentSlideIndex}>
+                  {renderElements()}
+                </Animation>
+              ) : (
+                renderElements()
+              )}
+              <div className="slide-number">{currentSlideIndex + 1}</div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* 模态框 */}
       {showTitleModal && (
         <EditModal
           title="编辑标题"
@@ -658,14 +630,7 @@ function Presentation({ token }) {
         />
       )}
 
-      {showThumbnailModal && (
-        <ThumbnailModal
-          presentation={presentation}
-          thumbnailSlideIndex={thumbnailSlideIndex}
-          handleUpdateThumbnail={handleUpdateThumbnail}
-          onClose={() => setShowThumbnailModal(false)}
-        />
-      )}
+
 
       <BackgroundPicker
         show={showBackgroundModal}
@@ -683,7 +648,12 @@ function Presentation({ token }) {
         <RearrangeSlides
           slides={presentation.slides}
           defaultBackground={presentation.defaultBackground}
-          onRearrange={handleRearrangeSlides}
+          onRearrange={(newSlidesOrder) => {
+            const updatedPresentation = { ...presentation, slides: newSlidesOrder };
+            setPresentation(updatedPresentation);
+            updateStore(updatedPresentation);
+            setShowRearrangeModal(false);
+          }}
           onClose={() => setShowRearrangeModal(false)}
         />
       )}
@@ -691,62 +661,39 @@ function Presentation({ token }) {
       {showRevisionModal && (
         <RevisionHistory
           history={presentation.history || []}
-          onRestore={handleRestoreRevision}
+          onRestore={(entry) => {
+            const updatedPresentation = {
+              ...presentation,
+              slides: entry.slides,
+              animationsEnabled: entry.animationsEnabled,
+            };
+            updateStore(updatedPresentation).then(() => {
+              setCurrentSlideIndex((prevIndex) => {
+                if (prevIndex >= updatedPresentation.slides.length) {
+                  return updatedPresentation.slides.length - 1;
+                }
+                return prevIndex;
+              });
+              setAnimationsEnabled(entry.animationsEnabled);
+              setShowRevisionModal(false);
+            });
+          }}
           onClose={() => setShowRevisionModal(false)}
         />
       )}
 
-      {/* 幻灯片内容 */}
-      <div className="slide-container" style={slideStyle}>
-        {animationsEnabled ? (
-          <Animation slideKey={currentSlideIndex}>
-            {renderElements()}
-            <div className="slide-number">
-              {currentSlideIndex + 1}
-            </div>
-          </Animation>
-        ) : (
-          <>
-            {renderElements()}
-            <div className="slide-number">
-              {currentSlideIndex + 1}
-            </div>
-          </>
-        )}
-        {presentation.slides.length > 1 && (
-          <SlideArrow
-            handlePrevSlide={handlePrevSlide}
-            handleNextSlide={handleNextSlide}
-            currentSlideIndex={currentSlideIndex}
-            totalSlides={presentation.slides.length}
-          />
-        )}
-      </div>
-
-      {/* 添加元素工具栏 */}
-      <div className="toolbar-container">
-        <div className="main-toolbar">
-          <div className="toolbar-group center">
-            <div className="toolbar-section">
-              <h4 className="toolbar-section-title">添加元素</h4>
-              <div className="toolbar-section-buttons">
-                <button className="toolbar-btn secondary" onClick={() => handleAddElement('text')}>
-                  📝 文本
-                </button>
-                <button className="toolbar-btn secondary" onClick={() => handleAddElement('image')}>
-                  🖼️ 图片
-                </button>
-                <button className="toolbar-btn secondary" onClick={() => handleAddElement('video')}>
-                  🎥 视频
-                </button>
-                <button className="toolbar-btn secondary" onClick={() => handleAddElement('code')}>
-                  💻 代码
-                </button>
-              </div>
+      {isConfirmModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="modal-title">删除确认</h3>
+            <p>您确定要删除这个演示文稿吗？</p>
+            <div className="modal-actions">
+              <button className="btn-modal-secondary" onClick={handleCancelDelete}>取消</button>
+              <button className="btn-modal-primary" onClick={handleConfirmDelete}>确认删除</button>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {isNotificationOpen && (
         <NotificationModal

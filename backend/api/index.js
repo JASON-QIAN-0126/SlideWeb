@@ -7,6 +7,7 @@ import swaggerDocument from "../swagger.json";
 import { AccessError, InputError } from "./error";
 import {
   getEmailFromAuthorization,
+  getProfile,
   getStore,
   login,
   logout,
@@ -71,6 +72,16 @@ app.post(
     authed(async (req, res, email) => {
       await logout(email);
       return res.json({});
+    })
+  )
+);
+
+app.get(
+  "/admin/auth/profile",
+  catchErrors(
+    authed(async (req, res, email) => {
+      const profile = await getProfile(email);
+      return res.json(profile);
     })
   )
 );

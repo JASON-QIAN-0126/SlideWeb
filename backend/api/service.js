@@ -141,6 +141,17 @@ export const register = (email, password, name) =>
     resolve(token);
   });
 
+export const getProfile = (email) =>
+  userLock((resolve, reject) => {
+    if (!(email in admins)) {
+      return reject(new AccessError("User not found"));
+    }
+    resolve({
+      email,
+      name: admins[email].name,
+    });
+  });
+
 /***************************************************************
                        Store Functions
 ***************************************************************/

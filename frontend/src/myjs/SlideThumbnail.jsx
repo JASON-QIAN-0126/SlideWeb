@@ -88,57 +88,89 @@ function SlideThumbnail({ slide }) {
           {slide.elements.map((element) => {
             const style = {
               position: 'absolute',
-              top: `${element.position.y}%`,
-              left: `${element.position.x}%`,
-              width: `${element.size.width}%`,
-              height: `${element.size.height}%`,
+              top: `${element.position?.y || 0}%`,
+              left: `${element.position?.x || 0}%`,
+              width: `${element.size?.width || 10}%`,
+              height: `${element.size?.height || 10}%`,
               overflow: 'hidden',
             };
+            
+            // 兼容新旧数据结构：优先使用element.properties，如果不存在则直接使用element的属性
+            const props = element.properties || element;
+            
             let content = null;
             switch (element.type) {
             case 'text':
               content = (
                 <div
                   style={{
-                    fontSize: `${element.properties.fontSize}em`,
-                    color: element.properties.color,
+                    fontSize: `${props.fontSize || 1}em`,
+                    color: props.color || '#000000',
                     whiteSpace: 'pre-wrap',
-                    fontFamily: element.properties.fontFamily,
+                    fontFamily: props.fontFamily || 'Arial',
                   }}
                 >
-                  {element.properties.text}
+                  {props.text || '文本'}
                 </div>
               );
               break;
             case 'image':
-              content = (
+              content = props.src ? (
                 <img
-                  src={element.properties.src}
-                  alt={element.properties.alt}
+                  src={props.src}
+                  alt={props.alt || '图片'}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
+              ) : (
+                <div style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  background: '#f0f0f0',
+                  color: '#666'
+                }}>
+                  图片
+                </div>
               );
               break;
             case 'video':
-              content = (
+              content = props.videoId ? (
                 <iframe
                   width="100%"
                   height="100%"
-                  src={`https://www.youtube.com/embed/${element.properties.videoId}`}
+                  src={`https://www.youtube.com/embed/${props.videoId}`}
                   allowFullScreen
                 ></iframe>
+              ) : (
+                <div style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  background: '#f0f0f0',
+                  color: '#666'
+                }}>
+                  视频
+                </div>
               );
               break;
             case 'code':
               content = (
                 <pre
                   style={{
-                    fontSize: `${element.properties.fontSize}em`,
+                    fontSize: `${props.fontSize || 1}em`,
                     fontFamily: 'monospace',
                     whiteSpace: 'pre-wrap',
+                    background: '#f8f8f8',
+                    padding: '4px',
+                    borderRadius: '2px',
+                    color: '#333'
                   }}
                 >
-                  {element.properties.code}
+                  {props.code || '代码'}
                 </pre>
               );
               break;

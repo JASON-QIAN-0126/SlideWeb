@@ -85,11 +85,33 @@
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .landing-title {
-    font-size: 3rem !important;
+  .github-button-top-right {
+    top: 15px;
+    right: 15px;
   }
   
-  .landing-btn {
+  .button-icon {
+    transform: scale(0.8);
+  }
+  
+  .cube {
+    width: 160px;
+  }
+  
+  .side {
+    width: 160px;
+  }
+  
+  .glass-button {
+    width: 140px !important;
+    height: 50px !important;
+  }
+  
+  .glass-btn {
+    font-size: 1rem;
+  }
+  
+  .normal-btn {
     padding: 14px 28px;
     font-size: 1rem;
     min-width: 120px;
@@ -97,11 +119,34 @@
 }
 
 @media (max-width: 480px) {
-  .landing-title {
-    font-size: 2.5rem !important;
+  .github-button-top-right {
+    top: 10px;
+    right: 10px;
   }
   
-  .landing-btn {
+  .button-icon {
+    transform: scale(0.6);
+  }
+  
+  .cube {
+    width: 120px;
+  }
+  
+  .side {
+    width: 120px;
+    font-size: 0.6em;
+  }
+  
+  .glass-button {
+    width: 120px !important;
+    height: 45px !important;
+  }
+  
+  .glass-btn {
+    font-size: 0.9rem;
+  }
+  
+  .normal-btn {
     padding: 12px 24px;
     font-size: 0.9rem;
     min-width: 100px;
@@ -121,4 +166,134 @@
 
 .landing-title .inline-block {
   text-shadow: 0 4px 16px rgba(255, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.github-button-top-right {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  pointer-events: auto;
+  animation: fadeIn 0.8s ease-in-out 0.2s both;
+}
+
+.github-button-icon {
+  display: flex;
+  border: 3px #fff solid;
+  width: fit-content;
+  height: fit-content;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.github-icon {
+  background-color: #fff;
+  padding: 10px 10px 5px 10px;
+}
+
+.github-icon svg {
+  width: 25px;
+  height: 25px;
+}
+
+.github-cube {
+  transition: all 0.4s;
+  transform-style: preserve-3d;
+  width: 200px;
+  height: 20px;
+}
+
+.github-button-icon:hover .github-cube {
+  transform: rotateX(90deg);
+}
+
+.github-side {
+  position: absolute;
+  height: 47px;
+  width: 200px;
+  display: flex;
+  font-size: 0.8em;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  border-radius: 8px;
+}
+
+.github-side-top {
+  background: #222229;
+  color: #fff;
+  transform: rotateX(-90deg) translate3d(0, 13.5px, 2em);
+}
+
+.github-side-front {
+  background: #222229;
+  color: #fff;
+  transform: translate3d(0, 0, 1em);
+}
+
+.normal-btn {
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  min-width: 140px;
+  pointer-events: auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.normal-btn-signin {
+  background: white;
+  color: #2d3748;
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+}
+
+.normal-btn-signin:hover {
+  transform: translateY(-3px);
+  /* box-shadow: 0 12px 35px rgba(255, 255, 255, 0.4);
+  background: #f8f8f8; */
+}
+
+.normal-btn-signin:active {
+  transform: translateY(-1px);
+  /* box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3); */
+}
+
+.glass-button {
+  pointer-events: auto;
+}
+
+.glass-btn {
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Inter', sans-serif;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass-btn:hover {
+  color: #f0f0f0;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.glass-btn-signup {
+  background: transparent !important;
 } 

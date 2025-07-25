@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: transparent; /* Galaxy背景已经提供了背景 */
+  background: transparent;
 }
 
 .auth-card {
@@ -19,7 +19,7 @@
   animation: authCardSlideIn 0.8s ease-out;
   position: relative;
   overflow: hidden;
-  pointer-events: auto; /* 恢复表单的交互功能 */
+  pointer-events: auto;
 }
 
 @keyframes authCardSlideIn {
@@ -33,7 +33,6 @@
   }
 }
 
-/* 为卡片添加微妙的光效 */
 .auth-card::before {
   content: '';
   position: absolute;
