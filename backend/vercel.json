@@ -1,14 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["swagger.json"]
-      }
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30,
+      "includeFiles": ["swagger.json"]
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
@@ -17,10 +14,5 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 30
-    }
   }
 }
