@@ -3,7 +3,7 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
-      "includeFiles": ["swagger.json"]
+      "includeFiles": "swagger.json"
     }
   },
   "routes": [
