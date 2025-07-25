@@ -105,8 +105,5 @@ export const api = {
   },
 };
 
-// 导出axios实例，供需要自定义请求的场景使用
 export { apiClient };
-
-// 导出API基础URL，供其他地方使用
 export { API_BASE_URL }; 
