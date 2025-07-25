@@ -1,13 +1,23 @@
 import AsyncLock from "async-lock";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import { Redis } from '@upstash/redis';
 import { AccessError, InputError } from "./error";
 
 const lock = new AsyncLock();
 
 const JWT_SECRET = "llamallamaduck";
 const DATABASE_FILE = "./database.json";
-const { KV_REST_API_URL, KV_REST_API_TOKEN, USE_VERCEL_KV } = process.env;
+
+// Initialize Redis client for Vercel KV
+let redis = null;
+if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  redis = new Redis({
+    url: process.env.KV_REST_API_URL,
+    token: process.env.KV_REST_API_TOKEN,
+  });
+}
+
 /***************************************************************
                        State Management
 ***************************************************************/
@@ -20,21 +30,11 @@ const update = async (admins) =>
   new Promise((resolve, reject) => {
     lock.acquire("saveData", async () => {
       try {
-        if (USE_VERCEL_KV) {
-          // Store to Vercel KV
-          const response = await fetch(`${KV_REST_API_URL}/set/admins`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${KV_REST_API_TOKEN}`,
-            },
-            body: JSON.stringify({ admins }),
-          });
-          if (!response.ok) {
-            reject(new Error("Writing to Vercel KV failed"));
-          }
+        if (redis) {
+          // Store to Vercel KV using Redis SDK
+          await redis.set("admins", JSON.stringify(admins));
         } else {
-          // Store to local file system
+          // Store to local file system (development mode)
           fs.writeFileSync(
             DATABASE_FILE,
             JSON.stringify(
@@ -60,30 +60,41 @@ export const reset = () => {
   admins = {};
 };
 
-try {
-  if (USE_VERCEL_KV) {
-    // Setup default admin object in KV DB
-    save();
-
-    // Read from Vercel KV
-    fetch(`${KV_REST_API_URL}/get/admins`, {
-      headers: {
-        Authorization: `Bearer ${KV_REST_API_TOKEN}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        admins = JSON.parse(data.result)["admins"];
-      });
-  } else {
-    // Read from local file
-    const data = JSON.parse(fs.readFileSync(DATABASE_FILE));
-    admins = data.admins;
+// Initialize data on startup
+const initializeData = async () => {
+  try {
+    if (redis) {
+      // Read from Vercel KV
+      console.log("Connecting to Vercel KV...");
+      const data = await redis.get("admins");
+      if (data) {
+        admins = JSON.parse(data);
+        console.log("Data loaded from Vercel KV");
+      } else {
+        // Initialize with empty admins object
+        console.log("No existing data found, initializing new database");
+        admins = {};
+        await save();
+      }
+    } else {
+      // Read from local file (development mode)
+      console.log("Running in development mode, using local file storage");
+      const data = JSON.parse(fs.readFileSync(DATABASE_FILE));
+      admins = data.admins;
+    }
+  } catch(error) {
+    console.log("WARNING: No database found, creating a new one");
+    console.log("Error details:", error.message);
+    admins = {};
+    await save();
   }
-} catch(error) {
-  console.log("WARNING: No database found, create a new one");
-  save();
-}
+};
+
+// Export initialization function to be called before server starts
+export const initializeDatabase = initializeData;
+
+// Initialize data on module load (but don't await in module scope)
+initializeData().catch(console.error);
 
 /***************************************************************
                        Helper Functions

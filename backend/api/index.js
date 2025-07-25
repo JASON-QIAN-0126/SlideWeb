@@ -14,8 +14,8 @@ import {
   register,
   save,
   setStore,
+  initializeDatabase,
 } from "./service";
-const { PROD_BACKEND_PORT, USE_VERCEL_KV } = process.env;
 
 const app = express();
 
@@ -118,10 +118,39 @@ app.get("/", (req, res) => res.redirect("/docs"));
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-const port = USE_VERCEL_KV
-  ? PROD_BACKEND_PORT
-  : JSON.parse(fs.readFileSync("../frontend/backend.config.json")).BACKEND_PORT;
+// Determine port based on environment
+let port;
+if (process.env.PORT) {
+  // Vercel will provide this
+  port = process.env.PORT;
+} else if (process.env.PROD_BACKEND_PORT) {
+  // Custom production port
+  port = process.env.PROD_BACKEND_PORT;
+} else {
+  // Development mode - read from config file
+  try {
+    port = JSON.parse(fs.readFileSync("../frontend/backend.config.json")).BACKEND_PORT;
+  } catch (error) {
+    console.log("Warning: Could not read backend.config.json, using default port 5005");
+    port = 5005;
+  }
+}
 
-app.listen(port, () => {
-  console.log(`For API docs, navigate to http://localhost:${port}`);
-});
+// Initialize database and start server
+const startServer = async () => {
+  try {
+    console.log("Initializing database...");
+    await initializeDatabase();
+    console.log("Database initialized successfully");
+    
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+      console.log(`For API docs, navigate to http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error("Failed to initialize database:", error);
+    process.exit(1);
+  }
+};
+
+startServer();

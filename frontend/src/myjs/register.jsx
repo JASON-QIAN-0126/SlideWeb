@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { Navigate,useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_BASE_URL } from '../config.js';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { api } from '../utils/api.js';
 import Galaxy_backend from '../Galaxy/Galaxy_backend';
 import '../styles/auth.css';
 
-function Register({ onRegister, isAuthenticated }) {
+function Register({ onLogin, isAuthenticated }) {
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -20,25 +19,21 @@ function Register({ onRegister, isAuthenticated }) {
   async function handleSubmit(e) {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError('Password does not match!');
+      setError('密码不匹配！');
       return;
     }
     try {
-      const response = await axios.post(`${API_BASE_URL}/admin/auth/register`, {
-        email,
-        password,
-        name,
-      });
+      const response = await api.auth.register(email, password, name);
       const token = response.data.token;
-      onRegister(token);
+      onLogin(token);
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
       } else {
-        setError('Failed to register');
+        setError('注册失败，请检查网络连接');
       }
     }
-  };
+  }
 
 
   return (

@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import SlideThumbnail from './SlideThumbnail';
 import LightRays from '../components/LightRays/LightRays';
-import { API_BASE_URL } from '../config.js';
+import { api } from '../utils/api.js';
 import '../styles/dashboard.css';
 
 function Dashboard({ onLogout, token}) {
@@ -17,9 +16,7 @@ function Dashboard({ onLogout, token}) {
 
   useEffect(() => {
     // 获取演示文稿数据
-    axios.get(`${API_BASE_URL}/store`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
+    api.store.get()
       .then((response) => {
         const store = response.data.store || {};
         const presentationsArray = Object.values(store);
@@ -30,9 +27,7 @@ function Dashboard({ onLogout, token}) {
       });
 
     // 获取用户信息
-    axios.get(`${API_BASE_URL}/admin/auth/profile`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
+    api.auth.getProfile()
       .then((response) => {
         if (response.data && response.data.name) {
           setUserInfo({ name: response.data.name });
@@ -82,15 +77,11 @@ function Dashboard({ onLogout, token}) {
 
     const savePresentation = async () => {
       try {
-        const storeResponse = await axios.get(`${API_BASE_URL}/store`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
+        const storeResponse = await api.store.get();
         const currentStore = storeResponse.data.store || {};
         currentStore[newPresentation.id] = newPresentation;
 
-        await axios.put(`${API_BASE_URL}/store`, { store: currentStore }, {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
+        await api.store.update(currentStore);
 
         setPresentations([...presentations, newPresentation]);
         setShowModal(false);

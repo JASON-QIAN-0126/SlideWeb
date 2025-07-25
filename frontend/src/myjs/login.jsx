@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_BASE_URL } from '../config.js';
+import { api } from '../utils/api.js';
 import Galaxy_backend from '../Galaxy/Galaxy_backend';
 import '../styles/auth.css';
 
@@ -18,17 +17,14 @@ function Login({ onLogin, isAuthenticated }) {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_BASE_URL}/admin/auth/login`, {
-        email,
-        password,
-      });
+      const response = await api.auth.login(email, password);
       const token = response.data.token;
       onLogin(token);
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
         setError(err.response.data.error);
       } else {
-        setError('Failed to login');
+        setError('登录失败，请检查网络连接');
       }
     }
   }

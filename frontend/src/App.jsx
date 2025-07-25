@@ -4,11 +4,10 @@ import LandingPage from './myjs/landpage';
 import Login from './myjs/login';
 import Register from './myjs/register';
 import Dashboard from './myjs/dashboard';
-import axios from 'axios';
 import Presentation from './myjs/presentation';
 import Preview from './myjs/preview';
 import GalaxyTest from './Galaxy/test';
-import { API_BASE_URL } from './config.js';
+import { api } from './utils/api.js';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -20,9 +19,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/admin/auth/logout`, {}, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      await api.auth.logout();
     } catch (err) {
       console.error('Failed to log out', err);
     } finally {

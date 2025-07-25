@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import TextElement from './textelement';
@@ -8,7 +7,6 @@ import VideoElement from './videoelement';
 import CodeElement from './codeelement';
 import Animation from './animation';
 import SlideArrow from './modal/SlideArrow';
-import { API_BASE_URL } from '../config.js';
 
 function Preview({ token }) {
   const { id, slideIndex } = useParams();
@@ -17,9 +15,7 @@ function Preview({ token }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/store`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
+    api.store.get()
       .then((response) => {
         const store = response.data.store || {};
         const presentationData = store[id];

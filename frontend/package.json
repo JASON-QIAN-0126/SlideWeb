@@ -5,10 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:prod": "vite --mode production",
     "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "build:prod": "vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest --run && cypress run"
+    "test": "vitest --run && cypress run",
+    "serve": "vite preview --port 3000"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",

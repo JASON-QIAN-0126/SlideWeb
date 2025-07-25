@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { api } from '../utils/api.js';
 import TextElement from './textelement';
 import ImageElement from './imageelement';
 import VideoElement from './videoelement';
@@ -15,7 +15,7 @@ import RearrangeSlides from './rearrange';
 import RevisionHistory from './revision';
 import SlideThumbnail from './SlideThumbnail';
 
-import { API_BASE_URL } from '../config.js';
+
 import '../styles/presentation.css';
 import DeletePresentation from './modal/DeletePresentation';
 import ButtonBar from './modal/EditButton';
@@ -69,9 +69,7 @@ function Presentation({ token }) {
   const [draggedIndex, setDraggedIndex] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/store`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
+    api.store.get()
       .then((response) => {
         const store = response.data.store || {};
         const presentationData = store[id];
@@ -91,15 +89,11 @@ function Presentation({ token }) {
   }, [id, token]);
 
   async function updateStore(updatedPresentation) {
-    const storeResponse = await axios.get(`${API_BASE_URL}/store`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    const storeResponse = await api.store.get();
     const store = storeResponse.data.store || {};
     store[id] = updatedPresentation;
 
-    await axios.put(`${API_BASE_URL}/store`, { store }, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    await api.store.update(store);
   }
 
   if (!presentation) {
@@ -406,15 +400,11 @@ function Presentation({ token }) {
   }
 
   function handleConfirmDelete() {
-    axios.get(`${API_BASE_URL}/store`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
+    api.store.get()
       .then((response) => {
         const store = response.data.store || {};
         delete store[id];
-        return axios.put(`${API_BASE_URL}/store`, { store }, {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
+        return api.store.update(store);
       })
       .then(() => {
         navigate('/dashboard');
