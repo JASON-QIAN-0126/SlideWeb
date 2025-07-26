@@ -1,53 +1,71 @@
-# ✨LoveSlide✨ — 一个简洁光彩文章演示应用
+# ✨ LoveSlide
 
-> 当你想给伙伴或公众来一场精致、亮眼、直观的展示，但又不想装胶带重的PPT系统时，**LoveSlide**就是你的第一选择。
+> A modern, eye-catching, and intuitive presentation platform for creating and sharing beautiful slides without the need for heavy desktop software.
 
-## 🌟 项目简介
+LoveSlide is a web-based presentation application built with **React.js**, designed to help users quickly create, edit, and share presentations with a focus on UI/UX and accessibility. The system emphasizes a smooth user experience and visually appealing design.
 
-**LoveSlide** 是一款基于 **React.js** 开发的文章演示网站应用。目标是帮助用户快速、简洁、意维地创建和分享他们的演示。同时，我们重视 UI/UX 和访问方便性，碳化拟真。
+## 🎨 Features
 
-## 🚀 核心功能
+### UI/UX Design
+- **Modern Interface** – Clean, intuitive, and visually engaging layout
+- **Responsive Design** – Fully adapts to both desktop and mobile devices
+- **Animated Interactions** – Smooth transitions and interactive modals
+- **Accessibility** – Focus on accessible design and usability
 
-### 登录、注册与退出
-- 使用者可登录、注册账号
-- 登录后进入 **控制面板**，退出后返回首页
-- 登录/注册表单支持回车键提交
+### Core Features
 
-### 演示文章创建
-- 登录后可创建新演示，填写标题、描述和缩略图
-- 所有演示代表为比例的卡片，自动排列、适应应急
+#### Authentication
+- **User Registration & Login** – Secure account creation and login
+- **Dashboard Access** – Enter the dashboard after login, return to landing page after logout
 
-### 演示编辑
-- 点击卡片进入编辑页，可
-  - 返回控制面板
-  - 删除全部演示
-  - 编辑演示名称和缩略图
-  - 新增/删除滑稿，用键盘箭头切换
-  - 显示当前滑稿编号
+#### Presentation Management
+- **Create Presentations** – Add new presentations with title, description, and thumbnail
+- **Card Layout** – All presentations displayed as adaptive cards for easy browsing
 
-### 滑稿元素编辑
-- 每张滑稿支持添加下列元素，可通过 **模态窗** 填写属性：
-  1. 文本: 大小，颜色，文本内容
-  2. 图片: 缩略尺寸，图片url/本地文件，alt描述
-  3. 视频: YouTube url，是否自动播放
-  4. 代码块: 代码内容，字体大小，自动识别语言(C, Python, JS)
-- 双击元素可编辑，右键可删除
+#### Slide Editing
+- **Edit Slides** – Click a card to enter the editor
+  - Return to dashboard
+  - Delete entire presentation
+  - Edit presentation name and thumbnail
+  - Add/delete slides, navigate with arrow keys
+  - Display current slide number
 
-### 演示编辑续扩功能
-- 全局字体选择，支持≥3种字体
-- 背景选择器：单色/渐变/图片
-- 预览模式：展示演示效果，关键操作保留
-- URL可反映滑稿编号，刷新不丢失
-- 元素可拖拽和缩放，支持边界抽拉操作
-- 演示滑稿可拖拽重排
-- 演示历史版本恢复
+#### Slide Element Editing
+- **Add Elements** – Each slide supports adding the following elements via modal dialogs:
+  1. **Text**: Size, color, content
+  2. **Image**: Thumbnail size, URL/local file, alt text
+  3. **Video**: YouTube URL, autoplay option
+  4. **Code Block**: Code content, font size, auto language detection (C, Python, JS)
+- **Edit/Delete** – Double-click to edit, right-click to delete elements
 
-## 🛠 技术组成
-- 前端框架：React.js
-- UI组件：Material UI / 自定义样式
-- UI 渲染测试：Vitest + Cypress
-- 完全 RESTful API 互联，后端由团队提供
-- 部署平台：Vercel
----
+#### Advanced Editing Features
+- **Global Font Selection** – Choose from at least 3 fonts
+- **Background Selector** – Solid color, gradient, or image backgrounds
+- **Preview Mode** – Preview presentation with key controls
+- **URL Slide Sync** – URL reflects current slide, refresh-safe
+- **Drag & Resize** – Elements can be dragged and resized with boundary snapping
+- **Slide Reordering** – Drag to rearrange slides
+- **Version History** – Restore previous versions of presentations
 
-> 展示不再等同，用 LoveSlide 播放想象。
+### Test Coverage
+- **UI Testing** – Vitest + Cypress for interface and interaction testing
+- **End-to-End Testing** – Full user flow and presentation editing tests
+
+## 🛠️ Tech Stack
+
+### Frontend Technologies
+```
+React.js
+Material UI / Custom CSS
+Cypress
+Vitest
+```
+
+### Backend Technologies
+```
+RESTful API
+Node.js
+```
+
+## 🔗 Demo URL：
+[https://www.slide-web-frontend.vercel.app](https://www.slide-web-frontend.vercel.app)
