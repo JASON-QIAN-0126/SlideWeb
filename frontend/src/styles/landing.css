@@ -82,80 +82,10 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .github-button-top-right {
-    top: 15px;
-    right: 15px;
-  }
-  
-  .button-icon {
-    transform: scale(0.8);
-  }
-  
-  .cube {
-    width: 160px;
-  }
-  
-  .side {
-    width: 160px;
-  }
-  
-  .glass-button {
-    width: 140px !important;
-    height: 50px !important;
-  }
-  
-  .glass-btn {
-    font-size: 1rem;
-  }
-  
-  .normal-btn {
-    padding: 14px 28px;
-    font-size: 1rem;
-    min-width: 120px;
-  }
-}
-
-@media (max-width: 480px) {
-  .github-button-top-right {
-    top: 10px;
-    right: 10px;
-  }
-  
-  .button-icon {
-    transform: scale(0.6);
-  }
-  
-  .cube {
-    width: 120px;
-  }
-  
-  .side {
-    width: 120px;
-    font-size: 0.6em;
-  }
-  
-  .glass-button {
-    width: 120px !important;
-    height: 45px !important;
-  }
-  
-  .glass-btn {
-    font-size: 0.9rem;
-  }
-  
-  .normal-btn {
-    padding: 12px 24px;
-    font-size: 0.9rem;
-    min-width: 100px;
-  }
-}
-
 /* 顶部导航栏样式 */
 .top-navbar {
   position: fixed;
-  top: 0;
+  top: 2%;
   left: 0;
   right: 0;
   height: 60px;
@@ -163,48 +93,57 @@
   z-index: 1000;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 0 20px;
 }
 
 .top-navbar-content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
   color: white;
   font-family: 'Inter', sans-serif;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 8px 16px;
-  backdrop-filter: blur(10px);
-  width: 30%;
+  background: transparent;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 24px;
   justify-content: center;
+  min-height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
 }
 
 .react-logo {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+}
+
+.react-logo svg {
+  width: 24px;
+  height: 24px;
 }
 
 .top-navbar-text {
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   font-weight: 500;
   color: #e5e5e5;
 }
 
 /* 圆形副标题样式 */
 .circular-subtitle {
-  margin-bottom: 40px;
+  margin-bottom: 25px;
   animation: fadeIn 0.8s ease-in-out 0.3s both;
 }
 
 .circular-text-container {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50px;
-  padding: 12px 24px;
+  padding: 8px 20px;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -218,7 +157,7 @@
 }
 
 .circular-text {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: #e5e5e5;
   font-family: 'Inter', sans-serif;
@@ -241,7 +180,9 @@
 }
 
 .github-button-top-right {
-  position: relative;
+  position: fixed;
+  top: 2%;
+  right: 20px;
   z-index: 1000;
   pointer-events: auto;
   animation: fadeIn 0.8s ease-in-out 0.2s both;
@@ -354,3 +295,128 @@
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 } 
+
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .top-navbar {
+    top: 1%;
+    padding: 0 10px;
+  }
+  
+  .top-navbar-content {
+    gap: 8px;
+    padding: 6px 16px;
+    width: auto;
+    max-width: 85%;
+    white-space: nowrap;
+  }
+  
+  .top-navbar-text {
+    font-size: 0.8rem;
+  }
+  
+  .react-logo svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .github-button-top-right {
+    display: none;
+  }
+  
+  .circular-subtitle {
+    margin-bottom: 20px;
+  }
+  
+  .circular-text-container {
+    padding: 6px 16px;
+  }
+  
+  .circular-text {
+    font-size: 0.8rem;
+  }
+  
+  h1 {
+    font-size: 3rem !important;
+    margin-bottom: 20px !important;
+  }
+  
+  .normal-btn {
+    padding: 14px 28px;
+    font-size: 1rem;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-navbar {
+    top: 1%;
+    padding: 0 5px;
+  }
+  
+  .top-navbar-content {
+    gap: 6px;
+    padding: 4px 12px;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  .top-navbar-text {
+    font-size: 0.7rem;
+  }
+  
+  .react-logo svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .github-button-top-right {
+    display: none; /* 隐藏github按钮 */
+  }
+  
+  .circular-subtitle {
+    margin-bottom: 15px;
+  }
+  
+  .circular-text-container {
+    padding: 5px 14px;
+  }
+  
+  .circular-text {
+    font-size: 0.75rem;
+  }
+  
+  h1 {
+    font-size: 2.5rem !important;
+    margin-bottom: 15px !important;
+  }
+  
+  .normal-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    min-width: 100px;
+  }
+  
+  div[style*="gap: 30px"] {
+    gap: 20px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .top-navbar-content {
+    gap: 4px;
+    padding: 2px 8px;
+    max-width: 95%;
+  }
+  
+  .top-navbar-text {
+    font-size: 0.6rem;
+  }
+  
+  .react-logo svg {
+    width: 14px;
+    height: 14px;
+  }
+}

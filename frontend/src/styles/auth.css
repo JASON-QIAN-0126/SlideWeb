@@ -230,6 +230,43 @@
   transform: translateY(0);
 }
 
+.auth-form .btn-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.auth-form .btn-outline {
+  background: transparent;
+  color: #4a5568;
+  border: 2px solid #e2e8f0;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  flex: 1;
+  min-width: 120px;
+}
+
+.auth-form .btn-outline:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+  color: #4a5568;
+}
+
+.auth-form .btn-outline:active {
+  transform: translateY(0);
+}
+
+.auth-form .auth-submit {
+  flex: 1;
+  min-width: 120px;
+}
+
 .auth-link {
   text-align: center;
   margin-top: 20px;
