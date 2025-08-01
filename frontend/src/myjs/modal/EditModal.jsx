@@ -58,32 +58,50 @@ const CancelButton = styled.button`
   }
 `;
 
-const EditModal = ({ title, value, onChange, onSave, onClose, placeholder, isTextArea }) => (
-  <ModalOverlay>
-    <ModalContent>
-      <h3>{title}</h3>
-      {isTextArea ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          style={{ width: '85%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-        />
-      ) : (
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          style={{ width: '85%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-        />
-      )}
-      <ButtonContainer>
-        <CancelButton onClick={onClose}>Cancel</CancelButton>
-        <UpdateButton onClick={onSave}>Update</UpdateButton>
-      </ButtonContainer>
-    </ModalContent>
-  </ModalOverlay>
-);
+const EditModal = ({ title, value, onChange, onSave, onClose, placeholder, isTextArea }) => {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !isTextArea) {
+      onSave();
+    }
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onSave();
+    }
+  };
+
+  return (
+    <ModalOverlay onClick={handleOverlayClick}>
+      <ModalContent>
+        <h3>{title}</h3>
+        {isTextArea ? (
+          <textarea
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            style={{ width: '85%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+            autoFocus
+          />
+        ) : (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            style={{ width: '85%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+            autoFocus
+          />
+        )}
+        <ButtonContainer>
+          <CancelButton onClick={onClose}>取消</CancelButton>
+          <UpdateButton onClick={onSave}>更新</UpdateButton>
+        </ButtonContainer>
+      </ModalContent>
+    </ModalOverlay>
+  );
+};
 
 export default EditModal;

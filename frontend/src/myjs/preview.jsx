@@ -7,6 +7,7 @@ import VideoElement from './videoelement';
 import CodeElement from './codeelement';
 import Animation from './animation';
 import SlideArrow from './modal/SlideArrow';
+import api from '../utils/api';
 
 function Preview({ token }) {
   const { id, slideIndex } = useParams();
@@ -14,21 +15,36 @@ function Preview({ token }) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(parseInt(slideIndex) || 0);
   const navigate = useNavigate();
 
+  // 检查是否为游客模式
+  const isGuestMode = token === 'guest-token';
+
   useEffect(() => {
-    api.store.get()
-      .then((response) => {
-        const store = response.data.store || {};
-        const presentationData = store[id];
-        if (presentationData) {
-          setPresentation(presentationData);
-        } else {
-          console.error('Presentation not found');
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch presentation', err);
-      });
-  }, [id, token]);
+    if (isGuestMode) {
+      // 游客模式：从localStorage获取数据
+      const guestPresentations = JSON.parse(localStorage.getItem('guestPresentations') || '[]');
+      const presentationData = guestPresentations.find(p => p.id.toString() === id);
+      if (presentationData) {
+        setPresentation(presentationData);
+      } else {
+        console.error('Presentation not found in guest mode');
+      }
+    } else {
+      // 正常模式：从后端获取数据
+      api.store.get()
+        .then((response) => {
+          const store = response.data.store || {};
+          const presentationData = store[id];
+          if (presentationData) {
+            setPresentation(presentationData);
+          } else {
+            console.error('Presentation not found');
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to fetch presentation', err);
+        });
+    }
+  }, [id, token, isGuestMode]);
 
   const handleNextSlide = () => {
     if (currentSlideIndex < presentation.slides.length - 1) {
@@ -149,9 +165,11 @@ function Preview({ token }) {
         style={{
           position: 'absolute',
           bottom: '10px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          fontSize: '1em',
+          right: '15px',
+          fontSize: '0.9rem',
+          fontWeight: '500',
+          color: '#333333',
+          zIndex: 10,
         }}
       >
         {currentSlideIndex + 1} / {presentation.slides.length}

@@ -339,7 +339,7 @@ function Presentation({ token }) {
     const newElement = {
       id: uuidv4(),
       type: modalType,
-      position: { x: 10, y: 10 },
+      position: { x: 35, y: 40 }, // 页面中央位置
       size: { width: 30, height: 20 },
       properties: { ...elementProperties }
     };
@@ -486,7 +486,8 @@ function Presentation({ token }) {
   }
 
   // 处理图片文件变更
-  function handleImageFileChange(file) {
+  function handleImageFileChange(event) {
+    const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -500,17 +501,158 @@ function Presentation({ token }) {
     }
   }
 
+  // 获取选中的元素
+  function getSelectedElement() {
+    const currentSlide = presentation.slides[currentSlideIndex];
+    return currentSlide.elements?.find(el => el.id === selectedElementId);
+  }
+
+  // 更新元素属性
+  function updateElementProperty(property, value) {
+    const updatedSlide = {
+      ...presentation.slides[currentSlideIndex],
+      elements: presentation.slides[currentSlideIndex].elements.map(el =>
+        el.id === selectedElementId 
+          ? { 
+              ...el, 
+              properties: { 
+                ...el.properties, 
+                [property]: value 
+              }
+            } 
+          : el
+      )
+    };
+    
+    const updatedPresentation = {
+      ...presentation,
+      slides: presentation.slides.map((slide, index) =>
+        index === currentSlideIndex ? updatedSlide : slide
+      )
+    };
+
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+  }
+
+  // 渲染元素控制面板
+  function renderElementControls() {
+    const element = getSelectedElement();
+    if (!element) return null;
+
+    const props = element.properties || {};
+
+    if (element.type === 'text') {
+      return (
+        <div className="control-grid">
+          <div className="control-group">
+            <label>字体大小:</label>
+            <input
+              type="number"
+              min="0.5"
+              max="5"
+              step="0.1"
+              value={props.fontSize || 1}
+              onChange={(e) => updateElementProperty('fontSize', parseFloat(e.target.value))}
+              className="control-input"
+            />
+          </div>
+          <div className="control-group">
+            <label>颜色:</label>
+            <input
+              type="color"
+              value={props.color || '#000000'}
+              onChange={(e) => updateElementProperty('color', e.target.value)}
+              className="control-input color-input"
+            />
+          </div>
+          <div className="control-group">
+            <label>字体:</label>
+            <select
+              value={props.fontFamily || 'Arial'}
+              onChange={(e) => updateElementProperty('fontFamily', e.target.value)}
+              className="control-select"
+            >
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Courier New">Courier New</option>
+              <option value="微软雅黑">微软雅黑</option>
+              <option value="宋体">宋体</option>
+            </select>
+          </div>
+          <div className="control-group">
+            <label>对齐:</label>
+            <div className="alignment-buttons">
+              <button 
+                className={`btn btn-xs ${props.textAlign === 'left' ? 'btn-primary' : ''}`}
+                onClick={() => updateElementProperty('textAlign', 'left')}
+              >
+                ⬅️
+              </button>
+              <button 
+                className={`btn btn-xs ${props.textAlign === 'center' ? 'btn-primary' : ''}`}
+                onClick={() => updateElementProperty('textAlign', 'center')}
+              >
+                ⬆️
+              </button>
+              <button 
+                className={`btn btn-xs ${props.textAlign === 'right' ? 'btn-primary' : ''}`}
+                onClick={() => updateElementProperty('textAlign', 'right')}
+              >
+                ➡️
+              </button>
+            </div>
+          </div>
+          <div className="control-group">
+            <label>字重:</label>
+            <select
+              value={props.fontWeight || 'normal'}
+              onChange={(e) => updateElementProperty('fontWeight', e.target.value)}
+              className="control-select"
+            >
+              <option value="normal">正常</option>
+              <option value="bold">粗体</option>
+              <option value="lighter">细体</option>
+            </select>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="control-grid">
+        <p>选中元素: {element.type}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="presentation-container-new">
       {/* 顶部工具栏 */}
       <div className="presentation-header">
-        <h1 className="presentation-title">{presentation.name}</h1>
+        <div className="presentation-info">
+          <h1 
+            className="presentation-title editable-title"
+            onDoubleClick={() => {
+              setNewTitle(presentation.name);
+              setShowTitleModal(true);
+            }}
+          >
+            {presentation.name}
+          </h1>
+          <p 
+            className="presentation-description editable-description"
+            onDoubleClick={() => {
+              setNewDescription(presentation.description || '');
+              setShowDescriptionModal(true);
+            }}
+          >
+            {presentation.description || '双击添加描述'}
+          </p>
+        </div>
         <div className="header-actions">
           <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
             返回Dashboard
-          </button>
-          <button className="btn btn-primary" onClick={handlePreview}>
-            预览演示
           </button>
           <button className="btn btn-danger" onClick={handleDeletePresentation}>
             删除演示文稿
@@ -553,7 +695,6 @@ function Presentation({ token }) {
                 <div className="thumbnail-info">
                   <div className="thumbnail-left">
                     <span className="drag-handle" title="拖动排序">⋮⋮</span>
-                    <span className="slide-number">{index + 1}</span>
                   </div>
                   <button 
                     className="btn btn-xs btn-danger"
@@ -570,8 +711,16 @@ function Presentation({ token }) {
                     删除
                   </button>
                 </div>
+                <div className="thumbnail-page-number">{index + 1}</div>
               </div>
             ))}
+          </div>
+          
+          {/* 预览按钮 */}
+          <div className="sidebar-actions">
+            <button className="btn btn-primary preview-btn" onClick={handlePreview}>
+              🎬 预览演示
+            </button>
           </div>
         </div>
 
@@ -604,22 +753,30 @@ function Presentation({ token }) {
               </div>
             </div>
 
-            <div className="toolbar-section">
-              <h4>编辑</h4>
-              <div className="toolbar-buttons">
-                <button className="btn btn-sm" onClick={() => setShowTitleModal(true)}>
-                  编辑标题
-                </button>
-                <button className="btn btn-sm" onClick={() => setShowDescriptionModal(true)}>
-                  编辑描述
-                </button>
+            {selectedElementId && (
+              <div className="toolbar-section">
+                <h4>编辑元素</h4>
+                <div className="element-controls">
+                  {renderElementControls()}
+                </div>
               </div>
-            </div>
+            )}
+
+
           </div>
 
           {/* 幻灯片编辑区 */}
           <div className="slide-editor">
-            <div className="slide-container" style={slideStyle}>
+            <div 
+              className="slide-container" 
+              style={slideStyle}
+              onClick={(e) => {
+                // 点击空白区域取消选择
+                if (e.target === e.currentTarget) {
+                  setSelectedElementId(null);
+                }
+              }}
+            >
               {animationsEnabled ? (
                 <Animation slideKey={currentSlideIndex}>
                   {renderElements()}
