@@ -51,8 +51,13 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 
   const handleMouseMove = useCallback((e) => {
-    const slideWidth = 600;
-    const slideHeight = 400;
+    // 获取幻灯片容器的实际尺寸
+    const slideContainer = document.querySelector('.slide-container');
+    if (!slideContainer) return;
+    
+    const slideRect = slideContainer.getBoundingClientRect();
+    const slideWidth = slideRect.width;
+    const slideHeight = slideRect.height;
 
     if (isDraggingRef.current) {
       const deltaX = ((e.clientX - startXRef.current) / slideWidth) * 100;
@@ -61,8 +66,9 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
       let newX = originalPositionRef.current.x + deltaX;
       let newY = originalPositionRef.current.y + deltaY;
 
-      newX = clamp(newX, 0, 100 - originalSizeRef.current.width);
-      newY = clamp(newY, 0, 100 - originalSizeRef.current.height);
+      // 确保元素不会拖出边界
+      newX = clamp(newX, 0, 100 - element.size.width);
+      newY = clamp(newY, 0, 100 - element.size.height);
 
       updateElementPositionSize(element.id, {
         position: { x: newX, y: newY },
@@ -72,34 +78,37 @@ function MoveAndResize({ element, updateElementPositionSize, onMoveOrResizeEnd, 
 
     if (isResizingRef.current) {
       const deltaX = ((e.clientX - startXRef.current) / slideWidth) * 100;
+      const deltaY = ((e.clientY - startYRef.current) / slideHeight) * 100;
 
       let newWidth = originalSizeRef.current.width;
       let newHeight = originalSizeRef.current.height;
       let newX = originalPositionRef.current.x;
       let newY = originalPositionRef.current.y;
 
-      const aspectRatio = originalSizeRef.current.width / originalSizeRef.current.height;
-
+      // 根据拖拽方向调整尺寸和位置
       if (resizeDirectionRef.current === 'nw') {
-        newWidth = clamp(originalSizeRef.current.width - deltaX, 1, originalSizeRef.current.width + originalPositionRef.current.x);
-        newHeight = newWidth / aspectRatio;
-        newX = clamp(originalPositionRef.current.x + (originalSizeRef.current.width - newWidth), 0, 100 - newWidth);
-        newY = clamp(originalPositionRef.current.y + (originalSizeRef.current.height - newHeight), 0, 100 - newHeight);
+        newWidth = clamp(originalSizeRef.current.width - deltaX, 5, originalSizeRef.current.width + originalPositionRef.current.x);
+        newHeight = clamp(originalSizeRef.current.height - deltaY, 5, originalSizeRef.current.height + originalPositionRef.current.y);
+        newX = originalPositionRef.current.x + (originalSizeRef.current.width - newWidth);
+        newY = originalPositionRef.current.y + (originalSizeRef.current.height - newHeight);
       } else if (resizeDirectionRef.current === 'ne') {
-        newWidth = clamp(originalSizeRef.current.width + deltaX, 1, 100 - originalPositionRef.current.x);
-        newHeight = newWidth / aspectRatio;
-        newY = clamp(originalPositionRef.current.y + (originalSizeRef.current.height - newHeight), 0, 100 - newHeight);
+        newWidth = clamp(originalSizeRef.current.width + deltaX, 5, 100 - originalPositionRef.current.x);
+        newHeight = clamp(originalSizeRef.current.height - deltaY, 5, originalSizeRef.current.height + originalPositionRef.current.y);
+        newY = originalPositionRef.current.y + (originalSizeRef.current.height - newHeight);
       } else if (resizeDirectionRef.current === 'sw') {
-        newWidth = clamp(originalSizeRef.current.width - deltaX, 1, originalSizeRef.current.width + originalPositionRef.current.x);
-        newHeight = newWidth / aspectRatio;
-        newX = clamp(originalPositionRef.current.x + (originalSizeRef.current.width - newWidth), 0, 100 - newWidth);
+        newWidth = clamp(originalSizeRef.current.width - deltaX, 5, originalSizeRef.current.width + originalPositionRef.current.x);
+        newHeight = clamp(originalSizeRef.current.height + deltaY, 5, 100 - originalPositionRef.current.y);
+        newX = originalPositionRef.current.x + (originalSizeRef.current.width - newWidth);
       } else if (resizeDirectionRef.current === 'se') {
-        newWidth = clamp(originalSizeRef.current.width + deltaX, 1, 100 - originalPositionRef.current.x);
-        newHeight = newWidth / aspectRatio;
+        newWidth = clamp(originalSizeRef.current.width + deltaX, 5, 100 - originalPositionRef.current.x);
+        newHeight = clamp(originalSizeRef.current.height + deltaY, 5, 100 - originalPositionRef.current.y);
       }
 
-      newWidth = clamp(newWidth, 1, 100 - newX);
-      newHeight = clamp(newHeight, 1, 100 - newY);
+      // 确保元素不会超出边界
+      newX = clamp(newX, 0, 100 - newWidth);
+      newY = clamp(newY, 0, 100 - newHeight);
+      newWidth = clamp(newWidth, 5, 100 - newX);
+      newHeight = clamp(newHeight, 5, 100 - newY);
 
       updateElementPositionSize(element.id, {
         position: { x: newX, y: newY },

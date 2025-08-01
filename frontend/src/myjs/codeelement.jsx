@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import hljs from 'highlight.js/lib/core';
 
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -98,23 +98,86 @@ const StyledPre = styled.pre`
   border-radius: 4px;
 `;
 
-function CodeElement({ element}) {
+function CodeElement({ element, onUpdateElement}) {
   const codeRef = useRef(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editCode, setEditCode] = useState(element.properties.code || '');
 
   useEffect(() => {
-    if (codeRef.current) {
+    if (codeRef.current && !isEditing) {
       hljs.highlightElement(codeRef.current);
     }
-  }, [element.properties.code, element.properties.language]);
+  }, [element.properties.code, element.properties.language, isEditing]);
+
+  const handleDoubleClick = (e) => {
+    e.stopPropagation();
+    setIsEditing(true);
+    setEditCode(element.properties.code || '');
+  };
+
+  const handleSave = () => {
+    if (onUpdateElement) {
+      onUpdateElement(element.id, { code: editCode });
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      setIsEditing(false);
+      setEditCode(element.properties.code || '');
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const textarea = e.target;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newValue = editCode.substring(0, start) + '  ' + editCode.substring(end);
+      setEditCode(newValue);
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 2;
+      }, 0);
+    }
+  };
+
+  const handleBlur = () => {
+    handleSave();
+  };
+
+  if (isEditing) {
+    return (
+      <StyledPre fontSize={element.properties.fontSize || 1}>
+        <textarea
+          value={editCode}
+          onChange={(e) => setEditCode(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          autoFocus
+          style={{
+            width: '100%',
+            height: '100%',
+            border: '2px solid #6950a1',
+            borderRadius: '4px',
+            outline: 'none',
+            resize: 'none',
+            background: 'rgba(255, 255, 255, 0.9)',
+            fontFamily: 'monospace',
+            fontSize: `${element.properties.fontSize || 1}em`,
+            padding: '10px',
+            boxSizing: 'border-box',
+          }}
+        />
+      </StyledPre>
+    );
+  }
 
   return (
     <HighlightStyles>
-      <StyledPre fontSize={element.properties.fontSize || 1}>
+      <StyledPre fontSize={element.properties.fontSize || 1} onDoubleClick={handleDoubleClick}>
         <code 
           ref={codeRef} 
           className={`language-${element.properties.language || 'javascript'}`}
         >
-          {element.properties.code}
+          {element.properties.code || '双击编辑代码'}
         </code>
       </StyledPre>
     </HighlightStyles>

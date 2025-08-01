@@ -102,6 +102,32 @@ const ControlColumn = styled.div`
   gap: 15px;
 `;
 
+const CheckboxRow = styled.div`
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+  width: 100%;
+`;
+
+const CheckboxGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+  }
+
+  label {
+    font-size: 1rem;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+    cursor: pointer;
+  }
+`;
+
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -173,192 +199,178 @@ function AddElementModal({
                 }
               />
             </FormGroup>
-            <ControlRow>
-              <ControlColumn>
-                <FormGroup>
-                  <label>字体大小:</label>
-                  <input
-                    type="number"
-                    min="0.5"
-                    max="5"
-                    step="0.1"
-                    value={elementProperties.fontSize || 1}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        fontSize: parseFloat(e.target.value),
-                      })
-                    }
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>字体:</label>
-                  <select
-                    value={elementProperties.fontFamily || 'Arial'}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        fontFamily: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="Arial">Arial</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="微软雅黑">微软雅黑</option>
-                    <option value="宋体">宋体</option>
-                  </select>
-                </FormGroup>
-              </ControlColumn>
-              <ControlColumn>
-                <FormGroup>
-                  <label>颜色:</label>
-                  <input
-                    type="color"
-                    value={elementProperties.color || '#000000'}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        color: e.target.value,
-                      })
-                    }
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>字体粗细:</label>
-                  <select
-                    value={elementProperties.fontWeight || 'normal'}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        fontWeight: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="normal">正常</option>
-                    <option value="bold">粗体</option>
-                    <option value="lighter">细体</option>
-                  </select>
-                </FormGroup>
-              </ControlColumn>
-            </ControlRow>
+            <FormGroup>
+              <label>字体大小:</label>
+              <input
+                type="number"
+                min="0.5"
+                max="5"
+                step="0.1"
+                value={elementProperties.fontSize || 1}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    fontSize: parseFloat(e.target.value),
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>字体:</label>
+              <select
+                value={elementProperties.fontFamily || 'Arial'}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    fontFamily: e.target.value,
+                  })
+                }
+              >
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+                <option value="微软雅黑">微软雅黑</option>
+                <option value="宋体">宋体</option>
+              </select>
+            </FormGroup>
+            <FormGroup>
+              <label>颜色:</label>
+              <input
+                type="color"
+                value={elementProperties.color || '#000000'}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    color: e.target.value,
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>字体粗细:</label>
+              <select
+                value={elementProperties.fontWeight || 'normal'}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    fontWeight: e.target.value,
+                  })
+                }
+              >
+                <option value="normal">正常</option>
+                <option value="bold">粗体</option>
+                <option value="lighter">细体</option>
+              </select>
+            </FormGroup>
           </>
         )}
         {modalType === 'image' && (
           <>
-            <ControlRow>
-              <ControlColumn>
-                <FormGroup>
-                  <label>图片URL:</label>
-                  <input
-                    type="text"
-                    value={elementProperties.src || ''}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        src: e.target.value,
-                      })
-                    }
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>Alt文本:</label>
-                  <input
-                    type="text"
-                    value={elementProperties.alt || ''}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        alt: e.target.value,
-                      })
-                    }
-                  />
-                </FormGroup>
-              </ControlColumn>
-              <ControlColumn>
-                <FormGroup>
-                  <label>上传图片:</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageFileChange}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>对象适应:</label>
-                  <select
-                    value={elementProperties.objectFit || 'cover'}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        objectFit: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="cover">覆盖</option>
-                    <option value="contain">包含</option>
-                    <option value="fill">填充</option>
-                  </select>
-                </FormGroup>
-              </ControlColumn>
-            </ControlRow>
+            <FormGroup>
+              <label>图片URL:</label>
+              <input
+                type="text"
+                value={elementProperties.src || ''}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    src: e.target.value,
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>上传图片:</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageFileChange}
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>Alt文本:</label>
+              <input
+                type="text"
+                value={elementProperties.alt || ''}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    alt: e.target.value,
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>对象适应:</label>
+              <select
+                value={elementProperties.objectFit || 'cover'}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    objectFit: e.target.value,
+                  })
+                }
+              >
+                <option value="cover">覆盖</option>
+                <option value="contain">包含</option>
+                <option value="fill">填充</option>
+              </select>
+            </FormGroup>
           </>
         )}
         {modalType === 'video' && (
           <>
-            <ControlRow>
-              <ControlColumn>
-                <FormGroup>
-                  <label>视频URL:</label>
-                  <input
-                    type="text"
-                    value={elementProperties.videoUrl || ''}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        videoUrl: e.target.value,
-                      })
-                    }
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>上传视频:</label>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleVideoFileChange}
-                  />
-                </FormGroup>
-              </ControlColumn>
-              <ControlColumn>
-                <FormGroup>
-                  <label>自动播放:</label>
-                  <input
-                    type="checkbox"
-                    checked={elementProperties.autoplay || false}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        autoplay: e.target.checked,
-                      })
-                    }
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <label>循环播放:</label>
-                  <input
-                    type="checkbox"
-                    checked={elementProperties.loop || false}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        loop: e.target.checked,
-                      })
-                    }
-                  />
-                </FormGroup>
-              </ControlColumn>
-            </ControlRow>
+            <FormGroup>
+              <label>视频URL:</label>
+              <input
+                type="text"
+                value={elementProperties.videoUrl || ''}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    videoUrl: e.target.value,
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>上传视频:</label>
+              <input
+                type="file"
+                accept="video/*"
+                onChange={handleVideoFileChange}
+              />
+            </FormGroup>
+            <CheckboxRow>
+              <CheckboxGroup>
+                <input
+                  type="checkbox"
+                  id="autoplay"
+                  checked={elementProperties.autoplay || false}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      autoplay: e.target.checked,
+                    })
+                  }
+                />
+                <label htmlFor="autoplay">自动播放</label>
+              </CheckboxGroup>
+              <CheckboxGroup>
+                <input
+                  type="checkbox"
+                  id="loop"
+                  checked={elementProperties.loop || false}
+                  onChange={(e) =>
+                    setElementProperties({
+                      ...elementProperties,
+                      loop: e.target.checked,
+                    })
+                  }
+                />
+                <label htmlFor="loop">循环播放</label>
+              </CheckboxGroup>
+            </CheckboxRow>
           </>
         )}
         {modalType === 'code' && (
@@ -375,73 +387,38 @@ function AddElementModal({
                 }
               />
             </FormGroup>
-            <ControlRow>
-              <ControlColumn>
-                <FormGroup>
-                  <label>语言:</label>
-                  <select
-                    value={elementProperties.language || 'javascript'}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        language: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="javascript">JavaScript</option>
-                    <option value="python">Python</option>
-                    <option value="c">C</option>
-                  </select>
-                </FormGroup>
-                <FormGroup>
-                  <label>字体大小:</label>
-                  <input
-                    type="number"
-                    min="0.5"
-                    max="3"
-                    step="0.1"
-                    value={elementProperties.fontSize || 1}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        fontSize: parseFloat(e.target.value),
-                      })
-                    }
-                  />
-                </FormGroup>
-              </ControlColumn>
-              <ControlColumn>
-                <FormGroup>
-                  <label>主题:</label>
-                  <select
-                    value={elementProperties.theme || 'default'}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        theme: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="default">默认</option>
-                    <option value="dark">暗色</option>
-                    <option value="light">亮色</option>
-                  </select>
-                </FormGroup>
-                <FormGroup>
-                  <label>显示行号:</label>
-                  <input
-                    type="checkbox"
-                    checked={elementProperties.showLineNumbers || false}
-                    onChange={(e) =>
-                      setElementProperties({
-                        ...elementProperties,
-                        showLineNumbers: e.target.checked,
-                      })
-                    }
-                  />
-                </FormGroup>
-              </ControlColumn>
-            </ControlRow>
+            <FormGroup>
+              <label>字体大小:</label>
+              <input
+                type="number"
+                min="0.5"
+                max="3"
+                step="0.1"
+                value={elementProperties.fontSize || 1}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    fontSize: parseFloat(e.target.value),
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup>
+              <label>主题:</label>
+              <select
+                value={elementProperties.theme || 'default'}
+                onChange={(e) =>
+                  setElementProperties({
+                    ...elementProperties,
+                    theme: e.target.value,
+                  })
+                }
+              >
+                <option value="default">默认</option>
+                <option value="dark">暗色</option>
+                <option value="light">亮色</option>
+              </select>
+            </FormGroup>
           </>
         )}
         <ButtonContainer>

@@ -394,9 +394,17 @@
   }
   
   .normal-btn {
-    padding: 12px 24px;
-    font-size: 0.9rem;
-    min-width: 100px;
+    padding: 16px 32px;
+    font-size: 1rem;
+    min-width: 140px;
+    border-radius: 50px;
+  }
+  
+  .landing-btn {
+    padding: 18px 36px;
+    font-size: 1.1rem;
+    min-width: 160px;
+    border-radius: 50px;
   }
   
   div[style*="gap: 30px"] {

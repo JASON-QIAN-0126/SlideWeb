@@ -110,14 +110,19 @@ function Presentation({ token }) {
   // 键盘事件处理
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Delete' && selectedElementId) {
+      console.log('Key pressed:', e.key, 'Selected element:', selectedElementId, 'Target:', e.target.tagName);
+      // 确保不在输入框中时才响应删除键
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElementId && 
+          !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+        e.preventDefault();
+        console.log('Deleting element:', selectedElementId);
         handleDeleteElement();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [selectedElementId]);
 
@@ -171,11 +176,12 @@ function Presentation({ token }) {
       const bg = currentSlide.background || presentation.defaultBackground || {};
       switch (bg.type) {
         case 'solid':
+        case 'color':
           return bg.value || '#ffffff';
         case 'gradient':
-          return `linear-gradient(${bg.direction || '45deg'}, ${bg.from || '#ffffff'}, ${bg.to || '#000000'})`;
+          return bg.value || `linear-gradient(${bg.direction || '45deg'}, ${bg.from || '#ffffff'}, ${bg.to || '#000000'})`;
         case 'image':
-          return `url(${bg.url}) center/cover no-repeat`;
+          return `url(${bg.value || bg.url}) center/cover no-repeat`;
         default:
           return '#ffffff';
       }
@@ -258,7 +264,10 @@ function Presentation({ token }) {
               cursor: isSelected ? 'move' : 'pointer'
             }}
           >
-            <ElementComponent element={elementWithDefaults} />
+            <ElementComponent 
+              element={elementWithDefaults} 
+              onUpdateElement={element.type === 'text' || element.type === 'code' ? handleElementUpdate : undefined}
+            />
           </div>
         </MoveAndResize>
       );
@@ -371,10 +380,25 @@ function Presentation({ token }) {
     setShowModal(true);
   }
 
+  // 自动判断代码类型
+  function detectCodeLanguage(code) {
+    if (!code) return 'javascript';
+    
+    // 简单的代码语言检测
+    if (code.includes('def ') || code.includes('import ') || code.includes('print(')) {
+      return 'python';
+    } else if (code.includes('#include') || code.includes('int main') || code.includes('printf')) {
+      return 'c';
+    } else {
+      return 'javascript';
+    }
+  }
+
   // 保存元素
   function handleSaveElement() {
     // 根据元素类型设置默认尺寸
     let defaultSize = { width: 30, height: 20 };
+    let finalProperties = { ...elementProperties };
     
     if (modalType === 'text') {
       const textLength = elementProperties.text?.length || 0;
@@ -392,6 +416,8 @@ function Presentation({ token }) {
         width: 60,
         height: Math.min(Math.max(codeLines * 2, 15), 50)
       };
+      // 自动检测代码语言
+      finalProperties.language = detectCodeLanguage(elementProperties.code);
     }
 
     const newElement = {
@@ -400,7 +426,7 @@ function Presentation({ token }) {
       position: { x: 35, y: 40 }, // 页面中央位置
       size: defaultSize,
       layer: Math.max(...(currentSlide.elements || []).map(el => el.layer || 0), 0) + 1, // 默认最顶层
-      properties: { ...elementProperties }
+      properties: finalProperties
     };
 
     const updatedSlide = {
@@ -635,6 +661,34 @@ function Presentation({ token }) {
     updateStore(updatedPresentation);
   }
 
+  // 双击编辑元素内容
+  function handleElementUpdate(elementId, newProperties) {
+    const updatedSlide = {
+      ...presentation.slides[currentSlideIndex],
+      elements: presentation.slides[currentSlideIndex].elements.map(el =>
+        el.id === elementId 
+          ? { 
+              ...el, 
+              properties: { 
+                ...el.properties, 
+                ...newProperties 
+              }
+            } 
+          : el
+      )
+    };
+    
+    const updatedPresentation = {
+      ...presentation,
+      slides: presentation.slides.map((slide, index) =>
+        index === currentSlideIndex ? updatedSlide : slide
+      )
+    };
+
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+  }
+
   // 渲染元素控制面板
   function renderElementControls() {
     const element = getSelectedElement();
@@ -688,20 +742,35 @@ function Presentation({ token }) {
               <button 
                 className={`btn btn-xs ${props.textAlign === 'left' ? 'btn-primary' : ''}`}
                 onClick={() => updateElementProperty('textAlign', 'left')}
+                title="左对齐"
               >
-                ⬅️
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="2" y="4" width="8" height="1.5" rx="0.5"/>
+                  <rect x="2" y="7" width="10" height="1.5" rx="0.5"/>
+                  <rect x="2" y="10" width="6" height="1.5" rx="0.5"/>
+                </svg>
               </button>
               <button 
                 className={`btn btn-xs ${props.textAlign === 'center' ? 'btn-primary' : ''}`}
                 onClick={() => updateElementProperty('textAlign', 'center')}
+                title="居中对齐"
               >
-                ⬆️
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="3" y="4" width="10" height="1.5" rx="0.5"/>
+                  <rect x="2" y="7" width="12" height="1.5" rx="0.5"/>
+                  <rect x="5" y="10" width="6" height="1.5" rx="0.5"/>
+                </svg>
               </button>
               <button 
                 className={`btn btn-xs ${props.textAlign === 'right' ? 'btn-primary' : ''}`}
                 onClick={() => updateElementProperty('textAlign', 'right')}
+                title="右对齐"
               >
-                ➡️
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="6" y="4" width="8" height="1.5" rx="0.5"/>
+                  <rect x="4" y="7" width="10" height="1.5" rx="0.5"/>
+                  <rect x="8" y="10" width="6" height="1.5" rx="0.5"/>
+                </svg>
               </button>
             </div>
           </div>
@@ -837,6 +906,63 @@ function Presentation({ token }) {
       );
     }
 
+    if (element.type === 'code') {
+      return (
+        <div className="control-grid">
+          <div className="control-group">
+            <label>语言类型:</label>
+            <select
+              value={props.language || 'javascript'}
+              onChange={(e) => updateElementProperty('language', e.target.value)}
+              className="control-select"
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="c">C</option>
+            </select>
+          </div>
+          <div className="control-group">
+            <label>字体大小:</label>
+            <input
+              type="number"
+              min="0.5"
+              max="3"
+              step="0.1"
+              value={props.fontSize || 1}
+              onChange={(e) => updateElementProperty('fontSize', parseFloat(e.target.value))}
+              className="control-input"
+            />
+          </div>
+          <div className="control-group">
+            <label>主题:</label>
+            <select
+              value={props.theme || 'default'}
+              onChange={(e) => updateElementProperty('theme', e.target.value)}
+              className="control-select"
+            >
+              <option value="default">默认</option>
+              <option value="dark">暗色</option>
+              <option value="light">亮色</option>
+            </select>
+          </div>
+          <div className="control-group">
+            <label>层级:</label>
+            <select
+              value={element.layer || 0}
+              onChange={(e) => updateElementLayer(parseInt(e.target.value))}
+              className="control-select"
+            >
+              {Array.from({ length: maxLayer + 2 }, (_, i) => (
+                <option key={i} value={i}>
+                  {i === 0 ? '最底层' : i === maxLayer + 1 ? '最顶层' : `第${i}层`}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="control-grid">
         <p>选中元素: {element.type}</p>
@@ -862,9 +988,9 @@ function Presentation({ token }) {
     <div className="presentation-container-new">
       {/* 顶部工具栏 */}
       <div className="presentation-header">
-        <div className="presentation-info">
+        <div className="pres-header-info">
           <h1 
-            className="presentation-title editable-title"
+            className="pres-header-title editable-title"
             onDoubleClick={() => {
               setNewTitle(presentation.name);
               setShowTitleModal(true);
@@ -873,7 +999,7 @@ function Presentation({ token }) {
             {presentation.name}
           </h1>
           <p 
-            className="presentation-description editable-description"
+            className="pres-header-description editable-description"
             onDoubleClick={() => {
               setNewDescription(presentation.description || '');
               setShowDescriptionModal(true);
@@ -884,7 +1010,7 @@ function Presentation({ token }) {
         </div>
         <div className="header-actions">
           <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
-            返回Dashboard
+            返回用户页面
           </button>
           <button className="btn btn-danger" onClick={handleDeletePresentation}>
             删除演示文稿

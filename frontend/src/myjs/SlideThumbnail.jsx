@@ -5,9 +5,7 @@ function SlideThumbnail({ slide }) {
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: '200px',
-          margin: '0 auto',
-          aspectRatio: '16 / 9',
+          height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -23,38 +21,43 @@ function SlideThumbnail({ slide }) {
   const originalSlideWidth = 1000;
   const originalSlideHeight = 562.5;
 
-  const containerMaxWidth = 200; 
-  const scalingFactor = containerMaxWidth / originalSlideWidth;
+  // 动态计算容器宽度和缩放比例
+  const getContainerDimensions = () => {
+    // 使用父容器的实际尺寸
+    return {
+      width: '100%',
+      height: '100%'
+    };
+  };
 
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
-        maxWidth: `${containerMaxWidth}px`,
-        margin: '0 auto',
-        aspectRatio: '16 / 9',
+        height: '100%',
         overflow: 'hidden',
         backgroundColor: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       <div
         style={{
-          position: 'absolute',
-          width: `${originalSlideWidth}px`,
-          height: `${originalSlideHeight}px`,
-          transform: `scale(${scalingFactor})`,
-          transformOrigin: 'top left',
-          top: 0,
-          left: 0,
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          aspectRatio: '16 / 9',
+          transform: 'none',
         }}
       >
         {slide.background && (
           <div
             style={{
               position: 'absolute',
-              width: `${originalSlideWidth}px`,
-              height: `${originalSlideHeight}px`,
+              width: '100%',
+              height: '100%',
               top: 0,
               left: 0,
               ...(() => {
@@ -81,8 +84,8 @@ function SlideThumbnail({ slide }) {
         <div
           style={{
             position: 'relative',
-            width: `${originalSlideWidth}px`,
-            height: `${originalSlideHeight}px`,
+            width: '100%',
+            height: '100%',
           }}
         >
           {slide.elements.map((element) => {
@@ -104,10 +107,20 @@ function SlideThumbnail({ slide }) {
               content = (
                 <div
                   style={{
-                    fontSize: `${props.fontSize || 1}em`,
+                    fontSize: `${(props.fontSize || 1) * 0.5}em`, // 缩略图中字体稍小
                     color: props.color || '#000000',
                     whiteSpace: 'pre-wrap',
                     fontFamily: props.fontFamily || 'Arial',
+                    textAlign: props.textAlign || 'left',
+                    fontWeight: props.fontWeight || 'normal',
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: props.textAlign === 'center' ? 'center' : 'flex-start',
+                    justifyContent: props.textAlign === 'center' ? 'center' : 
+                                   props.textAlign === 'right' ? 'flex-end' : 'flex-start',
+                    padding: '2px',
+                    boxSizing: 'border-box',
                   }}
                 >
                   {props.text || '文本'}
@@ -161,13 +174,18 @@ function SlideThumbnail({ slide }) {
               content = (
                 <pre
                   style={{
-                    fontSize: `${props.fontSize || 1}em`,
+                    fontSize: `${(props.fontSize || 1) * 0.4}em`, // 缩略图中代码字体更小
                     fontFamily: 'monospace',
                     whiteSpace: 'pre-wrap',
                     background: '#f8f8f8',
-                    padding: '4px',
+                    padding: '2px',
                     borderRadius: '2px',
-                    color: '#333'
+                    color: '#333',
+                    margin: 0,
+                    width: '100%',
+                    height: '100%',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box'
                   }}
                 >
                   {props.code || '代码'}

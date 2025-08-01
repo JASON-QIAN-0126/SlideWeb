@@ -91,7 +91,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 280px;
+  height: 320px;
   overflow: hidden;
 }
 
@@ -104,12 +104,14 @@
 
 .presentation-thumbnail {
   width: 100%;
-  height: 210px; /* 3/4 of 280px */
+  flex: 3;
   background: #f8fafc;
   border-radius: 12px 12px 0 0;
   overflow: hidden;
   position: relative;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 
@@ -121,7 +123,7 @@
   justify-content: space-between;
   align-items: flex-start;
   color: white;
-  height: 70px;
+  min-height: 70px;
   box-sizing: border-box;
 }
 
@@ -334,6 +336,19 @@
     gap: 20px;
   }
   
+  .presentation-card {
+    height: 280px;
+  }
+  
+  .presentation-thumbnail {
+    flex: 3;
+  }
+  
+  .presentation-info {
+    flex: 1;
+    min-height: 60px;
+  }
+  
   .modal-content {
     min-width: 0;
     width: 90vw;
@@ -347,7 +362,34 @@
   }
   
   .presentation-card {
-    padding: 15px;
+    height: 260px;
+    padding: 10px;
+  }
+  
+  .presentation-thumbnail {
+    flex: 3;
+  }
+  
+  .presentation-info {
+    flex: 1;
+    min-height: 50px;
+    padding: 8px 12px;
+  }
+  
+  .presentation-title {
+    font-size: 0.85rem;
+  }
+  
+  .presentation-description {
+    font-size: 0.7rem;
+  }
+  
+  .presentation-slides-count {
+    font-size: 0.75rem;
+  }
+  
+  .presentation-date {
+    font-size: 0.7rem;
   }
   
   .empty-state {

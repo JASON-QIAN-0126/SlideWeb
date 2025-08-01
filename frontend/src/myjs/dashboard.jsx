@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import SlideThumbnail from './SlideThumbnail';
 import LightRays from '../components/LightRays/LightRays';
 import { api } from '../utils/api.js';
+import { createExamplePresentation } from './examplePresentation.jsx';
 import '../styles/dashboard.css';
 
 function Dashboard({ onLogout, token}) {
@@ -17,10 +18,20 @@ function Dashboard({ onLogout, token}) {
   // 检查是否为游客模式
   const isGuestMode = token === 'guest-token';
 
+
+
   useEffect(() => {
     if (isGuestMode) {
       // 游客模式：从localStorage获取数据
-      const guestPresentations = JSON.parse(localStorage.getItem('guestPresentations') || '[]');
+      let guestPresentations = JSON.parse(localStorage.getItem('guestPresentations') || '[]');
+      
+      // 如果是首次访问（没有演示文稿），创建示例演示文稿
+      if (guestPresentations.length === 0) {
+        const examplePresentation = createExamplePresentation();
+        guestPresentations = [examplePresentation];
+        localStorage.setItem('guestPresentations', JSON.stringify(guestPresentations));
+      }
+      
       setPresentations(guestPresentations);
       setUserInfo({ name: '游客' });
     } else {

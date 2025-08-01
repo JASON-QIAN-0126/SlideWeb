@@ -1,4 +1,9 @@
-function TextElement({ element}) {
+import { useState } from 'react';
+
+function TextElement({ element, onUpdateElement}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(element.properties.text || '');
+
   const style = {
     fontSize: `${element.properties.fontSize || 1}em`,
     color: element.properties.color || '#000000',
@@ -16,9 +21,56 @@ function TextElement({ element}) {
     boxSizing: 'border-box',
   };
 
+  const handleDoubleClick = (e) => {
+    e.stopPropagation();
+    setIsEditing(true);
+    setEditText(element.properties.text || '');
+  };
+
+  const handleSave = () => {
+    if (onUpdateElement) {
+      onUpdateElement(element.id, { text: editText });
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      setIsEditing(false);
+      setEditText(element.properties.text || '');
+    }
+  };
+
+  const handleBlur = () => {
+    handleSave();
+  };
+
+  if (isEditing) {
+    return (
+      <textarea
+        value={editText}
+        onChange={(e) => setEditText(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        autoFocus
+        style={{
+          ...style,
+          border: '2px solid #6950a1',
+          borderRadius: '4px',
+          outline: 'none',
+          resize: 'none',
+          background: 'rgba(255, 255, 255, 0.9)',
+        }}
+      />
+    );
+  }
+
   return (
-    <div style={style}>
-      {element.properties.text}
+    <div style={style} onDoubleClick={handleDoubleClick}>
+      {element.properties.text || '双击编辑文本'}
     </div>
   );
 }

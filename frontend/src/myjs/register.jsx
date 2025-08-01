@@ -22,6 +22,22 @@ function Register({ onLogin, isAuthenticated }) {
       setError('密码不匹配！');
       return;
     }
+    
+    // 暂时禁用注册功能，显示后端服务未续费提示
+    alert('后端服务未续费，暂时无法注册新账户。\n\n正在为您切换到游客模式...');
+    
+    // 先设置token，然后使用React Router导航
+    onLogin('guest-token');
+    
+    // 使用setTimeout让状态更新完成后再导航
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 100);
+    
+    return;
+    
+    // 原有的注册逻辑（暂时注释掉）
+    /*
     try {
       const response = await api.auth.register(email, password, name);
       const token = response.data.token;
@@ -33,6 +49,7 @@ function Register({ onLogin, isAuthenticated }) {
         setError('注册失败，请检查网络连接');
       }
     }
+    */
   }
 
 

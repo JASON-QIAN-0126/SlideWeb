@@ -15,9 +15,9 @@ function LandingPage() {
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
               <g fill="#61DAFB">
                 <circle cx="12" cy="12" r="2"/>
-                <ellipse cx="12" cy="12" rx="11" ry="4" stroke="#61DAFB" stroke-width="2" fill="none"/>
-                <ellipse cx="12" cy="12" rx="11" ry="4" stroke="#61DAFB" stroke-width="2" fill="none" transform="rotate(60 12 12)"/>
-                <ellipse cx="12" cy="12" rx="11" ry="4" stroke="#61DAFB" stroke-width="2" fill="none" transform="rotate(120 12 12)"/>
+                        <ellipse cx="12" cy="12" rx="11" ry="4" stroke="#61DAFB" strokeWidth="2" fill="none"/>
+        <ellipse cx="12" cy="12" rx="11" ry="4" stroke="#61DAFB" strokeWidth="2" fill="none" transform="rotate(60 12 12)"/>
+        <ellipse cx="12" cy="12" rx="11" ry="4" stroke="#61DAFB" strokeWidth="2" fill="none" transform="rotate(120 12 12)"/>
               </g>
             </svg>
           </div>
@@ -64,9 +64,9 @@ function LandingPage() {
         <div className="circular-subtitle">
           <div className="circular-text-container">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" fill="none"/>
-                <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" fill="none"/>
-                <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" fill="none"/>
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" strokeWidth="2" fill="none"/>
+        <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" fill="none"/>
+        <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" fill="none"/>
               </svg>
             <span className="circular-text">Use Slide to show your idea anytime!</span>
           </div>

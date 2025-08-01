@@ -49,7 +49,7 @@ function App() {
         <Route
           path="/register"
           element={
-            <Register onRegister={handleLogin} isAuthenticated={!!token} />
+            <Register onLogin={handleLogin} isAuthenticated={!!token} />
           }
         />
         <Route
