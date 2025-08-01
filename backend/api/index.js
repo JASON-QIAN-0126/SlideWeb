@@ -35,6 +35,33 @@ try {
   };
 }
 
+// Initialize database on cold start
+let isInitialized = false;
+const ensureInitialized = async () => {
+  if (!isInitialized) {
+    try {
+      console.log("Initializing database...");
+      await initializeDatabase();
+      console.log("Database initialized successfully");
+      isInitialized = true;
+    } catch (error) {
+      console.error("Failed to initialize database:", error);
+      throw error;
+    }
+  }
+};
+
+// Middleware to ensure database is initialized
+app.use(async (req, res, next) => {
+  try {
+    await ensureInitialized();
+    next();
+  } catch (error) {
+    console.error("Database initialization failed:", error);
+    res.status(500).json({ error: "Database initialization failed" });
+  }
+});
+
 const catchErrors = (fn) => async (req, res) => {
   try {
     await fn(req, res);
@@ -129,33 +156,6 @@ app.put(
 app.get("/", (req, res) => res.redirect("/docs"));
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// Initialize database on cold start
-let isInitialized = false;
-const ensureInitialized = async () => {
-  if (!isInitialized) {
-    try {
-      console.log("Initializing database...");
-      await initializeDatabase();
-      console.log("Database initialized successfully");
-      isInitialized = true;
-    } catch (error) {
-      console.error("Failed to initialize database:", error);
-      throw error;
-    }
-  }
-};
-
-// Middleware to ensure database is initialized
-app.use(async (req, res, next) => {
-  try {
-    await ensureInitialized();
-    next();
-  } catch (error) {
-    console.error("Database initialization failed:", error);
-    res.status(500).json({ error: "Database initialization failed" });
-  }
-});
 
 // For Vercel serverless functions
 export default app;
