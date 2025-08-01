@@ -1,11 +1,68 @@
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
-import SlideThumbnail from './SlideThumbnail';
-import Particles from '../components/Particles/Particles';
-import { api } from '../utils/api.js';
-import { createExamplePresentation } from './examplePresentation.jsx';
+import { preloadManager } from './preloadManager';
 import '../styles/dashboard.css';
+
+// 使用预加载的模块
+const SlideThumbnail = preloadManager.getPreloadedModule('SlideThumbnail')?.default || 
+  (() => import('./SlideThumbnail').then(m => m.default));
+const Particles = preloadManager.getPreloadedModule('Particles')?.default || 
+  (() => import('../components/Particles/Particles').then(m => m.default));
+const api = preloadManager.getPreloadedModule('api')?.api || 
+  (() => import('../utils/api').then(m => m.api));
+const createExamplePresentation = preloadManager.getPreloadedModule('examplePresentation')?.createExamplePresentation || 
+  (() => import('./examplePresentation').then(m => m.createExamplePresentation));
+
+// Particles包装组件，处理异步加载
+function ParticlesWrapper() {
+  const [ParticlesComponent, setParticlesComponent] = useState(null);
+
+  useEffect(() => {
+    const loadParticles = async () => {
+      try {
+        const ParticlesModule = await Particles;
+        setParticlesComponent(() => ParticlesModule);
+      } catch (error) {
+        console.error('Failed to load Particles component:', error);
+      }
+    };
+
+    loadParticles();
+  }, []);
+
+  if (!ParticlesComponent) {
+    return null; // 或者返回一个加载指示器
+  }
+
+  return <ParticlesComponent />;
+}
+
+// SlideThumbnail包装组件，处理异步加载
+function SlideThumbnailWrapper({ slide }) {
+  const [SlideThumbnailComponent, setSlideThumbnailComponent] = useState(null);
+
+  useEffect(() => {
+    const loadSlideThumbnail = async () => {
+      try {
+        const SlideThumbnailModule = await SlideThumbnail;
+        setSlideThumbnailComponent(() => SlideThumbnailModule);
+      } catch (error) {
+        console.error('Failed to load SlideThumbnail component:', error);
+      }
+    };
+
+    loadSlideThumbnail();
+  }, []);
+
+  if (!SlideThumbnailComponent) {
+    return <div style={{ width: '100%', height: '100%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <span style={{ color: '#666' }}>加载中...</span>
+    </div>;
+  }
+
+  return slide ? <SlideThumbnailComponent slide={slide} /> : <SlideThumbnailComponent />;
+}
 
 function Dashboard({ onLogout, token}) {
   const [presentations, setPresentations] = useState([]);
@@ -21,39 +78,45 @@ function Dashboard({ onLogout, token}) {
 
 
   useEffect(() => {
-    if (isGuestMode) {
-      // 游客模式：从localStorage获取数据
-      let guestPresentations = JSON.parse(localStorage.getItem('guestPresentations') || '[]');
-      
-      // 如果是首次访问（没有演示文稿），创建示例演示文稿
-      if (guestPresentations.length === 0) {
-        const examplePresentation = createExamplePresentation();
-        guestPresentations = [examplePresentation];
-        localStorage.setItem('guestPresentations', JSON.stringify(guestPresentations));
-      }
-      
-      setPresentations(guestPresentations);
-      setUserInfo({ name: '游客' });
-    } else {
-      // 正常模式：从后端获取数据
-      api.store.get()
-        .then((response) => {
+    const loadData = async () => {
+      if (isGuestMode) {
+        // 游客模式：从localStorage获取数据
+        let guestPresentations = JSON.parse(localStorage.getItem('guestPresentations') || '[]');
+        
+        // 如果是首次访问（没有演示文稿），创建示例演示文稿
+        if (guestPresentations.length === 0) {
+          try {
+            const createExampleFn = await createExamplePresentation;
+            const examplePresentation = createExampleFn();
+            guestPresentations = [examplePresentation];
+            localStorage.setItem('guestPresentations', JSON.stringify(guestPresentations));
+          } catch (error) {
+            console.error('Failed to create example presentation:', error);
+          }
+        }
+        
+        setPresentations(guestPresentations);
+        setUserInfo({ name: '游客' });
+      } else {
+        // 正常模式：从后端获取数据
+        try {
+          const apiInstance = await api;
+          const response = await apiInstance.store.get();
           const store = response.data.store || {};
           const presentationsArray = Object.values(store);
           setPresentations(presentationsArray);
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error('Failed to fetch presentations', err);
-        });
+        }
 
-      // 获取用户信息
-      api.auth.getProfile()
-        .then((response) => {
+        // 获取用户信息
+        try {
+          const apiInstance = await api;
+          const response = await apiInstance.auth.getProfile();
           if (response.data && response.data.name) {
             setUserInfo({ name: response.data.name });
           }
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error('Failed to fetch user info', err);
           // 如果获取用户信息失败，尝试从token中解析（简单实现）
           try {
@@ -64,8 +127,11 @@ function Dashboard({ onLogout, token}) {
           } catch (e) {
             console.log('Could not parse token');
           }
-        });
-    }
+        }
+      }
+    };
+
+    loadData();
   }, [token, isGuestMode]);
 
   function handleLogout() {
@@ -114,11 +180,12 @@ function Dashboard({ onLogout, token}) {
       // 正常模式：保存到后端
       const savePresentation = async () => {
         try {
-          const storeResponse = await api.store.get();
+          const apiInstance = await api;
+          const storeResponse = await apiInstance.store.get();
           const currentStore = storeResponse.data.store || {};
           currentStore[newPresentation.id] = newPresentation;
 
-          await api.store.update(currentStore);
+          await apiInstance.store.update(currentStore);
 
           setPresentations([...presentations, newPresentation]);
           setShowModal(false);
@@ -141,7 +208,7 @@ function Dashboard({ onLogout, token}) {
   return (
     <div className="dashboard-container" style={{ background: '#0d1117', position: 'relative', minHeight: '100vh' }}>
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <Particles />
+        <ParticlesWrapper />
       </div>
 
       <div style={{ position: 'relative', zIndex: 1 }}>
@@ -210,14 +277,14 @@ function Dashboard({ onLogout, token}) {
                 >
                   <div className="presentation-thumbnail">
                     {presentation.slides && presentation.slides.length > 0 ? (
-                      <SlideThumbnail 
+                      <SlideThumbnailWrapper 
                         slide={{ 
                           ...presentation.slides[0], 
                           background: presentation.slides[0]?.background || presentation.defaultBackground || {} 
                         }} 
                       />
                     ) : (
-                      <SlideThumbnail />
+                      <SlideThumbnailWrapper />
                     )}
                   </div>
                   <div className="presentation-info">
