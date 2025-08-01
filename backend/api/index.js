@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import fs from "fs";
 import swaggerUi from "swagger-ui-express";
-import { AccessError, InputError } from "./error";
+import { AccessError, InputError } from "./error.js";
 import {
   getEmailFromAuthorization,
   getProfile,
@@ -14,11 +14,23 @@ import {
   save,
   setStore,
   initializeDatabase,
-} from "./service";
+} from "./service.js";
 
 const app = express();
 
-app.use(cors());
+// 配置 CORS 允许前端访问
+app.use(cors({
+  origin: [
+    'https://slide-web-frontend.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://localhost:5173'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: "50mb" }));
 

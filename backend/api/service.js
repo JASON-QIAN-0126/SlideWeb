@@ -2,7 +2,7 @@ import AsyncLock from "async-lock";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import { Redis } from '@upstash/redis';
-import { AccessError, InputError } from "./error";
+import { AccessError, InputError } from "./error.js";
 
 const lock = new AsyncLock();
 
@@ -126,8 +126,25 @@ const initializeData = async () => {
       console.log("🔄 Loading data from Vercel KV...");
       const data = await redis.get("admins");
       if (data) {
-        admins = JSON.parse(data);
-        console.log("✅ Data loaded from Vercel KV, users:", Object.keys(admins).length);
+        try {
+          // Handle different data types that Redis might return
+          if (typeof data === 'string') {
+            admins = JSON.parse(data);
+          } else if (typeof data === 'object' && data !== null) {
+            admins = data;
+          } else {
+            console.log("⚠️ Unexpected data type from Redis:", typeof data, data);
+            admins = {};
+          }
+          console.log("✅ Data loaded from Vercel KV, users:", Object.keys(admins).length);
+        } catch (parseError) {
+          console.error("❌ Failed to parse data from KV:", parseError.message);
+          console.log("Raw data:", data);
+          console.log("Data type:", typeof data);
+          // Initialize with empty data if parsing fails
+          admins = {};
+          await save();
+        }
       } else {
         // Initialize with empty admins object
         console.log("📝 No existing data found, initializing new database");
