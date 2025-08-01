@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import SlideThumbnail from './SlideThumbnail';
-import LightRays from '../components/LightRays/LightRays';
+import Particles from '../components/Particles/Particles';
 import { api } from '../utils/api.js';
 import { createExamplePresentation } from './examplePresentation.jsx';
 import '../styles/dashboard.css';
@@ -141,17 +141,7 @@ function Dashboard({ onLogout, token}) {
   return (
     <div className="dashboard-container" style={{ background: '#0d1117', position: 'relative', minHeight: '100vh' }}>
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <LightRays 
-          raysOrigin="top-center"
-          raysColor="#ffffff"
-          raysSpeed={0.5}
-          lightSpread={1.2}
-          rayLength={1.5}
-          fadeDistance={0.8}
-          saturation={0.3}
-          followMouse={true}
-          mouseInfluence={0.05}
-        />
+        <Particles />
       </div>
 
       <div style={{ position: 'relative', zIndex: 1 }}>
