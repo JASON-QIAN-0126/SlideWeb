@@ -172,8 +172,8 @@ const initializeData = async () => {
 // Export initialization function to be called before server starts
 export const initializeDatabase = initializeData;
 
-// Initialize data on module load (but don't await in module scope)
-initializeData().catch(console.error);
+// 移除模块加载时的自动初始化，改为在需要时初始化
+// initializeData().catch(console.error);
 
 /***************************************************************
                        Helper Functions

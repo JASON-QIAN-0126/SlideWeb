@@ -3,7 +3,6 @@ import cors from "cors";
 import express from "express";
 import fs from "fs";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "../swagger.json";
 import { AccessError, InputError } from "./error";
 import {
   getEmailFromAuthorization,
@@ -22,6 +21,19 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: "50mb" }));
+
+// 动态导入swagger文档
+let swaggerDocument;
+try {
+  swaggerDocument = JSON.parse(fs.readFileSync('./swagger.json', 'utf8'));
+} catch (error) {
+  console.warn('Could not load swagger.json:', error.message);
+  swaggerDocument = {
+    openapi: "3.0.0",
+    info: { title: "Presto API", version: "1.0.0" },
+    paths: {}
+  };
+}
 
 const catchErrors = (fn) => async (req, res) => {
   try {
@@ -118,39 +130,54 @@ app.get("/", (req, res) => res.redirect("/docs"));
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Determine port based on environment
-let port;
-if (process.env.PORT) {
-  // Vercel will provide this
-  port = process.env.PORT;
-} else if (process.env.PROD_BACKEND_PORT) {
-  // Custom production port
-  port = process.env.PROD_BACKEND_PORT;
-} else {
-  // Development mode - read from config file
-  try {
-    port = JSON.parse(fs.readFileSync("../frontend/backend.config.json")).BACKEND_PORT;
-  } catch (error) {
-    console.log("Warning: Could not read backend.config.json, using default port 5005");
-    port = 5005;
-  }
-}
-
-// Initialize database and start server
-const startServer = async () => {
-  try {
-    console.log("Initializing database...");
-    await initializeDatabase();
-    console.log("Database initialized successfully");
-    
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-      console.log(`For API docs, navigate to http://localhost:${port}`);
-    });
-  } catch (error) {
-    console.error("Failed to initialize database:", error);
-    process.exit(1);
+// Initialize database on cold start
+let isInitialized = false;
+const ensureInitialized = async () => {
+  if (!isInitialized) {
+    try {
+      console.log("Initializing database...");
+      await initializeDatabase();
+      console.log("Database initialized successfully");
+      isInitialized = true;
+    } catch (error) {
+      console.error("Failed to initialize database:", error);
+      throw error;
+    }
   }
 };
 
-startServer();
+// Middleware to ensure database is initialized
+app.use(async (req, res, next) => {
+  try {
+    await ensureInitialized();
+    next();
+  } catch (error) {
+    console.error("Database initialization failed:", error);
+    res.status(500).json({ error: "Database initialization failed" });
+  }
+});
+
+// For Vercel serverless functions
+export default app;
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  let port;
+  if (process.env.PORT) {
+    port = process.env.PORT;
+  } else if (process.env.PROD_BACKEND_PORT) {
+    port = process.env.PROD_BACKEND_PORT;
+  } else {
+    try {
+      port = JSON.parse(fs.readFileSync("../frontend/backend.config.json")).BACKEND_PORT;
+    } catch (error) {
+      console.log("Warning: Could not read backend.config.json, using default port 5005");
+      port = 5005;
+    }
+  }
+
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+    console.log(`For API docs, navigate to http://localhost:${port}`);
+  });
+}

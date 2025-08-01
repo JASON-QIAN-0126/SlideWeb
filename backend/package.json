@@ -2,13 +2,15 @@
   "name": "love-slide-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "api/index.js",
+  "type": "module",
   "scripts": {
     "test": "jest test/*",
     "lint": "eslint api/*.js",
     "start": "nodemon -r esm api/index.js --ignore database.json",
     "reset": "npx rimraf database.json",
-    "build": "babel api --out-dir dist && mkdir -p public && cp -r dist/* public/"
+    "build": "echo 'No build step needed for Vercel'",
+    "dev": "nodemon api/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -18,7 +20,6 @@
     "async-lock": "^1.2.4",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
-    "esm": "^3.2.25",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.6",
