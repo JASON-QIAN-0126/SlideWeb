@@ -139,10 +139,10 @@ function BackgroundPicker({ show, onClose, onApply, currentBackground, isDefault
   return (
     <ModalOverlay>
       <ModalContent>
-        <h3>Set Slide Background</h3>
+        <h3>设置幻灯片背景</h3>
 
         <LabelContainer>
-          <label>Background Type:</label>
+          <label>背景类型:</label>
           <select
             value={backgroundType}
             onChange={(e) => {
@@ -156,15 +156,15 @@ function BackgroundPicker({ show, onClose, onApply, currentBackground, isDefault
               setUploadedImage('');
             }}
           >
-            <option value="color">Solid Color</option>
-            <option value="gradient">Gradient</option>
-            <option value="image">Image</option>
+            <option value="color">纯色</option>
+            <option value="gradient">渐变</option>
+            <option value="image">图片</option>
           </select>
         </LabelContainer>
 
         {backgroundType === 'color' && (
           <LabelContainer>
-            <label>Color (HEX):</label>
+            <label>颜色 (HEX):</label>
             <ColorContainer>
               <input
                 type="color"
@@ -183,34 +183,34 @@ function BackgroundPicker({ show, onClose, onApply, currentBackground, isDefault
 
         {backgroundType === 'gradient' && (
           <GradientContainer>
-            <label>Gradient Type:</label>
+            <label>渐变类型:</label>
             <select
               value={gradientType}
               onChange={(e) => setGradientType(e.target.value)}
             >
-              <option value="linear">Linear Gradient</option>
-              <option value="radial">Radial Gradient</option>
+              <option value="linear">线性渐变</option>
+              <option value="radial">径向渐变</option>
             </select>
 
             {gradientType === 'linear' && (
-              <label>Direction:</label>
+              <label>渐变方向:</label>
             )}
             {gradientType === 'linear' && (
               <select value={direction} onChange={(e) => setDirection(e.target.value)}>
-                <option value="to right">To Right</option>
-                <option value="to bottom">To Bottom</option>
-                <option value="45deg">45deg</option>
-                <option value="135deg">135deg</option>
+                <option value="to right">向右</option>
+                <option value="to bottom">向下</option>
+                <option value="45deg">45度</option>
+                <option value="135deg">135度</option>
               </select>
             )}
 
             {gradientType === 'radial' && (
-              <label>Shape:</label>
+              <label>形状:</label>
             )}
             {gradientType === 'radial' && (
               <select value={shape} onChange={(e) => setShape(e.target.value)}>
-                <option value="ellipse">Ellipse</option>
-                <option value="circle">Circle</option>
+                <option value="ellipse">椭圆</option>
+                <option value="circle">圆</option>
               </select>
             )}
 
@@ -231,21 +231,21 @@ function BackgroundPicker({ show, onClose, onApply, currentBackground, isDefault
                   />
                 </ColorContainer>
               ))}
-              <button onClick={() => setColors([...colors, '#ffffff'])}>Add Color</button>
+              <button onClick={() => setColors([...colors, '#ffffff'])}>添加颜色</button>
             </div>
           </GradientContainer>
         )}
 
         {backgroundType === 'image' && (
           <ImageContainer>
-            <label>Image URL:</label>
+            <label>图片URL:</label>
             <input
               type="text"
               value={imageURL}
               onChange={(e) => setImageURL(e.target.value)}
               placeholder="https://example.com/image.jpg"
             />
-            <label>OR Upload Image:</label>
+            <label>上传图片:</label>
             <input type="file" accept="image/*" onChange={(e) => {
               const file = e.target.files[0];
               if (file) {
@@ -263,12 +263,12 @@ function BackgroundPicker({ show, onClose, onApply, currentBackground, isDefault
             checked={isDefault}
             onChange={(e) => setIsDefault(e.target.checked)}
           />
-          <label style={{ marginLeft: '5px' }}>Set as default background for all slides</label>
+          <label style={{ marginLeft: '5px' }}>设置为默认背景</label>
         </CheckboxContainer>
 
         <ButtonContainer>
-          <CancelButton onClick={onClose}>Cancel</CancelButton>
-          <UpdateButton onClick={handleApply}>Apply</UpdateButton>
+          <CancelButton onClick={onClose}>取消</CancelButton>
+          <UpdateButton onClick={handleApply}>应用</UpdateButton>
         </ButtonContainer>
       </ModalContent>
     </ModalOverlay>

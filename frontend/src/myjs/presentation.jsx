@@ -107,6 +107,41 @@ function Presentation({ token }) {
     }
   }, [id, token, isGuestMode]);
 
+  // 键盘事件处理
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Delete' && selectedElementId) {
+        handleDeleteElement();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedElementId]);
+
+  // 删除选中元素
+  function handleDeleteElement() {
+    if (!selectedElementId) return;
+
+    const updatedSlide = {
+      ...presentation.slides[currentSlideIndex],
+      elements: presentation.slides[currentSlideIndex].elements.filter(el => el.id !== selectedElementId)
+    };
+    
+    const updatedPresentation = {
+      ...presentation,
+      slides: presentation.slides.map((slide, index) =>
+        index === currentSlideIndex ? updatedSlide : slide
+      )
+    };
+
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+    setSelectedElementId(null);
+  }
+
   async function updateStore(updatedPresentation) {
     if (isGuestMode) {
       // 游客模式：更新localStorage
@@ -154,7 +189,9 @@ function Presentation({ token }) {
 
   // 渲染元素
   function renderElements() {
-    return (currentSlide.elements || []).map((element) => {
+    return (currentSlide.elements || [])
+      .sort((a, b) => (a.layer || 0) - (b.layer || 0)) // 按层级排序
+      .map((element) => {
       // 确保element有必要的属性
       if (!element || !element.id) {
         return null;
@@ -336,11 +373,33 @@ function Presentation({ token }) {
 
   // 保存元素
   function handleSaveElement() {
+    // 根据元素类型设置默认尺寸
+    let defaultSize = { width: 30, height: 20 };
+    
+    if (modalType === 'text') {
+      const textLength = elementProperties.text?.length || 0;
+      defaultSize = {
+        width: Math.min(Math.max(textLength * 0.8, 15), 60),
+        height: Math.min(Math.max(textLength / 20, 8), 30)
+      };
+    } else if (modalType === 'image') {
+      defaultSize = { width: 40, height: 30 };
+    } else if (modalType === 'video') {
+      defaultSize = { width: 50, height: 35 };
+    } else if (modalType === 'code') {
+      const codeLines = elementProperties.code?.split('\n').length || 1;
+      defaultSize = {
+        width: 60,
+        height: Math.min(Math.max(codeLines * 2, 15), 50)
+      };
+    }
+
     const newElement = {
       id: uuidv4(),
       type: modalType,
       position: { x: 35, y: 40 }, // 页面中央位置
-      size: { width: 30, height: 20 },
+      size: defaultSize,
+      layer: Math.max(...(currentSlide.elements || []).map(el => el.layer || 0), 0) + 1, // 默认最顶层
       properties: { ...elementProperties }
     };
 
@@ -501,6 +560,22 @@ function Presentation({ token }) {
     }
   }
 
+  // 处理视频文件变更
+  function handleVideoFileChange(event) {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('video/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setElementProperties(prev => ({
+          ...prev,
+          videoUrl: e.target.result,
+          fileName: file.name
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   // 获取选中的元素
   function getSelectedElement() {
     const currentSlide = presentation.slides[currentSlideIndex];
@@ -535,12 +610,39 @@ function Presentation({ token }) {
     updateStore(updatedPresentation);
   }
 
+  // 更新元素层级
+  function updateElementLayer(newLayer) {
+    const updatedSlide = {
+      ...presentation.slides[currentSlideIndex],
+      elements: presentation.slides[currentSlideIndex].elements.map(el =>
+        el.id === selectedElementId 
+          ? { 
+              ...el, 
+              layer: newLayer
+            } 
+          : el
+      )
+    };
+    
+    const updatedPresentation = {
+      ...presentation,
+      slides: presentation.slides.map((slide, index) =>
+        index === currentSlideIndex ? updatedSlide : slide
+      )
+    };
+
+    setPresentation(updatedPresentation);
+    updateStore(updatedPresentation);
+  }
+
   // 渲染元素控制面板
   function renderElementControls() {
     const element = getSelectedElement();
     if (!element) return null;
 
     const props = element.properties || {};
+    const currentSlide = presentation.slides[currentSlideIndex];
+    const maxLayer = Math.max(...(currentSlide.elements || []).map(el => el.layer || 0), 0);
 
     if (element.type === 'text') {
       return (
@@ -615,6 +717,122 @@ function Presentation({ token }) {
               <option value="lighter">细体</option>
             </select>
           </div>
+          <div className="control-group">
+            <label>层级:</label>
+            <select
+              value={element.layer || 0}
+              onChange={(e) => updateElementLayer(parseInt(e.target.value))}
+              className="control-select"
+            >
+              {Array.from({ length: maxLayer + 2 }, (_, i) => (
+                <option key={i} value={i}>
+                  {i === 0 ? '最底层' : i === maxLayer + 1 ? '最顶层' : `第${i}层`}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      );
+    }
+
+    if (element.type === 'image') {
+      return (
+        <div className="control-grid">
+          <div className="control-group">
+            <label>图片URL:</label>
+            <input
+              type="text"
+              value={props.src || ''}
+              onChange={(e) => updateElementProperty('src', e.target.value)}
+              className="control-input"
+              placeholder="输入图片URL"
+            />
+          </div>
+          <div className="control-group">
+            <label>Alt文本:</label>
+            <input
+              type="text"
+              value={props.alt || ''}
+              onChange={(e) => updateElementProperty('alt', e.target.value)}
+              className="control-input"
+              placeholder="图片描述"
+            />
+          </div>
+          <div className="control-group">
+            <label>对象适应:</label>
+            <select
+              value={props.objectFit || 'cover'}
+              onChange={(e) => updateElementProperty('objectFit', e.target.value)}
+              className="control-select"
+            >
+              <option value="cover">覆盖</option>
+              <option value="contain">包含</option>
+              <option value="fill">填充</option>
+            </select>
+          </div>
+          <div className="control-group">
+            <label>层级:</label>
+            <select
+              value={element.layer || 0}
+              onChange={(e) => updateElementLayer(parseInt(e.target.value))}
+              className="control-select"
+            >
+              {Array.from({ length: maxLayer + 2 }, (_, i) => (
+                <option key={i} value={i}>
+                  {i === 0 ? '最底层' : i === maxLayer + 1 ? '最顶层' : `第${i}层`}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      );
+    }
+
+    if (element.type === 'video') {
+      return (
+        <div className="control-grid">
+          <div className="control-group">
+            <label>视频URL:</label>
+            <input
+              type="text"
+              value={props.videoUrl || ''}
+              onChange={(e) => updateElementProperty('videoUrl', e.target.value)}
+              className="control-input"
+              placeholder="输入视频URL"
+            />
+          </div>
+          <div className="control-group">
+            <label>自动播放:</label>
+            <input
+              type="checkbox"
+              checked={props.autoplay || false}
+              onChange={(e) => updateElementProperty('autoplay', e.target.checked)}
+              className="control-input"
+            />
+          </div>
+          <div className="control-group">
+            <label>循环播放:</label>
+            <input
+              type="checkbox"
+              checked={props.loop || false}
+              onChange={(e) => updateElementProperty('loop', e.target.checked)}
+              className="control-input"
+            />
+          </div>
+          <div className="control-group">
+            <label>层级:</label>
+            <select
+              value={element.layer || 0}
+              onChange={(e) => updateElementLayer(parseInt(e.target.value))}
+              className="control-select"
+            >
+              {Array.from({ length: maxLayer + 2 }, (_, i) => (
+                <option key={i} value={i}>
+                  {i === 0 ? '最底层' : i === maxLayer + 1 ? '最顶层' : `第${i}层`}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       );
     }
@@ -622,6 +840,20 @@ function Presentation({ token }) {
     return (
       <div className="control-grid">
         <p>选中元素: {element.type}</p>
+        <div className="control-group">
+          <label>层级:</label>
+          <select
+            value={element.layer || 0}
+            onChange={(e) => updateElementLayer(parseInt(e.target.value))}
+            className="control-select"
+          >
+            {Array.from({ length: maxLayer + 2 }, (_, i) => (
+              <option key={i} value={i}>
+                {i === 0 ? '最底层' : i === maxLayer + 1 ? '最顶层' : `第${i}层`}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     );
   }
@@ -897,6 +1129,7 @@ function Presentation({ token }) {
         handleUpdateElement={handleUpdateElement}
         setShowModal={setShowModal}
         handleImageFileChange={handleImageFileChange}
+        handleVideoFileChange={handleVideoFileChange}
       />
     </div>
   );

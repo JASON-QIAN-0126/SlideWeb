@@ -105,12 +105,17 @@ function CodeElement({ element}) {
     if (codeRef.current) {
       hljs.highlightElement(codeRef.current);
     }
-  }, [element.properties.code]);
+  }, [element.properties.code, element.properties.language]);
 
   return (
     <HighlightStyles>
       <StyledPre fontSize={element.properties.fontSize || 1}>
-        <code ref={codeRef}>{element.properties.code}</code>
+        <code 
+          ref={codeRef} 
+          className={`language-${element.properties.language || 'javascript'}`}
+        >
+          {element.properties.code}
+        </code>
       </StyledPre>
     </HighlightStyles>
   );

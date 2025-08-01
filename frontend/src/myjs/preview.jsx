@@ -7,7 +7,7 @@ import VideoElement from './videoelement';
 import CodeElement from './codeelement';
 import Animation from './animation';
 import SlideArrow from './modal/SlideArrow';
-import api from '../utils/api';
+import { api } from '../utils/api';
 
 function Preview({ token }) {
   const { id, slideIndex } = useParams();

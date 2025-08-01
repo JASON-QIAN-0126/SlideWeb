@@ -25,7 +25,7 @@ function LandingPage() {
             text="Welcome to Slide Website build by React"
             as="span"
             className="top-navbar-text"
-            typingSpeed={150}
+            typingSpeed={120}
             loop={false}
             showCursor={false}
           />
