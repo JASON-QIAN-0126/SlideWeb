@@ -95,8 +95,17 @@ const catchErrors = (fn) => async (req, res) => {
 ***************************************************************/
 
 const authed = (fn) => async (req, res) => {
-  const email = getEmailFromAuthorization(req.header("Authorization"));
-  await fn(req, res, email);
+  try {
+    const authorization = req.header("Authorization");
+    if (!authorization) {
+      return res.status(403).send({ error: "Authorization header required" });
+    }
+    const email = getEmailFromAuthorization(authorization);
+    await fn(req, res, email);
+  } catch (error) {
+    console.log("Auth error:", error.message);
+    return res.status(403).send({ error: "Authentication failed" });
+  }
 };
 
 app.post(

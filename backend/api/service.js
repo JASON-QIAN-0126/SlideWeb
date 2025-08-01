@@ -207,14 +207,35 @@ export const userLock = (callback) =>
 
 export const getEmailFromAuthorization = (authorization) => {
   try {
-    const token = authorization.replace("Bearer ", "");
-    const { email } = jwt.verify(token, JWT_SECRET);
-    if (!(email in admins)) {
-      throw new AccessError("Invalid Token");
+    if (!authorization) {
+      throw new AccessError("No authorization header provided");
     }
+    
+    if (!authorization.startsWith("Bearer ")) {
+      throw new AccessError("Invalid authorization format. Expected: Bearer <token>");
+    }
+    
+    const token = authorization.replace("Bearer ", "");
+    if (!token) {
+      throw new AccessError("No token provided");
+    }
+    
+    const { email } = jwt.verify(token, JWT_SECRET);
+    if (!email) {
+      throw new AccessError("Invalid token payload");
+    }
+    
+    if (!(email in admins)) {
+      throw new AccessError("User not found or token invalid");
+    }
+    
     return email;
   } catch(error) {
-    throw new AccessError("Invalid token");
+    console.log("Token verification error:", error.message);
+    if (error instanceof AccessError) {
+      throw error;
+    }
+    throw new AccessError("Token verification failed: " + error.message);
   }
 };
 

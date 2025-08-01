@@ -15,14 +15,14 @@ const getApiBaseUrl = () => {
     const hostname = window.location.hostname;
     
     if (hostname.includes('slide-web-frontend.vercel.app')) {
-      return 'https://slide-web-backend.vercel.app';
+      return 'https://slide-web-backend-fgoh3gt0h-jianghao-qians-projects.vercel.app';
     }
     
     if (hostname.includes('netlify.app')) {
-      return 'https://slide-web-backend.vercel.app';
+      return 'https://slide-web-backend-fgoh3gt0h-jianghao-qians-projects.vercel.app';
     }
     
-    return 'https://slide-web-backend.vercel.app';
+    return 'https://slide-web-backend-fgoh3gt0h-jianghao-qians-projects.vercel.app';
   }
   
   return 'http://localhost:5005';
