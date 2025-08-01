@@ -28,6 +28,11 @@ function Login({ onLogin, isAuthenticated }) {
       }
     }
   }
+
+  function handleGuestLogin() {
+    // 游客登录，直接进入dashboard，不与后端连接
+    onLogin('guest-token');
+  }
   
   return (
     <Galaxy_backend variant="auth">
@@ -72,10 +77,19 @@ function Login({ onLogin, isAuthenticated }) {
               </button>
             </div>
           </form>
+          
           <div className="auth-link">
             <span className="auth-link-text">还没有账户？</span>
             <a className="auth-link-button" href="/register">立即注册</a>
           </div>
+          
+          <div className="auth-divider">
+            <span>或者</span>
+          </div>
+          
+          <button className="auth-guest-btn" onClick={handleGuestLogin}>
+            游客登录
+          </button>
         </div>
       </div>
     </Galaxy_backend>

@@ -68,32 +68,61 @@ function Presentation({ token }) {
   // drag and drop for slide reordering
   const [draggedIndex, setDraggedIndex] = useState(null);
 
+  // 检查是否为游客模式
+  const isGuestMode = token === 'guest-token';
+
   useEffect(() => {
-    api.store.get()
-      .then((response) => {
-        const store = response.data.store || {};
-        const presentationData = store[id];
-        if (presentationData) {
-          setPresentation(presentationData);
-          setAnimationsEnabled(presentationData.animationsEnabled || false);
-          if (presentationData.slides.length > 0 && !presentationData.slides[0].elements) {
-            presentationData.slides[0].elements = [];
-          }
-        } else {
-          console.error('Presentation not found');
+    if (isGuestMode) {
+      // 游客模式：从localStorage获取数据
+      const guestPresentations = JSON.parse(localStorage.getItem('guestPresentations') || '[]');
+      const presentationData = guestPresentations.find(p => p.id.toString() === id);
+      if (presentationData) {
+        setPresentation(presentationData);
+        setAnimationsEnabled(presentationData.animationsEnabled || false);
+        if (presentationData.slides.length > 0 && !presentationData.slides[0].elements) {
+          presentationData.slides[0].elements = [];
         }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch presentation', err);
-      });
-  }, [id, token]);
+      } else {
+        console.error('Presentation not found in guest mode');
+      }
+    } else {
+      // 正常模式：从后端获取数据
+      api.store.get()
+        .then((response) => {
+          const store = response.data.store || {};
+          const presentationData = store[id];
+          if (presentationData) {
+            setPresentation(presentationData);
+            setAnimationsEnabled(presentationData.animationsEnabled || false);
+            if (presentationData.slides.length > 0 && !presentationData.slides[0].elements) {
+              presentationData.slides[0].elements = [];
+            }
+          } else {
+            console.error('Presentation not found');
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to fetch presentation', err);
+        });
+    }
+  }, [id, token, isGuestMode]);
 
   async function updateStore(updatedPresentation) {
-    const storeResponse = await api.store.get();
-    const store = storeResponse.data.store || {};
-    store[id] = updatedPresentation;
+    if (isGuestMode) {
+      // 游客模式：更新localStorage
+      const guestPresentations = JSON.parse(localStorage.getItem('guestPresentations') || '[]');
+      const updatedPresentations = guestPresentations.map(p => 
+        p.id.toString() === id ? updatedPresentation : p
+      );
+      localStorage.setItem('guestPresentations', JSON.stringify(updatedPresentations));
+    } else {
+      // 正常模式：更新后端
+      const storeResponse = await api.store.get();
+      const store = storeResponse.data.store || {};
+      store[id] = updatedPresentation;
 
-    await api.store.update(store);
+      await api.store.update(store);
+    }
   }
 
   if (!presentation) {
@@ -400,18 +429,27 @@ function Presentation({ token }) {
   }
 
   function handleConfirmDelete() {
-    api.store.get()
-      .then((response) => {
-        const store = response.data.store || {};
-        delete store[id];
-        return api.store.update(store);
-      })
-      .then(() => {
-        navigate('/dashboard');
-      })
-      .catch((err) => {
-        console.error('Failed to delete presentation', err);
-      });
+    if (isGuestMode) {
+      // 游客模式：从localStorage删除
+      const guestPresentations = JSON.parse(localStorage.getItem('guestPresentations') || '[]');
+      const updatedPresentations = guestPresentations.filter(p => p.id.toString() !== id);
+      localStorage.setItem('guestPresentations', JSON.stringify(updatedPresentations));
+      navigate('/dashboard');
+    } else {
+      // 正常模式：从后端删除
+      api.store.get()
+        .then((response) => {
+          const store = response.data.store || {};
+          delete store[id];
+          return api.store.update(store);
+        })
+        .then(() => {
+          navigate('/dashboard');
+        })
+        .catch((err) => {
+          console.error('Failed to delete presentation', err);
+        });
+    }
   }
 
   function handleCancelDelete() {
