@@ -13,6 +13,12 @@ function Preview({ token }) {
   const { id, slideIndex } = useParams();
   const [presentation, setPresentation] = useState(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(parseInt(slideIndex) || 0);
+
+  // 当URL参数变化时更新currentSlideIndex
+  useEffect(() => {
+    const newSlideIndex = parseInt(slideIndex) || 0;
+    setCurrentSlideIndex(newSlideIndex);
+  }, [slideIndex]);
   const navigate = useNavigate();
 
   // 检查是否为游客模式

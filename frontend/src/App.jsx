@@ -59,7 +59,7 @@ function App() {
           }
         />
         <Route
-          path="/presentation/:id"
+          path="/presentation/:id/:slideIndex?"
           element={
             token ? (
               <Presentation token={token} />
@@ -67,10 +67,6 @@ function App() {
               <Navigate to="/" replace />
             )
           }
-        />
-        <Route 
-          path="/presentation/:id/:slideIndex?" 
-          element={<Presentation token={token} />} 
         />
         <Route
           path="/preview/:id/:slideIndex?"
