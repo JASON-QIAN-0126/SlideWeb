@@ -4,15 +4,30 @@ import { useNavigate } from 'react-router-dom';
 import { preloadManager } from './preloadManager';
 import '../styles/dashboard.css';
 
-// 使用预加载的模块
-const SlideThumbnail = preloadManager.getPreloadedModule('SlideThumbnail')?.default || 
-  (() => import('./SlideThumbnail').then(m => m.default));
-const Particles = preloadManager.getPreloadedModule('Particles')?.default || 
-  (() => import('../components/Particles/Particles').then(m => m.default));
-const api = preloadManager.getPreloadedModule('api')?.api || 
-  (() => import('../utils/api').then(m => m.api));
-const createExamplePresentation = preloadManager.getPreloadedModule('examplePresentation')?.createExamplePresentation || 
-  (() => import('./examplePresentation').then(m => m.createExamplePresentation));
+// 获取预加载的模块或创建导入函数
+const getSlideThumbnail = () => {
+  const module = preloadManager.getPreloadedModule('SlideThumbnail');
+  if (module?.default) return Promise.resolve(module.default);
+  return import('./SlideThumbnail').then(m => m.default);
+};
+
+const getParticles = () => {
+  const module = preloadManager.getPreloadedModule('Particles');
+  if (module?.default) return Promise.resolve(module.default);
+  return import('../components/Particles/Particles').then(m => m.default);
+};
+
+const getApi = () => {
+  const module = preloadManager.getPreloadedModule('api');
+  if (module?.api) return Promise.resolve(module.api);
+  return import('../utils/api').then(m => m.api);
+};
+
+const getCreateExamplePresentation = () => {
+  const module = preloadManager.getPreloadedModule('examplePresentation');
+  if (module?.createExamplePresentation) return Promise.resolve(module.createExamplePresentation);
+  return import('./examplePresentation').then(m => m.createExamplePresentation);
+};
 
 // Particles包装组件，处理异步加载
 function ParticlesWrapper() {
@@ -21,7 +36,7 @@ function ParticlesWrapper() {
   useEffect(() => {
     const loadParticles = async () => {
       try {
-        const ParticlesModule = await Particles;
+        const ParticlesModule = await getParticles();
         setParticlesComponent(() => ParticlesModule);
       } catch (error) {
         console.error('Failed to load Particles component:', error);
@@ -32,7 +47,7 @@ function ParticlesWrapper() {
   }, []);
 
   if (!ParticlesComponent) {
-    return null; // 或者返回一个加载指示器
+    return null;
   }
 
   return <ParticlesComponent />;
@@ -45,7 +60,7 @@ function SlideThumbnailWrapper({ slide }) {
   useEffect(() => {
     const loadSlideThumbnail = async () => {
       try {
-        const SlideThumbnailModule = await SlideThumbnail;
+        const SlideThumbnailModule = await getSlideThumbnail();
         setSlideThumbnailComponent(() => SlideThumbnailModule);
       } catch (error) {
         console.error('Failed to load SlideThumbnail component:', error);
@@ -86,7 +101,7 @@ function Dashboard({ onLogout, token}) {
         // 如果是首次访问（没有演示文稿），创建示例演示文稿
         if (guestPresentations.length === 0) {
           try {
-            const createExampleFn = await createExamplePresentation;
+            const createExampleFn = await getCreateExamplePresentation();
             const examplePresentation = createExampleFn();
             guestPresentations = [examplePresentation];
             localStorage.setItem('guestPresentations', JSON.stringify(guestPresentations));
@@ -100,7 +115,7 @@ function Dashboard({ onLogout, token}) {
       } else {
         // 正常模式：从后端获取数据
         try {
-          const apiInstance = await api;
+          const apiInstance = await getApi();
           const response = await apiInstance.store.get();
           const store = response.data.store || {};
           const presentationsArray = Object.values(store);
@@ -111,7 +126,7 @@ function Dashboard({ onLogout, token}) {
 
         // 获取用户信息
         try {
-          const apiInstance = await api;
+          const apiInstance = await getApi();
           const response = await apiInstance.auth.getProfile();
           if (response.data && response.data.name) {
             setUserInfo({ name: response.data.name });
@@ -180,7 +195,7 @@ function Dashboard({ onLogout, token}) {
       // 正常模式：保存到后端
       const savePresentation = async () => {
         try {
-          const apiInstance = await api;
+          const apiInstance = await getApi();
           const storeResponse = await apiInstance.store.get();
           const currentStore = storeResponse.data.store || {};
           currentStore[newPresentation.id] = newPresentation;

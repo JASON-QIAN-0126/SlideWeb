@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Galaxy_backend from '../Galaxy/Galaxy_backend';
 import TextType from '../components/TextType/TextType';
-import { PreloadManagerComponent, PreloadStatusIndicator } from './preloadManager';
+import { PreloadManagerComponent } from './preloadManager';
 import '../styles/landing.css';
 
 function LandingPage() {
@@ -11,7 +11,6 @@ function LandingPage() {
   return (
     <Galaxy_backend variant="landing">
       <PreloadManagerComponent />
-      <PreloadStatusIndicator />
       <div className="top-navbar">
         <div className="top-navbar-content">
           <div className="react-logo">
