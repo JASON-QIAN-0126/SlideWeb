@@ -73,6 +73,11 @@ function Dashboard({ onLogout, token}) {
   }
   
   function handleSavePresentation() {
+    if (!newPresentationName.trim()) {
+      alert('请输入演示文稿名称');
+      return;
+    }
+
     const newPresentation = {
       id: Date.now(),
       name: newPresentationName,
@@ -123,7 +128,7 @@ function Dashboard({ onLogout, token}) {
   }
 
   return (
-    <div className="dashboard-container" style={{ background: '#4a4a4a', position: 'relative', minHeight: '100vh' }}>
+    <div className="dashboard-container" style={{ background: '#0d1117', position: 'relative', minHeight: '100vh' }}>
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
         <LightRays 
           raysOrigin="top-center"
@@ -150,8 +155,8 @@ function Dashboard({ onLogout, token}) {
         </div>
         
         <div className="dashboard-actions">
-          <button className="btn-primary" onClick={handleCreatePresentation}>创建演示文稿</button>
-          <button className="btn-secondary" onClick={handleLogout}>
+          <button className="btn btn-primary" onClick={handleCreatePresentation}>创建演示文稿</button>
+          <button className="btn-outline btn-secondary" onClick={handleLogout}>
             {isGuestMode ? '退出游客模式' : '退出登录'}
           </button>
         </div>
@@ -171,10 +176,9 @@ function Dashboard({ onLogout, token}) {
                 type="text"
                 value={newPresentationDescription}
                 onChange={(e) => setNewPresentationDescription(e.target.value)}
-                placeholder="描述"
+                placeholder="描述（可选）"
                 className="modal-input"
               />
-              <p style={{fontSize: '0.9rem', color: '#6c757d', margin: '10px 0'}}>缩略图将显示演示文稿的所有幻灯片</p>
               {isGuestMode && (
                 <p style={{fontSize: '0.8rem', color: '#e53e3e', margin: '5px 0'}}>
                   ⚠️ 游客模式：数据仅保存在本地浏览器中
@@ -216,20 +220,16 @@ function Dashboard({ onLogout, token}) {
                     )}
                   </div>
                   <div className="presentation-info">
-                    <h3 className="presentation-title" style={{ color: 'white' }}>{presentation.name}</h3>
-                    <div className="presentation-meta">
-                      <span className="presentation-date" style={{ color: '#cbd5e0' }}>
-                        {new Date().toLocaleDateString('zh-CN')}
-                      </span>
-                      <span className="presentation-slides-count" style={{ color: '#cbd5e0' }}>
-                        {presentation.slides.length} 张幻灯片
-                      </span>
+                    <div className="presentation-left">
+                      <h3 className="presentation-title">{presentation.name}</h3>
+                      {presentation.description && (
+                        <p className="presentation-description">{presentation.description}</p>
+                      )}
                     </div>
-                    {presentation.description && (
-                      <p style={{ margin: '0 0 15px 0', fontSize: '0.9rem', color: '#e2e8f0', lineHeight: '1.4' }}>
-                        {presentation.description}
-                      </p>
-                    )}
+                    <div className="presentation-right">
+                      <div className="presentation-slides-count">{presentation.slides.length} 张幻灯片</div>
+                      <div className="presentation-date">{new Date().toLocaleDateString('zh-CN')}</div>
+                    </div>
                   </div>
                 </div>
               ))}

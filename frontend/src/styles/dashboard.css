@@ -14,7 +14,7 @@
   font-size: 3rem;
   font-weight: 700;
   margin: 0 0 10px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #e5e7eb;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -37,40 +37,35 @@
   flex-wrap: wrap;
 }
 
-.btn-primary, .btn-secondary {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  position: relative;
-  overflow: hidden;
+/* Dashboard专用按钮样式 */
+.dashboard-actions .btn-primary {
+  background: white !important;
+  color: #2d3748 !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  min-width: 140px;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+.dashboard-actions .btn-primary:hover {
+  background: white !important;
+  color: #2d3748 !important;
+  transform: translateY(-1px) scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+.dashboard-actions .btn-secondary {
+  background: #6b7280 !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3) !important;
+  min-width: 140px;
 }
 
-.btn-secondary {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
-}
-
-.btn-secondary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6);
+.dashboard-actions .btn-secondary:hover {
+  background: #6b7280 !important;
+  color: white !important;
+  transform: translateY(-1px) scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4) !important;
 }
 
 /* 演示文稿网格 */
@@ -91,10 +86,13 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
-  padding: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 280px;
+  overflow: hidden;
 }
 
 .presentation-card:hover {
@@ -105,37 +103,83 @@
 }
 
 .presentation-thumbnail {
-  aspect-ratio: 16/9;
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 15px;
+  width: 100%;
+  height: 210px; /* 3/4 of 280px */
   background: #f8fafc;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
   position: relative;
+  flex-shrink: 0;
 }
 
 
 
 .presentation-info {
-  color: white;
-}
-
-.presentation-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 10px 0;
-  color: inherit;
-}
-
-.presentation-meta {
+  flex: 1;
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 0.85rem;
+  align-items: flex-start;
+  color: white;
+  height: 70px;
+  box-sizing: border-box;
 }
 
-.presentation-date, .presentation-slides-count {
-  color: rgba(255, 255, 255, 0.8);
+.presentation-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-right: 12px;
+  min-width: 0; /* 允许flex项目收缩 */
+}
+
+.presentation-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.presentation-card .presentation-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 2px 0;
+  color: inherit;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  text-align: left;
+  text-shadow: none;
+  letter-spacing: normal;
+}
+
+.presentation-description {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.presentation-slides-count {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  text-align: right;
+}
+
+.presentation-date {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  text-align: right;
 }
 
 /* 空状态 */

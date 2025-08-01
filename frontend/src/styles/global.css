@@ -75,23 +75,24 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: 12px 20px;
+  padding: 16px 24px;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
-  text-transform: capitalize;
-  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   white-space: nowrap;
   user-select: none;
   outline: none;
-  pointer-events: auto; /* 确保按钮可以点击 */
+  pointer-events: auto;
+  background: linear-gradient(135deg, #2d3748, #4a5568);
+  color: white;
+  box-shadow: 0 8px 25px rgba(45, 55, 72, 0.4);
 }
 
 .btn:before {
@@ -112,6 +113,16 @@ body {
 
 .btn:hover:before {
   left: 100%;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 35px rgba(45, 55, 72, 0.6);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 20px rgba(45, 55, 72, 0.4);
 }
 
 .btn:focus {
@@ -221,16 +232,23 @@ body {
 /* 轮廓按钮 */
 .btn-outline {
   background: transparent;
-  border: 2px solid var(--primary-color);
-  color: var(--primary-color);
+  color: #4a5568;
+  border: 2px solid #e2e8f0;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
   box-shadow: none;
 }
 
 .btn-outline:hover {
-  background: var(--primary-color);
-  color: var(--text-white);
+  background: #f7fafc;
+  border-color: #cbd5e0;
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  color: #4a5568;
 }
 
 .btn-outline-secondary {

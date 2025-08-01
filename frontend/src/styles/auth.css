@@ -173,7 +173,7 @@
 }
 
 .auth-submit:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 12px 35px rgba(45, 55, 72, 0.6);
 }
 
@@ -254,7 +254,8 @@
 .auth-form .btn-outline:hover {
   background: #f7fafc;
   border-color: #cbd5e0;
-  transform: translateY(-1px);
+  transform: translateY(-0.5px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   color: #4a5568;
 }
 
